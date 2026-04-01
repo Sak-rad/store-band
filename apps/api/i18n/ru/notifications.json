@@ -1,0 +1,7 @@
+{
+  "newMessage": "Новое сообщение от {name}",
+  "bookingRequest": "Новый запрос на бронирование: {listing}",
+  "bookingConfirmed": "Ваше бронирование подтверждено",
+  "bookingCancelled": "Бронирование отменено",
+  "reviewReceived": "Вы получили новый отзыв"
+}

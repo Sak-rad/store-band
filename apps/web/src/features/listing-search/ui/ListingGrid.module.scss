@@ -1,0 +1,63 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-5;
+
+  @include below(xl) { grid-template-columns: repeat(2, 1fr); }
+  @include below(sm) { grid-template-columns: 1fr; gap: $spacing-4; }
+}
+
+.empty {
+  grid-column: 1 / -1;
+  padding: $spacing-16 0;
+  text-align: center;
+  color: $color-text-muted;
+  font-size: $font-size-base;
+}
+
+.loading {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-5;
+
+  @include below(xl) { grid-template-columns: repeat(2, 1fr); }
+  @include below(sm) { grid-template-columns: 1fr; gap: $spacing-4; }
+}
+
+.skeleton {
+  border-radius: $radius-xl;
+  overflow: hidden;
+  background: $color-background-tertiary;
+  animation: pulse 1.6s ease-in-out infinite;
+
+  &__image {
+    aspect-ratio: 4 / 3;
+    background: $color-border;
+  }
+
+  &__body {
+    padding: $spacing-4;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2;
+  }
+
+  &__line {
+    height: 14px;
+    background: $color-background-tertiary;
+    border-radius: $radius-sm;
+
+    &--short { width: 50%; }
+    &--medium { width: 75%; }
+    &--full { width: 100%; }
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

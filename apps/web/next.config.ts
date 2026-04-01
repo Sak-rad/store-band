@@ -1,0 +1,16 @@
+import type { NextConfig } from 'next';
+import createNextIntlPlugin from 'next-intl/plugin';
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
+
+const nextConfig: NextConfig = {
+  output: 'standalone',
+  images: {
+    remotePatterns: [
+      { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
+      { protocol: 'https', hostname: 'cdn.example.com' },
+    ],
+  },
+};
+
+export default withNextIntl(nextConfig);

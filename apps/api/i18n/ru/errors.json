@@ -1,0 +1,20 @@
+{
+  "invalidCredentials": "Неверный email или пароль",
+  "emailTaken": "Этот email уже зарегистрирован",
+  "weakPassword": "Пароль должен содержать минимум 8 символов",
+  "required": "Поле обязательно для заполнения",
+  "invalidEmail": "Некорректный адрес email",
+  "minLength": "Минимум {min} символов",
+  "maxLength": "Максимум {max} символов",
+  "datesUnavailable": "Выбранные даты недоступны",
+  "checkoutBeforeCheckin": "Дата выезда должна быть позже даты заезда",
+  "listingNotFound": "Объявление не найдено",
+  "providerNotFound": "Провайдер не найден",
+  "unauthorized": "Необходима авторизация",
+  "forbidden": "Доступ запрещён",
+  "notFound": "Не найдено",
+  "conflict": "Ресурс уже существует",
+  "serverError": "Внутренняя ошибка сервера",
+  "bothLocalesRequired": "Необходимо заполнить содержимое на английском и русском языках",
+  "invalidRating": "Рейтинг должен быть от 1 до 5"
+}

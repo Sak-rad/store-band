@@ -1,0 +1,42 @@
+@import 'reset';
+@import 'variables';
+
+body {
+  font-family: $font-sans;
+  color: $color-text-primary;
+  background: $color-background-primary;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: $color-border-secondary;
+  border-radius: 3px;
+
+  &:hover { background: $color-text-tertiary; }
+}
+
+// Layout utilities
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+// Listings layout
+.listings-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 260px 1fr;
+  }
+}

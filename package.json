@@ -1,0 +1,21 @@
+{
+  "name": "relocation-platform",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "test": "turbo test",
+    "db:generate": "cd apps/api && pnpm prisma generate",
+    "db:migrate": "cd apps/api && pnpm prisma migrate dev",
+    "db:push": "cd apps/api && pnpm prisma db push",
+    "db:seed": "cd apps/api && pnpm prisma db seed"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0",
+    "prettier": "^3.2.0",
+    "typescript": "^5.4.0"
+  }
+}

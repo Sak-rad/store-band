@@ -1,0 +1,38 @@
+@import '../../../../styles/variables';
+
+.switcher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  &__btn {
+    padding: 4px 8px;
+    border: none;
+    background: transparent;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: $color-text-secondary;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: color 0.15s, background 0.15s;
+
+    &:hover:not(:disabled) {
+      color: $color-text-primary;
+      background: $color-background-secondary;
+    }
+
+    &--active {
+      color: $color-primary;
+      cursor: default;
+    }
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &__divider {
+    color: $color-border;
+    font-size: 0.75rem;
+  }
+}

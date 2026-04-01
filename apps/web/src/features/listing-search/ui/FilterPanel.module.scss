@@ -1,0 +1,121 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.filter {
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-xl;
+  padding: $spacing-5;
+  position: sticky;
+  top: calc($header-height + $spacing-4);
+
+  @include below(lg) { position: static; }
+
+  // ─── Head ────────────────────────────────────────────────────────────
+
+  &__head {
+    @include flex-between;
+    margin-bottom: $spacing-5;
+    padding-bottom: $spacing-4;
+    border-bottom: 1px solid $color-border-light;
+  }
+
+  &__title {
+    font-size: $font-size-md;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__clear {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-primary;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    &:hover { text-decoration: underline; }
+  }
+
+  // ─── Section ─────────────────────────────────────────────────────────
+
+  &__section {
+    margin-bottom: $spacing-5;
+
+    &:last-child { margin-bottom: 0; }
+
+    &__label {
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $color-text-primary;
+      margin-bottom: $spacing-3;
+    }
+  }
+
+  // ─── Chips ───────────────────────────────────────────────────────────
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-2;
+  }
+
+  &__subrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-2;
+    margin-top: $spacing-3;
+    padding-top: $spacing-3;
+    border-top: 1px solid $color-border-light;
+  }
+
+  &__chip {
+    padding: $spacing-1 $spacing-3;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text-secondary;
+    background: $color-surface;
+    cursor: pointer;
+    transition: border-color $transition-fast, background $transition-fast, color $transition-fast;
+    font-family: inherit;
+
+    &:hover {
+      border-color: $color-primary;
+      color: $color-primary;
+    }
+
+    &--active {
+      background: $color-primary;
+      border-color: $color-primary;
+      color: #fff;
+    }
+
+    &--sm {
+      font-size: $font-size-xs;
+      padding: 2px $spacing-2;
+    }
+  }
+
+  // ─── Price ───────────────────────────────────────────────────────────
+
+  &__price {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+
+    input {
+      @include input-base;
+      flex: 1;
+      padding: $spacing-2 $spacing-3;
+      font-size: $font-size-sm;
+    }
+
+    span {
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+      flex-shrink: 0;
+    }
+  }
+}

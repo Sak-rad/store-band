@@ -1,0 +1,112 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  background: $color-surface;
+  transition: transform $transition-base, box-shadow $transition-base;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-card-hover;
+
+    .card__img img { transform: scale(1.04); }
+  }
+
+  // ─── Image ───────────────────────────────────────────────────────────
+
+  &__img {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: $color-background-tertiary;
+    border-radius: $radius-xl;
+
+    img { transition: transform 0.4s ease; }
+
+    &__placeholder {
+      width: 100%;
+      height: 100%;
+      @include flex-center;
+      background: $color-background-tertiary;
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: $spacing-3;
+    left: $spacing-3;
+    padding: 3px $spacing-3;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(4px);
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  // ─── Body ────────────────────────────────────────────────────────────
+
+  &__body {
+    padding: $spacing-3 $spacing-1 $spacing-1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+    flex: 1;
+  }
+
+  &__location {
+    font-size: $font-size-xs;
+    font-weight: 500;
+    color: $color-text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__title {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+    line-height: 1.35;
+    @include truncate(2);
+  }
+
+  &__footer {
+    @include flex-between;
+    margin-top: $spacing-2;
+  }
+
+  &__price {
+    font-size: $font-size-base;
+    color: $color-text-primary;
+
+    strong { font-weight: 700; }
+
+    span {
+      font-size: $font-size-xs;
+      font-weight: 400;
+      color: $color-text-secondary;
+    }
+  }
+
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: $font-size-sm;
+    color: $color-star;
+    font-weight: 600;
+
+    &__count {
+      color: $color-text-muted;
+      font-weight: 400;
+      font-size: $font-size-xs;
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "newMessage": "New message from {name}",
+  "bookingRequest": "New booking request for {listing}",
+  "bookingConfirmed": "Your booking is confirmed",
+  "bookingCancelled": "Booking was cancelled",
+  "reviewReceived": "You received a new review"
+}

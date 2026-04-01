@@ -1,0 +1,171 @@
+{
+  "common": {
+    "save": "Сохранить",
+    "cancel": "Отмена",
+    "delete": "Удалить",
+    "edit": "Редактировать",
+    "loading": "Загрузка...",
+    "error": "Что-то пошло не так",
+    "noResults": "Ничего не найдено",
+    "search": "Поиск",
+    "filters": "Фильтры",
+    "showMore": "Показать ещё",
+    "currency": {
+      "usd": "USD",
+      "eur": "EUR",
+      "thb": "฿ THB",
+      "aed": "AED"
+    },
+    "clearAll": "Сбросить"
+  },
+  "home": {
+
+  },
+  "auth": {
+    "loginTitle": "Войти",
+    "registerTitle": "Создать аккаунт",
+    "email": "Email",
+    "password": "Пароль",
+    "name": "Полное имя",
+    "forgotPassword": "Забыли пароль?",
+    "noAccount": "Нет аккаунта?",
+    "hasAccount": "Уже есть аккаунт?",
+    "loginBtn": "Войти",
+    "registerBtn": "Зарегистрироваться",
+    "logoutBtn": "Выйти",
+    "loading": "Подождите...",
+    "errors": {
+      "invalidCredentials": "Неверный email или пароль",
+      "emailTaken": "Этот email уже зарегистрирован",
+      "weakPassword": "Пароль должен содержать минимум 8 символов"
+    }
+  },
+  "listings": {
+    "searchTitle": "Найдите жильё за рубежом",
+    "searchPlaceholder": "Город, страна или ключевое слово...",
+    "filterPrice": "Цена",
+    "filterCategory": "Категория",
+    "filterCountry": "Страна",
+    "filterCity": "Город",
+    "perNight": "за ночь",
+    "perMonth": "в месяц",
+    "contactProvider": "Написать провайдеру",
+    "book": "Забронировать",
+    "addToFavorites": "Сохранить",
+    "removeFromFavorites": "Сохранено",
+    "noListings": "По вашим фильтрам ничего не найдено",
+    "categories": {
+      "apartments": "Квартиры",
+      "villas": "Виллы",
+      "excursions": "Экскурсии",
+      "transport": "Транспорт",
+      "services": "Услуги",
+      "food": "Питание",
+      "healthcare": "Медицина",
+      "education": "Образование"
+    },
+    "popular": "Популярные направления",
+    "allListings": "Все объявления",
+    "reviews": "отзывов",
+    "aboutListing": "Об этом объявлении",
+    "realEstate": "🏘 Недвижимость",
+    "services": "🛎 Услуги",
+    "listingType": {
+      "rent": "Аренда",
+      "buy": "Покупка",
+      "short-term": "Краткосрочно"
+    }
+  },
+  "chat": {
+    "placeholder": "Написать сообщение...",
+    "typing": "{name} печатает...",
+    "online": "В сети",
+    "offline": "Не в сети",
+    "pinnedListing": "Объявление в контексте",
+    "newChat": "Новый чат",
+    "noChats": "Чатов пока нет",
+    "sendMessage": "Отправить",
+    "replyTo": "Ответить на"
+  },
+  "booking": {
+    "checkIn": "Заезд",
+    "checkOut": "Выезд",
+    "guests": "Гостей",
+    "totalPrice": "Итого",
+    "requestBooking": "Запросить бронирование",
+    "statuses": {
+      "pending": "Ожидает подтверждения",
+      "confirmed": "Подтверждено",
+      "cancelled": "Отменено"
+    },
+    "errors": {
+      "datesUnavailable": "Выбранные даты недоступны",
+      "checkoutBeforeCheckin": "Дата выезда должна быть позже даты заезда"
+    }
+  },
+  "notifications": {
+    "newMessage": "Новое сообщение от {name}",
+    "bookingRequest": "Новый запрос на бронирование: {listing}",
+    "bookingConfirmed": "Ваше бронирование подтверждено",
+    "bookingCancelled": "Бронирование отменено",
+    "reviewReceived": "Вы получили новый отзыв",
+    "empty": "Уведомлений нет"
+  },
+  "reviews": {
+    "title": "Отзывы",
+    "writeReview": "Написать отзыв",
+    "rating": "Рейтинг",
+    "comment": "Комментарий",
+    "submitReview": "Отправить отзыв",
+    "noReviews": "Отзывов пока нет"
+  },
+  "favorites": {
+    "title": "Сохранённые объявления",
+    "empty": "Вы пока не сохранили ни одного объявления"
+  },
+  "profile": {
+    "title": "Мой профиль",
+    "language": "Язык",
+    "languageEn": "Английский",
+    "languageRu": "Русский",
+    "editProfile": "Редактировать профиль",
+    "myBookings": "Мои бронирования",
+    "myFavorites": "Сохранённые",
+    "providerDashboard": "Кабинет провайдера",
+    "savedListings": "Сохранённые объявления"
+  },
+  "meta": {
+    "homeTitle": "Relocation Platform — Жильё за рубежом",
+    "homeDescription": "Квартиры, услуги и экскурсии для релокантов"
+  },
+  "nav": {
+    "home": "Главная",
+    "listings": "Объявления",
+    "chats": "Сообщения",
+    "bookings": "Бронирования",
+    "favorites": "Сохранённые",
+    "profile": "Профиль",
+    "login": "Войти",
+    "register": "Регистрация",
+    "logout": "Выйти"
+  },
+  "provider": {
+    "contact": "Связаться",
+    "verified": "Проверен",
+    "listings": "Объявления",
+    "reviews": "Отзывы",
+    "becomeProvider": "Стать провайдером",
+    "createListing": "Создать объявление",
+    "editListing": "Редактировать объявление",
+    "listingFormTabEn": "Английский",
+    "listingFormTabRu": "Русский",
+    "bothLanguagesRequired": "Пожалуйста, заполните на английском и русском языках"
+  },
+  "upload": {
+    "dragDrop": "Перетащите файлы сюда",
+    "orClick": "или нажмите для выбора",
+    "uploading": "Загрузка...",
+    "maxSize": "Максимальный размер: {size}",
+    "formats": "Поддерживаются: JPG, PNG, WebP, GIF"
+  }
+}

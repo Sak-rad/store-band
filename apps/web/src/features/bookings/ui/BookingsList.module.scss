@@ -1,0 +1,96 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.page {
+  flex: 1;
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-6;
+  width: 100%;
+
+  @include below(sm) { padding: $spacing-6 $spacing-4; }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    margin-bottom: $spacing-6;
+  }
+}
+
+.list {
+  @include flex-col;
+  gap: $spacing-4;
+
+  &__empty {
+    padding: $spacing-16 0;
+    text-align: center;
+    color: $color-text-muted;
+    font-size: $font-size-base;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-4;
+  padding: $spacing-5;
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-xl;
+  transition: box-shadow $transition-base;
+
+  &:hover { box-shadow: $shadow-md; }
+
+  @include below(sm) { flex-direction: column; gap: $spacing-3; }
+
+  &__thumb {
+    width: 96px;
+    height: 72px;
+    border-radius: $radius-lg;
+    background: $color-background-tertiary;
+    flex-shrink: 0;
+    overflow: hidden;
+    position: relative;
+
+    @include below(sm) { width: 100%; height: 160px; }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: $font-size-md;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-1;
+    @include truncate(1);
+  }
+
+  &__dates {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    margin-bottom: $spacing-2;
+  }
+
+  &__total {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+  }
+
+  &__status {
+    flex-shrink: 0;
+    padding: $spacing-1 $spacing-4;
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+
+    &--pending    { background: $color-warning-bg;  color: $color-warning-text; }
+    &--confirmed  { background: $color-success-bg;  color: $color-success-text; }
+    &--cancelled  { background: $color-error-bg;    color: $color-error-text; }
+    &--completed  { background: $color-background-tertiary; color: $color-text-secondary; }
+  }
+}

@@ -1,0 +1,128 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - $header-height - 2px);
+  background: $color-surface;
+
+  &__messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-6;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+    scroll-behavior: smooth;
+
+    @include below(sm) { padding: $spacing-4; }
+  }
+
+  &__day {
+    text-align: center;
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+
+  &__message {
+    display: flex;
+    flex-direction: column;
+    max-width: 68%;
+    align-self: flex-start;
+
+    &--own {
+      align-self: flex-end;
+
+      .chat__message__text {
+        background: $color-primary;
+        color: #fff;
+        border-radius: $radius-lg $radius-lg $radius-sm $radius-lg;
+      }
+    }
+
+    &__author {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      font-weight: 500;
+      margin-bottom: $spacing-1;
+      padding-left: $spacing-2;
+    }
+
+    &__text {
+      background: $color-background-secondary;
+      padding: $spacing-3 $spacing-4;
+      border-radius: $radius-lg $radius-lg $radius-lg $radius-sm;
+      font-size: $font-size-base;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    &__time {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      margin-top: $spacing-1;
+      padding: 0 $spacing-2;
+      align-self: flex-end;
+    }
+  }
+
+  &__typing {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    font-style: italic;
+    padding: 0 $spacing-2;
+  }
+
+  &__input {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    padding: $spacing-4 $spacing-6;
+    border-top: 1px solid $color-border-light;
+    background: $color-surface;
+
+    @include below(sm) { padding: $spacing-3 $spacing-4; }
+
+    input {
+      flex: 1;
+      padding: $spacing-3 $spacing-4;
+      border: 1.5px solid $color-border;
+      border-radius: $radius-full;
+      font-size: $font-size-base;
+      font-family: inherit;
+      background: $color-background-secondary;
+      color: $color-text-primary;
+      transition: border-color $transition-fast, box-shadow $transition-fast;
+
+      &::placeholder { color: $color-text-muted; }
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        background: $color-surface;
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+      }
+    }
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      background: $color-primary;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background $transition-fast, transform $transition-fast;
+
+      &:hover { background: $color-primary-dark; }
+      &:active { transform: scale(0.94); }
+    }
+  }
+}

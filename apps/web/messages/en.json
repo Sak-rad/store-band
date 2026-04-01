@@ -1,0 +1,171 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "noResults": "No results found",
+    "search": "Search",
+    "filters": "Filters",
+    "showMore": "Show more",
+    "currency": {
+      "usd": "USD",
+      "eur": "EUR",
+      "thb": "฿ THB",
+      "aed": "AED"
+    },
+    "clearAll": "Clear all"
+  },
+  "home": {
+
+  },
+  "auth": {
+    "loginTitle": "Sign in",
+    "registerTitle": "Create account",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full name",
+    "forgotPassword": "Forgot password?",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginBtn": "Sign in",
+    "registerBtn": "Register",
+    "logoutBtn": "Log out",
+    "loading": "Please wait...",
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailTaken": "This email is already registered",
+      "weakPassword": "Password must be at least 8 characters"
+    }
+  },
+  "listings": {
+    "searchTitle": "Find your home abroad",
+    "searchPlaceholder": "City, country or keyword...",
+    "filterPrice": "Price",
+    "filterCategory": "Category",
+    "filterCountry": "Country",
+    "filterCity": "City",
+    "perNight": "per night",
+    "perMonth": "per month",
+    "contactProvider": "Contact provider",
+    "book": "Book now",
+    "addToFavorites": "Save",
+    "removeFromFavorites": "Saved",
+    "noListings": "No listings match your filters",
+    "categories": {
+      "apartments": "Apartments",
+      "villas": "Villas",
+      "excursions": "Excursions",
+      "transport": "Transport",
+      "services": "Services",
+      "food": "Food",
+      "healthcare": "Healthcare",
+      "education": "Education"
+    },
+    "popular": "Popular destinations",
+    "allListings": "All listings",
+    "reviews": "reviews",
+    "aboutListing": "About this listing",
+    "realEstate": "🏘 Real Estate",
+    "services": "🛎 Services",
+    "listingType": {
+      "rent": "Rent",
+      "buy": "Buy",
+      "short-term": "Short-term"
+    }
+  },
+  "chat": {
+    "placeholder": "Write a message...",
+    "typing": "{name} is typing...",
+    "online": "Online",
+    "offline": "Offline",
+    "pinnedListing": "Listing in context",
+    "newChat": "New conversation",
+    "noChats": "No conversations yet",
+    "sendMessage": "Send",
+    "replyTo": "Reply to"
+  },
+  "booking": {
+    "checkIn": "Check-in",
+    "checkOut": "Check-out",
+    "guests": "Guests",
+    "totalPrice": "Total",
+    "requestBooking": "Request booking",
+    "statuses": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "cancelled": "Cancelled"
+    },
+    "errors": {
+      "datesUnavailable": "Selected dates are not available",
+      "checkoutBeforeCheckin": "Check-out must be after check-in"
+    }
+  },
+  "notifications": {
+    "newMessage": "New message from {name}",
+    "bookingRequest": "New booking request for {listing}",
+    "bookingConfirmed": "Your booking is confirmed",
+    "bookingCancelled": "Booking was cancelled",
+    "reviewReceived": "You received a new review",
+    "empty": "No notifications"
+  },
+  "reviews": {
+    "title": "Reviews",
+    "writeReview": "Write a review",
+    "rating": "Rating",
+    "comment": "Comment",
+    "submitReview": "Submit review",
+    "noReviews": "No reviews yet"
+  },
+  "favorites": {
+    "title": "Saved listings",
+    "empty": "You haven't saved any listings yet"
+  },
+  "profile": {
+    "title": "My profile",
+    "language": "Language",
+    "languageEn": "English",
+    "languageRu": "Russian",
+    "editProfile": "Edit profile",
+    "myBookings": "My bookings",
+    "myFavorites": "Saved",
+    "providerDashboard": "Provider dashboard",
+    "savedListings": "Saved listings"
+  },
+  "meta": {
+    "homeTitle": "Relocation Platform — Find housing abroad",
+    "homeDescription": "Find apartments, services and excursions for relocants"
+  },
+  "nav": {
+    "home": "Home",
+    "listings": "Listings",
+    "chats": "Messages",
+    "bookings": "Bookings",
+    "favorites": "Saved",
+    "profile": "Profile",
+    "login": "Sign in",
+    "register": "Register",
+    "logout": "Log out"
+  },
+  "provider": {
+    "contact": "Contact",
+    "verified": "Verified",
+    "listings": "Listings",
+    "reviews": "Reviews",
+    "becomeProvider": "Become a provider",
+    "createListing": "Create listing",
+    "editListing": "Edit listing",
+    "listingFormTabEn": "English",
+    "listingFormTabRu": "Russian",
+    "bothLanguagesRequired": "Please fill in both English and Russian"
+  },
+  "upload": {
+    "dragDrop": "Drag and drop files here",
+    "orClick": "or click to select",
+    "uploading": "Uploading...",
+    "maxSize": "Max file size: {size}",
+    "formats": "Supported: JPG, PNG, WebP, GIF"
+  }
+}

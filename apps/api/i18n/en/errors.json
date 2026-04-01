@@ -1,0 +1,20 @@
+{
+  "invalidCredentials": "Invalid email or password",
+  "emailTaken": "This email is already registered",
+  "weakPassword": "Password must be at least 8 characters",
+  "required": "This field is required",
+  "invalidEmail": "Invalid email address",
+  "minLength": "Minimum {min} characters required",
+  "maxLength": "Maximum {max} characters allowed",
+  "datesUnavailable": "Selected dates are not available",
+  "checkoutBeforeCheckin": "Check-out must be after check-in",
+  "listingNotFound": "Listing not found",
+  "providerNotFound": "Provider not found",
+  "unauthorized": "Unauthorized",
+  "forbidden": "Access denied",
+  "notFound": "Not found",
+  "conflict": "Resource already exists",
+  "serverError": "Internal server error",
+  "bothLocalesRequired": "Both English and Russian content are required",
+  "invalidRating": "Rating must be between 1 and 5"
+}

@@ -1,0 +1,52 @@
+@import '../../../../../styles/variables';
+@import '../../../../../styles/mixins';
+
+.page {
+  flex: 1;
+
+  &__search {
+    border-bottom: 1px solid $color-border-light;
+    background: $color-surface;
+  }
+
+  &__body {
+    max-width: $container-max-width;
+    margin: 0 auto;
+    padding: $spacing-8 $spacing-6;
+    display: grid;
+    grid-template-columns: $sidebar-width 1fr;
+    gap: $spacing-8;
+    align-items: start;
+
+    @include below(lg) {
+      grid-template-columns: 1fr;
+      padding: $spacing-6 $spacing-4;
+    }
+
+    @include below(sm) {
+      padding: $spacing-4;
+      gap: $spacing-4;
+    }
+  }
+
+  &__sidebar {
+    @include below(lg) { order: 2; }
+  }
+
+  &__main {
+    min-width: 0;
+    @include below(lg) { order: 1; }
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    margin-bottom: $spacing-6;
+
+    @include below(sm) {
+      font-size: $font-size-xl;
+      margin-bottom: $spacing-4;
+    }
+  }
+}

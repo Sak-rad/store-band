@@ -1,0 +1,250 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.detail {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-6;
+
+  @include below(sm) { padding: $spacing-4; }
+
+  // ─── Gallery ─────────────────────────────────────────────────────────
+
+  &__gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto;
+    gap: $spacing-2;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    margin-bottom: $spacing-8;
+    max-height: 480px;
+
+    @include below(md) {
+      grid-template-columns: 1fr;
+      max-height: 260px;
+    }
+
+    &__item {
+      position: relative;
+      overflow: hidden;
+
+      &:first-child {
+        grid-column: span 2;
+        grid-row: span 2;
+
+        @include below(md) {
+          grid-column: span 1;
+          grid-row: span 1;
+        }
+      }
+
+      img { transition: transform 0.4s ease; }
+      &:hover img { transform: scale(1.03); }
+    }
+
+    &__item:not(:first-child) {
+      @include below(md) { display: none; }
+    }
+  }
+
+  // ─── Layout ──────────────────────────────────────────────────────────
+
+  &__layout {
+    display: grid;
+    grid-template-columns: 1fr $booking-panel-width;
+    gap: $spacing-10;
+    align-items: start;
+
+    @include below(lg) {
+      grid-template-columns: 1fr;
+      gap: $spacing-6;
+    }
+  }
+
+  // ─── Info ────────────────────────────────────────────────────────────
+
+  &__info { min-width: 0; }
+
+  &__breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+    margin-bottom: $spacing-3;
+
+    a {
+      color: $color-primary;
+      &:hover { text-decoration: underline; }
+    }
+  }
+
+  &__category {
+    display: inline-block;
+    padding: 3px $spacing-3;
+    background: $color-primary-light;
+    color: $color-primary;
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: $spacing-3;
+  }
+
+  &__title {
+    font-size: clamp(1.375rem, 3vw, 2rem);
+    font-weight: 800;
+    color: $color-text-primary;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    margin-bottom: $spacing-3;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-4;
+    margin-bottom: $spacing-6;
+    padding-bottom: $spacing-6;
+    border-bottom: 1px solid $color-border-light;
+  }
+
+  &__location {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+
+    svg { color: $color-primary; flex-shrink: 0; }
+  }
+
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1;
+    font-size: $font-size-base;
+    font-weight: 600;
+    color: $color-star;
+
+    span {
+      font-weight: 400;
+      color: $color-text-secondary;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__section {
+    margin-bottom: $spacing-8;
+
+    h2 {
+      font-size: $font-size-xl;
+      font-weight: 700;
+      color: $color-text-primary;
+      margin-bottom: $spacing-4;
+    }
+  }
+
+  &__description {
+    font-size: $font-size-base;
+    line-height: 1.8;
+    color: $color-text-secondary;
+    white-space: pre-line;
+  }
+
+  &__price {
+    display: flex;
+    align-items: baseline;
+    gap: $spacing-2;
+    padding: $spacing-5;
+    background: $color-background-secondary;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-6;
+
+    &__amount {
+      font-size: $font-size-3xl;
+      font-weight: 800;
+      color: $color-text-primary;
+      letter-spacing: -0.02em;
+    }
+
+    &__period {
+      font-size: $font-size-base;
+      color: $color-text-secondary;
+    }
+  }
+
+  // ─── Provider card ───────────────────────────────────────────────────
+
+  &__provider {
+    @include flex-between;
+    gap: $spacing-4;
+    padding: $spacing-5;
+    background: $color-background-secondary;
+    border: 1px solid $color-border-light;
+    border-radius: $radius-xl;
+    margin-top: $spacing-6;
+
+    &__avatar {
+      position: relative;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: $color-primary;
+      color: #fff;
+      @include flex-center;
+      font-size: $font-size-md;
+      font-weight: 700;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    &__info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &__name {
+      font-size: $font-size-base;
+      font-weight: 600;
+      color: $color-text-primary;
+      @include truncate(1);
+    }
+
+    &__rating {
+      font-size: $font-size-sm;
+      color: $color-star;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    &__btn {
+      @include btn-primary;
+      padding: $spacing-2 $spacing-5;
+      font-size: $font-size-sm;
+      border-radius: $radius-full;
+      flex-shrink: 0;
+    }
+  }
+
+  // ─── Sidebar ─────────────────────────────────────────────────────────
+
+  &__sidebar {
+    position: sticky;
+    top: calc($header-height + $spacing-6);
+    align-self: start;
+    background: $color-surface;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-xl;
+    box-shadow: $shadow-lg;
+    overflow: hidden;
+
+    @include below(lg) {
+      position: static;
+      border-radius: $radius-xl;
+    }
+  }
+}

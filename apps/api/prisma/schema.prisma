@@ -1,0 +1,358 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────────────────────────
+
+enum UserRole {
+  USER
+  PROVIDER
+  ADMIN
+}
+
+enum AccountProvider {
+  GOOGLE
+  VK
+  TELEGRAM
+  APPLE
+}
+
+enum ContextType {
+  LISTING
+  SERVICE
+  TOUR
+  VEHICLE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum NotificationType {
+  NEW_MESSAGE
+  BOOKING_REQUEST
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  REVIEW_RECEIVED
+}
+
+// ─── User & Auth ──────────────────────────────────────────────────────────────
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String?
+  name            String?
+  avatarUrl       String?
+  role            UserRole  @default(USER)
+  preferredLocale String    @default("en")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  sessions      Session[]
+  accounts      Account[]
+  provider      Provider?
+  bookings      Booking[]
+  reviews       Review[]
+  favorites     Favorite[]
+  notifications Notification[]
+  chatsAsUser  Chat[]     @relation("ChatUser")
+  sentMessages Message[]
+
+  @@index([email])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  userAgent    String?
+  ip           String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+}
+
+model Account {
+  id           String          @id @default(cuid())
+  userId       String
+  provider     AccountProvider
+  providerId   String
+  accessToken  String?
+  refreshToken String?
+  createdAt    DateTime        @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerId])
+  @@index([userId])
+}
+
+// ─── Provider ─────────────────────────────────────────────────────────────────
+
+model Provider {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  nameI18n    Json     // { "en": "...", "ru": "..." }
+  name        String
+  bioI18n     Json?    // { "en": "...", "ru": "..." }
+  bio         String?
+  avatarUrl   String?
+  phone       String?
+  website     String?
+  isVerified  Boolean  @default(false)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listings Listing[]
+  reviews  Review[]
+  chats    Chat[]    @relation("ChatProvider")
+
+  @@index([userId])
+}
+
+// ─── Location ─────────────────────────────────────────────────────────────────
+
+model Country {
+  id       String @id @default(cuid())
+  nameI18n Json   // { "en": "Thailand", "ru": "Таиланд" }
+  name     String
+  code     String @unique // "TH", "AE", "GE"
+
+  cities   City[]
+  listings Listing[]
+
+  @@index([code])
+}
+
+model City {
+  id        String @id @default(cuid())
+  nameI18n  Json   // { "en": "Bangkok", "ru": "Бангкок" }
+  name      String
+  countryId String
+
+  country  Country   @relation(fields: [countryId], references: [id])
+  listings Listing[]
+
+  @@index([countryId])
+}
+
+// ─── Category ─────────────────────────────────────────────────────────────────
+
+model Category {
+  id       String @id @default(cuid())
+  nameI18n Json   // { "en": "Apartments", "ru": "Квартиры" }
+  name     String
+  slug     String @unique
+  icon     String?
+  parentId String?
+
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id])
+  children Category[] @relation("CategoryTree")
+  listings Listing[]
+
+  @@index([slug])
+  @@index([parentId])
+}
+
+// ─── Listing ──────────────────────────────────────────────────────────────────
+
+model Listing {
+  id              String    @id @default(cuid())
+  titleI18n       Json      // { "en": "Cozy apartment", "ru": "Уютная квартира" }
+  descriptionI18n Json      // { "en": "...", "ru": "..." }
+  title           String    // denormalized for full-text search
+  description     String    // denormalized
+  priceMin        Decimal   @db.Decimal(12, 2)
+  priceMax        Decimal?  @db.Decimal(12, 2)
+  currency        String    @default("USD")
+  lat             Float?
+  lng             Float?
+  address         String?
+  categoryId      String
+  cityId          String
+  countryId       String
+  providerId      String
+  listingType     String    @default("rent") // "rent" | "buy" | "short-term"
+  isPublished     Boolean   @default(false)
+  isFeatured      Boolean   @default(false)
+  rating          Float     @default(0)
+  reviewCount     Int       @default(0)
+  deletedAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  category  Category       @relation(fields: [categoryId], references: [id])
+  city      City           @relation(fields: [cityId], references: [id])
+  country   Country        @relation(fields: [countryId], references: [id])
+  provider  Provider       @relation(fields: [providerId], references: [id])
+  media     ListingMedia[]
+  bookings  Booking[]
+  reviews   Review[]
+  favorites Favorite[]
+  chats     Chat[]
+
+  @@index([cityId, categoryId])
+  @@index([providerId])
+  @@index([countryId])
+  @@index([isPublished, deletedAt])
+  @@index([isFeatured])
+}
+
+model ListingMedia {
+  id        String  @id @default(cuid())
+  listingId String
+  url       String
+  thumbUrl  String?
+  type      String  @default("image") // image | video
+  order     Int     @default(0)
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId])
+}
+
+// ─── Chat ─────────────────────────────────────────────────────────────────────
+
+model Chat {
+  id          String      @id @default(cuid())
+  userId      String
+  providerId  String
+  listingId   String?
+  contextType ContextType?
+  contextId   String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  user     User      @relation("ChatUser", fields: [userId], references: [id], onDelete: Cascade)
+  provider Provider  @relation("ChatProvider", fields: [providerId], references: [id], onDelete: Cascade)
+  listing  Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
+  messages Message[]
+
+  @@unique([userId, providerId, listingId])
+  @@index([userId])
+  @@index([providerId])
+}
+
+model Message {
+  id                String   @id @default(cuid())
+  chatId            String
+  senderId          String
+  text              String
+  readBy            String[] @default([])
+  replyToMessageId  String?
+  isPinned          Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  chat    Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender  User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo Message? @relation("MessageReply", fields: [replyToMessageId], references: [id])
+  replies Message[] @relation("MessageReply")
+
+  @@index([chatId, createdAt])
+  @@index([senderId])
+}
+
+// ─── Booking ──────────────────────────────────────────────────────────────────
+
+model Booking {
+  id                 String        @id @default(cuid())
+  userId             String
+  listingId          String
+  checkIn            DateTime
+  checkOut           DateTime
+  bookingDate        DateTime      @default(now())
+  guestCount         Int           @default(1)
+  totalPrice         Decimal       @db.Decimal(12, 2)
+  currency           String        @default("USD")
+  status             BookingStatus @default(PENDING)
+  paymentStatus      PaymentStatus @default(UNPAID)
+  cancellationReason String?
+  notes              String?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, checkIn, checkOut])
+  @@index([userId])
+  @@index([status])
+}
+
+// ─── Review ───────────────────────────────────────────────────────────────────
+
+model Review {
+  id         String   @id @default(cuid())
+  userId     String
+  listingId  String?
+  providerId String?
+  rating     Int      // 1–5
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing  Listing?  @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  provider Provider? @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([listingId])
+  @@index([providerId])
+  @@index([userId])
+}
+
+// ─── Favorite ─────────────────────────────────────────────────────────────────
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  listingId String
+  createdAt DateTime @default(now())
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@index([userId])
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  titleKey  String
+  bodyKey   String
+  params    Json?
+  read      Boolean          @default(false)
+  link      String?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}

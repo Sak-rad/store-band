@@ -1,0 +1,26 @@
+{
+  "bookingRequest": {
+    "subject": "New booking request",
+    "title": "New booking request",
+    "body": "You have a new booking request for {listingTitle}.",
+    "action": "Review Request"
+  },
+  "bookingConfirmed": {
+    "subject": "Your booking is confirmed",
+    "title": "Booking confirmed!",
+    "body": "Great news! Your booking has been confirmed by the provider.",
+    "action": "View Booking"
+  },
+  "bookingCancelled": {
+    "subject": "Booking was cancelled",
+    "title": "Booking cancelled",
+    "body": "Unfortunately, your booking has been cancelled.",
+    "action": "Browse Listings"
+  },
+  "newMessage": {
+    "subject": "New message from {senderName}",
+    "title": "New message",
+    "body": "You have a new message from {senderName}.",
+    "action": "Open Chat"
+  }
+}
