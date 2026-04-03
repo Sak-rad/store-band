@@ -16,7 +16,7 @@ export class NotificationProcessor {
   ) {}
 
   @Process('booking-request')
-  async handleBookingRequest(job: Job<{ bookingId: string; providerUserId: string; listingTitle: string }>) {
+  async handleBookingRequest(job: Job<{ bookingId: number; providerUserId: number; listingTitle: string }>) {
     const { bookingId, providerUserId, listingTitle } = job.data;
     const user = await this.prisma.user.findUnique({ where: { id: providerUserId } });
     if (!user) return;
@@ -39,7 +39,7 @@ export class NotificationProcessor {
   }
 
   @Process('booking-confirmed')
-  async handleBookingConfirmed(job: Job<{ bookingId: string; userId: string }>) {
+  async handleBookingConfirmed(job: Job<{ bookingId: number; userId: number }>) {
     const { bookingId, userId } = job.data;
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) return;
@@ -61,7 +61,7 @@ export class NotificationProcessor {
   }
 
   @Process('booking-cancelled')
-  async handleBookingCancelled(job: Job<{ bookingId: string; userId: string }>) {
+  async handleBookingCancelled(job: Job<{ bookingId: number; userId: number }>) {
     const { bookingId, userId } = job.data;
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) return;
@@ -83,7 +83,7 @@ export class NotificationProcessor {
   }
 
   @Process('new-message')
-  async handleNewMessage(job: Job<{ userId: string; senderName: string; chatId: string }>) {
+  async handleNewMessage(job: Job<{ userId: number; senderName: string; chatId: number }>) {
     const { userId, senderName, chatId } = job.data;
 
     await this.notifService.create({

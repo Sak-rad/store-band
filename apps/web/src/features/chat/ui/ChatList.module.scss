@@ -1,0 +1,132 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-6;
+
+  @include below(sm) { padding: $spacing-4; }
+}
+
+.header {
+  margin-bottom: $spacing-6;
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: 800;
+    color: $color-text-primary;
+    letter-spacing: -0.02em;
+  }
+}
+
+.empty {
+  color: $color-text-muted;
+  text-align: center;
+  padding: $spacing-8 0;
+
+  a { color: $color-primary; }
+}
+
+.empty__box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-16;
+  background: $color-background-secondary;
+  border-radius: $radius-2xl;
+  color: $color-text-secondary;
+
+  span { font-size: 40px; }
+  p { font-size: $font-size-base; }
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: $color-border-light;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  border: 1px solid $color-border-light;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding: $spacing-4 $spacing-5;
+  background: $color-surface;
+  text-decoration: none;
+  transition: background $transition-fast;
+
+  &:hover { background: $color-background-secondary; }
+
+  &:first-child { border-radius: $radius-xl $radius-xl 0 0; }
+  &:last-child  { border-radius: 0 0 $radius-xl $radius-xl; }
+  &:only-child  { border-radius: $radius-xl; }
+
+  &__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: $color-primary-light;
+    color: $color-primary-dark;
+    font-size: $font-size-lg;
+    font-weight: 700;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__top {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $spacing-2;
+    margin-bottom: 2px;
+  }
+
+  &__name {
+    font-size: $font-size-base;
+    font-weight: 700;
+    color: $color-text-primary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__time {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    flex-shrink: 0;
+  }
+
+  &__listing {
+    font-size: $font-size-xs;
+    color: $color-primary;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 2px;
+  }
+
+  &__preview {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}

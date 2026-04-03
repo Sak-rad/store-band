@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class NotificationsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId: string, unreadOnly = false) {
+  async findAll(userId: number, unreadOnly = false) {
     return this.prisma.notification.findMany({
       where: { userId, ...(unreadOnly ? { read: false } : {}) },
       orderBy: { createdAt: 'desc' },
@@ -13,14 +13,14 @@ export class NotificationsService {
     });
   }
 
-  async markRead(id: string, userId: string) {
+  async markRead(id: number, userId: number) {
     return this.prisma.notification.updateMany({
       where: { id, userId },
       data: { read: true },
     });
   }
 
-  async markAllRead(userId: string) {
+  async markAllRead(userId: number) {
     return this.prisma.notification.updateMany({
       where: { userId, read: false },
       data: { read: true },
@@ -28,7 +28,7 @@ export class NotificationsService {
   }
 
   async create(data: {
-    userId: string;
+    userId: number;
     type: any;
     titleKey: string;
     bodyKey: string;

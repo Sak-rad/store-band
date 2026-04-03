@@ -89,14 +89,14 @@ export class AuthService {
     await this.prisma.session.deleteMany({ where: { refreshToken } });
   }
 
-  private async generateTokens(userId: string) {
+  private async generateTokens(userId: number) {
     const accessToken = this.jwt.sign({ sub: userId });
     const refreshToken = crypto.randomBytes(64).toString('hex');
     return { accessToken, refreshToken };
   }
 
   private async createSession(
-    userId: string,
+    userId: number,
     refreshToken: string,
     ip: string,
     userAgent: string,

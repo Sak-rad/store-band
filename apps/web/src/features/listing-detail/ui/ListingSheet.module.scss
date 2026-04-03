@@ -1,0 +1,341 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ─── Overlay ─────────────────────────────────────────────────────────────────
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-sheet;
+  display: flex;
+
+  @include above(md) { justify-content: flex-end; }
+  @include below(md) { align-items: flex-end; }
+
+  &__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.52);
+    backdrop-filter: blur(2px);
+    animation: fadeIn 0.22s ease;
+  }
+
+  &__panel {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: $color-surface;
+
+    // ── Desktop: right side panel ──────────────────────────────────────
+    @include above(md) {
+      width: 520px;
+      height: 100dvh;
+      border-radius: $radius-2xl 0 0 $radius-2xl;
+      animation: slideInRight 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: -8px 0 48px rgba(15, 23, 42, 0.18);
+    }
+
+    // ── Mobile: bottom sheet ───────────────────────────────────────────
+    @include below(md) {
+      width: 100%;
+      height: calc(100dvh - $header-height - 8px);
+      border-radius: $radius-2xl $radius-2xl 0 0;
+      animation: slideInUp 0.36s cubic-bezier(0.32, 0.72, 0, 1);
+
+      @media (min-width: 430px) and (max-width: 480px) {
+        height: calc(100dvh - $header-height - 30px);
+      }
+    }
+  }
+}
+
+// ─── Close button ─────────────────────────────────────────────────────────────
+
+.panel__close {
+  position: absolute;
+  top: $spacing-3;
+  right: $spacing-3;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-full;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+  font-size: $font-size-sm;
+  color: #fff;
+  @include flex-center;
+  transition: background $transition-fast;
+
+  &:hover { background: rgba(15, 23, 42, 0.55); }
+}
+
+// ─── Scroll container ─────────────────────────────────────────────────────────
+
+.panel__scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+// ─── Photo block ─────────────────────────────────────────────────────────────
+// Mobile: sticky so it stays visible while content scrolls over it
+// Desktop: normal flow at top of panel
+
+.panel__photos {
+  height: 280px;
+  flex-shrink: 0;
+
+  // Mobile: sticky — photo stays at top while content slides over
+  @include below(md) {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  // Desktop: taller, normal flow
+  @include above(md) {
+    height: 320px;
+    position: relative;
+    z-index: 0;
+  }
+}
+
+// ─── White content card ───────────────────────────────────────────────────────
+
+.panel__content {
+  position: relative;
+  background: $color-surface;
+  padding: $spacing-5 $spacing-6 $spacing-16;
+  min-height: 60vh;
+
+  // Mobile: rounded top, overlaps bottom of photo
+  @include below(md) {
+    z-index: 2;
+    border-radius: $radius-2xl $radius-2xl 0 0;
+    margin-top: -$radius-2xl; // slide up over photo edge
+    padding-top: $spacing-4;
+  }
+
+  // Desktop: no overlap, normal top
+  @include above(md) {
+    border-radius: 0;
+    margin-top: 0;
+  }
+
+  &--no-photo {
+    min-height: 100%;
+    margin-top: 0;
+    padding-top: $spacing-10;
+  }
+}
+
+// ─── Handle (mobile drag indicator) ──────────────────────────────────────────
+
+.panel__handle {
+  width: 36px;
+  height: 4px;
+  background: $color-border;
+  border-radius: $radius-full;
+  margin: 0 auto $spacing-5;
+
+  @include above(md) { display: none; }
+}
+
+// ─── Skeleton ────────────────────────────────────────────────────────────────
+
+.panel__skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3;
+}
+
+.panel__skeleton-line {
+  height: 16px;
+  border-radius: $radius-md;
+  background: $color-background-tertiary;
+  animation: pulse 1.4s ease-in-out infinite;
+}
+
+// ─── Content ─────────────────────────────────────────────────────────────────
+
+.content__category {
+  display: inline-block;
+  padding: 2px $spacing-3;
+  background: $color-primary-light;
+  color: $color-primary;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: $spacing-3;
+}
+
+.content__title {
+  font-size: clamp(1.2rem, 4vw, 1.625rem);
+  font-weight: 800;
+  color: $color-text-primary;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: $spacing-3;
+}
+
+.content__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-3;
+  align-items: center;
+  margin-bottom: $spacing-4;
+}
+
+.content__location {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+
+  svg { color: $color-primary; flex-shrink: 0; }
+}
+
+.content__rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: $font-size-sm;
+  font-weight: 600;
+  color: $color-star;
+
+  em {
+    font-style: normal;
+    font-weight: 400;
+    color: $color-text-muted;
+    font-size: $font-size-xs;
+  }
+}
+
+.content__price {
+  padding: $spacing-4;
+  background: $color-background-secondary;
+  border-radius: $radius-lg;
+  margin-bottom: $spacing-4;
+
+  strong {
+    font-size: $font-size-2xl;
+    font-weight: 800;
+    color: $color-text-primary;
+    letter-spacing: -0.02em;
+  }
+
+  span {
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+  }
+}
+
+.content__description {
+  font-size: $font-size-base;
+  line-height: 1.75;
+  color: $color-text-secondary;
+  white-space: pre-line;
+  margin-bottom: $spacing-6;
+}
+
+// ─── Provider card ────────────────────────────────────────────────────────────
+
+.content__provider {
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-4;
+  background: $color-background-secondary;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-xl;
+  margin-bottom: $spacing-5;
+}
+
+.content__prov-avatar {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: $radius-full;
+  background: $color-primary;
+  color: #fff;
+  @include flex-center;
+  font-size: $font-size-md;
+  font-weight: 700;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.content__prov-info { flex: 1; min-width: 0; }
+
+.content__prov-name {
+  font-size: $font-size-base;
+  font-weight: 600;
+  color: $color-text-primary;
+  @include truncate(1);
+}
+
+.content__prov-verified {
+  font-size: $font-size-xs;
+  color: $color-success;
+  margin-top: 2px;
+}
+
+.content__prov-btn {
+  @include btn-primary;
+  padding: $spacing-2 $spacing-4;
+  font-size: $font-size-sm;
+  border-radius: $radius-full;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.content__booking {
+  border: 1.5px solid $color-border;
+  border-radius: $radius-xl;
+  overflow: hidden;
+  margin-bottom: $spacing-4;
+}
+
+.content__fullpage {
+  display: block;
+  text-align: center;
+  font-size: $font-size-sm;
+  color: $color-primary;
+  text-decoration: none;
+  padding: $spacing-2;
+
+  &:hover { text-decoration: underline; }
+}
+
+// ─── Animations ───────────────────────────────────────────────────────────────
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}

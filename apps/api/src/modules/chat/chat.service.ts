@@ -6,7 +6,7 @@ import { CreateChatDto } from './dto/create-chat.dto';
 export class ChatService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId: string) {
+  async findAll(userId: number) {
     return this.prisma.chat.findMany({
       where: { OR: [{ userId }, { provider: { userId } }] },
       include: {
@@ -19,7 +19,7 @@ export class ChatService {
     });
   }
 
-  async findOne(id: string) {
+  async findOne(id: number) {
     const chat = await this.prisma.chat.findUnique({
       where: { id },
       include: {
@@ -32,31 +32,33 @@ export class ChatService {
     return chat;
   }
 
-  async create(dto: CreateChatDto, userId: string) {
+  async create(dto: CreateChatDto, userId: number) {
     const provider = await this.prisma.provider.findUnique({ where: { id: dto.providerId } });
     if (!provider) throw new NotFoundException('Provider not found');
 
-    return this.prisma.chat.upsert({
+    // upsert with nullable listingId doesn't work in PG (NULLs not equal in unique index)
+    const existing = await this.prisma.chat.findFirst({
       where: {
-        userId_providerId_listingId: {
-          userId,
-          providerId: dto.providerId,
-          listingId: dto.listingId ?? null,
-        },
+        userId,
+        providerId: dto.providerId,
+        listingId: dto.listingId ?? null,
       },
-      create: {
+    });
+    if (existing) return existing;
+
+    return this.prisma.chat.create({
+      data: {
         userId,
         providerId: dto.providerId,
         listingId: dto.listingId,
         contextType: dto.contextType as any,
         contextId: dto.contextId,
       },
-      update: {},
     });
   }
 
-  async getMessages(chatId: string, cursor?: string, limit = 50) {
-    const take = Math.min(limit, 100);
+  async getMessages(chatId: number, cursor?: number, limit?: number) {
+    const take = Math.min(Number.isFinite(Number(limit)) ? Number(limit) : 50, 100);
     const messages = await this.prisma.message.findMany({
       where: { chatId },
       take: take + 1,
@@ -68,7 +70,7 @@ export class ChatService {
       },
     });
 
-    let nextCursor: string | null = null;
+    let nextCursor: number | null = null;
     if (messages.length > take) {
       const next = messages.pop();
       nextCursor = next!.id;
@@ -77,8 +79,8 @@ export class ChatService {
   }
 
   async createMessage(
-    senderId: string,
-    data: { chatId: string; text: string; replyToMessageId?: string },
+    senderId: number,
+    data: { chatId: number; text: string; replyToMessageId?: number },
   ) {
     const message = await this.prisma.message.create({
       data: {
@@ -101,7 +103,7 @@ export class ChatService {
     return message;
   }
 
-  async markRead(messageId: string, userId: string) {
+  async markRead(messageId: number, userId: number) {
     const message = await this.prisma.message.findUnique({ where: { id: messageId } });
     if (!message) return;
     if (message.readBy.includes(userId)) return;
@@ -111,7 +113,7 @@ export class ChatService {
     });
   }
 
-  async pinMessage(messageId: string) {
+  async pinMessage(messageId: number) {
     return this.prisma.message.update({
       where: { id: messageId },
       data: { isPinned: true },

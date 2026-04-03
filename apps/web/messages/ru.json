@@ -7,6 +7,7 @@
     "loading": "Загрузка...",
     "error": "Что-то пошло не так",
     "noResults": "Ничего не найдено",
+    "verified": "Проверен",
     "search": "Поиск",
     "filters": "Фильтры",
     "showMore": "Показать ещё",
@@ -68,6 +69,7 @@
     "allListings": "Все объявления",
     "reviews": "отзывов",
     "aboutListing": "Об этом объявлении",
+    "viewFullPage": "Открыть полную страницу",
     "realEstate": "🏘 Недвижимость",
     "services": "🛎 Услуги",
     "listingType": {
@@ -77,6 +79,7 @@
     }
   },
   "chat": {
+    "title": "Сообщения",
     "placeholder": "Написать сообщение...",
     "typing": "{name} печатает...",
     "online": "В сети",
@@ -130,9 +133,14 @@
     "languageRu": "Русский",
     "editProfile": "Редактировать профиль",
     "myBookings": "Мои бронирования",
+    "myListings": "Мои объявления",
     "myFavorites": "Сохранённые",
     "providerDashboard": "Кабинет провайдера",
-    "savedListings": "Сохранённые объявления"
+    "savedListings": "Сохранённые объявления",
+    "addListing": "Добавить объявление",
+    "noListings": "Объявлений пока нет",
+    "noBookings": "Бронирований пока нет",
+    "loginToView": "Войдите чтобы видеть профиль"
   },
   "meta": {
     "homeTitle": "Relocation Platform — Жильё за рубежом",
@@ -159,7 +167,10 @@
     "editListing": "Редактировать объявление",
     "listingFormTabEn": "Английский",
     "listingFormTabRu": "Русский",
-    "bothLanguagesRequired": "Пожалуйста, заполните на английском и русском языках"
+    "bothLanguagesRequired": "Пожалуйста, заполните на английском и русском языках",
+    "createListingHint": "Заполните данные ниже. Объявление будет проверено перед публикацией.",
+    "listingSubmitted": "Объявление отправлено!",
+    "listingAwaitingApproval": "Ваше объявление ожидает проверки администратором."
   },
   "upload": {
     "dragDrop": "Перетащите файлы сюда",

@@ -20,7 +20,7 @@ async function main() {
 
   // ─── Cities ───────────────────────────────────────────────────────────
 
-  const findOrCreateCity = async (name: string, countryId: string, nameRu: string) => {
+  const findOrCreateCity = async (name: string, countryId: number, nameRu: string) => {
     const existing = await prisma.city.findFirst({ where: { name, countryId } });
     return existing ?? await prisma.city.create({ data: { name, countryId, nameI18n: { en: name, ru: nameRu } } });
   };
@@ -52,7 +52,7 @@ async function main() {
   });
 
   // Step 2: subcategories and top-level service categories
-  const upsertCat = (slug: string, name: string, nameRu: string, icon: string, parentId?: string) =>
+  const upsertCat = (slug: string, name: string, nameRu: string, icon: string, parentId?: number) =>
     (prisma.category.upsert as any)({
       where: { slug },
       update: { parentId: parentId ?? null },
@@ -76,7 +76,7 @@ async function main() {
 
   const seedUser = await prisma.user.upsert({
     where: { email: 'provider@relocate.dev' },
-    update: {},
+    update: { passwordHash },
     create: {
       email: 'provider@relocate.dev',
       passwordHash,
@@ -105,6 +105,25 @@ async function main() {
 
   await prisma.listing.deleteMany({ where: { providerId: provider.id } });
 
+  // Photo sets (3 photos per listing)
+  const PHOTOS = {
+    apt_city:   ['1522708323590-d24dbb6b0267','1502672260266-1c1ef2d93688','1555041469-a586c61ea9bc'],
+    apt_modern: ['1560347876-aeef00ee58a1','1484154218962-a197022b5858','1493809842364-78817add7ffb'],
+    apt_luxury: ['1600596542815-ffad4c1539a9','1600585154526-990dced4db0d','1600210492493-0946911123ea'],
+    apt_cozy:   ['1586023492125-27b2c045efd7','1617098850374-9d0f80a89e8d','1524758631624-e2822132akca'],
+    apt_beach:  ['1520250497591-112f2f40a3f4','1499793983690-e29da59ef1c2','1506929562872-bb421503ef21'],
+    villa_pool: ['1613490493576-12e4b8b77a06','1582268611958-ebfd161ef9cf','1540541338287-41700207dee6'],
+    villa_sea:  ['1512917774080-9991f1c4c750','1564013799919-ab600027ffc6','1510798831971-661eb04b3739'],
+    villa_garden: ['1537996194471-e657df975ab4','1565538810643-b5bdb714032a','1448630360428-65e5a19e6f92'],
+    dubai:      ['1512453979798-5ea266f8880c','1518684079-3c830dcef090','1560438188-1f9b7dc4f94a'],
+  };
+
+  const photoUrl = (id: string, w = 1200) =>
+    `https://images.unsplash.com/photo-${id}?w=${w}&q=80&auto=format&fit=crop`;
+
+  const mediaSet = (set: string[]) =>
+    set.map((id, i) => ({ url: photoUrl(id), thumbUrl: photoUrl(id, 400), order: i }));
+
   const listings = [
     // ── Vietnam – Ho Chi Minh City – Apartments ──
     {
@@ -115,6 +134,7 @@ async function main() {
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.7769, lng: 106.7009, address: '12 Lê Lợi, District 1, Ho Chi Minh City',
       isPublished: true, isFeatured: true, rating: 4.8, reviewCount: 24,
+      photos: PHOTOS.apt_city,
     },
     {
       titleI18n: { en: '2BR apartment in Thao Dien', ru: '2-комнатная квартира в Тхао Дьен' },
@@ -124,6 +144,7 @@ async function main() {
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.8029, lng: 106.7348, address: 'Thao Dien, District 2, Ho Chi Minh City',
       isPublished: true, isFeatured: false, rating: 4.6, reviewCount: 18,
+      photos: PHOTOS.apt_modern,
     },
     {
       titleI18n: { en: 'Luxury 3BR in Vinhomes Central Park', ru: 'Люкс 3-комнатная в Vinhomes Central Park' },
@@ -133,6 +154,7 @@ async function main() {
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.7970, lng: 106.7220, address: 'Vinhomes Central Park, Bình Thạnh, Ho Chi Minh City',
       isPublished: true, isFeatured: true, rating: 4.9, reviewCount: 41,
+      photos: PHOTOS.apt_luxury,
     },
     {
       titleI18n: { en: 'Affordable 1BR near Bui Vien Street', ru: 'Доступная 1-комнатная рядом с улицей Буй Вьен' },
@@ -142,6 +164,7 @@ async function main() {
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.7686, lng: 106.6953, address: 'Phạm Ngũ Lão, District 1, Ho Chi Minh City',
       isPublished: true, isFeatured: false, rating: 4.4, reviewCount: 9,
+      photos: PHOTOS.apt_cozy,
     },
 
     // ── Vietnam – Hanoi ──
@@ -153,6 +176,7 @@ async function main() {
       categoryId: apartments.id, cityId: hanoi.id, countryId: vietnam.id,
       lat: 21.0278, lng: 105.8342, address: 'Hoan Kiem District, Hanoi',
       isPublished: true, isFeatured: true, rating: 4.7, reviewCount: 33,
+      photos: PHOTOS.apt_city,
     },
 
     // ── Vietnam – Da Nang ──
@@ -164,6 +188,7 @@ async function main() {
       categoryId: apartments.id, cityId: danang.id, countryId: vietnam.id,
       lat: 16.0544, lng: 108.2472, address: 'My Khe Beach, Son Tra District, Da Nang',
       isPublished: true, isFeatured: true, rating: 4.9, reviewCount: 52,
+      photos: PHOTOS.apt_beach,
     },
     {
       titleI18n: { en: 'Private pool villa near Da Nang Beach', ru: 'Вилла с приватным бассейном у пляжа Дананга' },
@@ -173,6 +198,7 @@ async function main() {
       categoryId: villas.id, cityId: danang.id, countryId: vietnam.id,
       lat: 16.0200, lng: 108.2490, address: 'Ngu Hanh Son District, Da Nang',
       isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 17,
+      photos: PHOTOS.villa_pool,
     },
     {
       titleI18n: { en: 'Sea-view villa in Son Tra Peninsula', ru: 'Вилла с видом на море на полуострове Шон Ча' },
@@ -182,6 +208,7 @@ async function main() {
       categoryId: villas.id, cityId: danang.id, countryId: vietnam.id,
       lat: 16.1108, lng: 108.2768, address: 'Son Tra Peninsula, Da Nang',
       isPublished: true, isFeatured: false, rating: 4.8, reviewCount: 8,
+      photos: PHOTOS.villa_sea,
     },
     {
       titleI18n: { en: 'Garden villa near Hoi An Old Town', ru: 'Вилла с садом у Старого города Хойан' },
@@ -191,6 +218,7 @@ async function main() {
       categoryId: villas.id, cityId: danang.id, countryId: vietnam.id,
       lat: 15.8801, lng: 108.3380, address: 'Cam Chau, Hoi An',
       isPublished: true, isFeatured: false, rating: 4.7, reviewCount: 29,
+      photos: PHOTOS.villa_garden,
     },
 
     // ── Vietnam – Nha Trang ──
@@ -202,6 +230,7 @@ async function main() {
       categoryId: apartments.id, cityId: nhaTrang.id, countryId: vietnam.id,
       lat: 12.2388, lng: 109.1967, address: 'Trần Phú Street, Nha Trang',
       isPublished: true, isFeatured: true, rating: 4.7, reviewCount: 38,
+      photos: PHOTOS.apt_beach,
     },
     {
       titleI18n: { en: 'Beachside villa in Nha Trang', ru: 'Вилла у пляжа в Нячанге' },
@@ -211,6 +240,7 @@ async function main() {
       categoryId: villas.id, cityId: nhaTrang.id, countryId: vietnam.id,
       lat: 12.0060, lng: 109.1420, address: 'Cam Lam District, Nha Trang',
       isPublished: true, isFeatured: false, rating: 4.6, reviewCount: 14,
+      photos: PHOTOS.villa_pool,
     },
 
     // ── Thailand – Phuket ──
@@ -222,6 +252,7 @@ async function main() {
       categoryId: apartments.id, cityId: phuket.id, countryId: thailand.id,
       lat: 7.8960, lng: 98.2973, address: 'Patong, Kathu District, Phuket',
       isPublished: true, isFeatured: true, rating: 4.8, reviewCount: 61,
+      photos: PHOTOS.apt_beach,
     },
     {
       titleI18n: { en: 'Luxury pool villa in Kamala', ru: 'Люкс вилла с бассейном в Камала' },
@@ -231,6 +262,7 @@ async function main() {
       categoryId: villas.id, cityId: phuket.id, countryId: thailand.id,
       lat: 7.9508, lng: 98.2738, address: 'Kamala, Kathu District, Phuket',
       isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 23,
+      photos: PHOTOS.villa_pool,
     },
 
     // ── Thailand – Pattaya ──
@@ -242,6 +274,7 @@ async function main() {
       categoryId: apartments.id, cityId: pattaya.id, countryId: thailand.id,
       lat: 12.9236, lng: 100.8825, address: 'Central Pattaya Road, Pattaya',
       isPublished: true, isFeatured: true, rating: 4.5, reviewCount: 47,
+      photos: PHOTOS.apt_modern,
     },
 
     // ── UAE – Dubai ──
@@ -253,6 +286,7 @@ async function main() {
       categoryId: apartments.id, cityId: dubai.id, countryId: uae.id,
       lat: 25.0772, lng: 55.1341, address: 'Dubai Marina, Dubai',
       isPublished: true, isFeatured: true, rating: 4.9, reviewCount: 87,
+      photos: PHOTOS.dubai,
     },
     {
       titleI18n: { en: 'Luxury penthouse in Downtown Dubai', ru: 'Роскошный пентхаус в Даунтаун Дубай' },
@@ -262,6 +296,7 @@ async function main() {
       categoryId: apartments.id, cityId: dubai.id, countryId: uae.id,
       lat: 25.1972, lng: 55.2744, address: 'Downtown Dubai, Dubai',
       isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 12,
+      photos: PHOTOS.dubai,
     },
     {
       titleI18n: { en: 'Villa for sale in Palm Jumeirah', ru: 'Вилла на продажу на Пальма Джумейра' },
@@ -271,11 +306,18 @@ async function main() {
       categoryId: villas.id, cityId: dubai.id, countryId: uae.id,
       lat: 25.1124, lng: 55.1390, address: 'Palm Jumeirah, Dubai',
       isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 3,
+      photos: PHOTOS.villa_sea,
     },
-  ];
+  ] as const;
 
-  for (const listing of listings) {
-    await prisma.listing.create({ data: { ...listing, providerId: provider.id } });
+  for (const { photos, ...listing } of listings) {
+    await prisma.listing.create({
+      data: {
+        ...listing,
+        providerId: provider.id,
+        media: { createMany: { data: mediaSet(photos as unknown as string[]) } },
+      },
+    });
   }
 
   console.log(`✅ Seed complete — ${listings.length} listings created`);

@@ -5,6 +5,7 @@ import {
   Patch,
   Body,
   Param,
+  ParseIntPipe,
   Req,
   UseGuards,
   UseInterceptors,
@@ -32,34 +33,34 @@ export class ProvidersController {
 
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req: Request) {
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const locale = (req as any).locale || 'en';
     return this.providersService.findOne(id, locale);
   }
 
   @Public()
   @Get(':id/listings')
-  getListings(@Param('id') id: string, @Req() req: Request) {
+  getListings(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const locale = (req as any).locale || 'en';
     return this.providersService.getListings(id, locale);
   }
 
   @Public()
   @Get(':id/reviews')
-  getReviews(@Param('id') id: string) {
+  getReviews(@Param('id', ParseIntPipe) id: number) {
     return this.providersService.getReviews(id);
   }
 
   @Post()
-  create(@Body() dto: CreateProviderDto, @CurrentUser('id') userId: string) {
+  create(@Body() dto: CreateProviderDto, @CurrentUser('id') userId: number) {
     return this.providersService.create(dto, userId);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: Partial<CreateProviderDto>,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') userId: number,
   ) {
     return this.providersService.update(id, dto, userId);
   }

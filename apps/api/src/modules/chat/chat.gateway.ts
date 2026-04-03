@@ -20,7 +20,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
 
-  private onlineUsers = new Map<string, string>(); // userId -> socketId
+  private onlineUsers = new Map<number, string>(); // userId -> socketId
 
   constructor(
     private chatService: ChatService,
@@ -38,16 +38,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         secret: this.config.get('JWT_ACCESS_SECRET'),
       }) as { sub: string };
 
-      client.data.userId = payload.sub;
-      this.onlineUsers.set(payload.sub, client.id);
-      this.server.emit('user:online', { userId: payload.sub });
+      const userId = parseInt(payload.sub, 10);
+      client.data.userId = userId;
+      this.onlineUsers.set(userId, client.id);
+      this.server.emit('user:online', { userId });
     } catch {
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    const userId = client.data.userId;
+    const userId: number = client.data.userId;
     if (userId) {
       this.onlineUsers.delete(userId);
       this.server.emit('user:offline', { userId });
@@ -55,21 +56,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chat:join')
-  handleJoin(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+  handleJoin(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
     client.join(`chat:${chatId}`);
   }
 
   @SubscribeMessage('chat:leave')
-  handleLeave(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+  handleLeave(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
     client.leave(`chat:${chatId}`);
   }
 
   @SubscribeMessage('message:send')
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: string; text: string; replyToMessageId?: string },
+    @MessageBody() data: { chatId: number; text: string; replyToMessageId?: number },
   ) {
-    const userId = client.data.userId;
+    const userId: number = client.data.userId;
     const message = await this.chatService.createMessage(userId, data);
     this.server.to(`chat:${data.chatId}`).emit('message:new', message);
     return message;
@@ -78,9 +79,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message:read')
   async handleRead(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: string; messageId: string },
+    @MessageBody() data: { chatId: number; messageId: number },
   ) {
-    const userId = client.data.userId;
+    const userId: number = client.data.userId;
     await this.chatService.markRead(data.messageId, userId);
     this.server
       .to(`chat:${data.chatId}`)
@@ -88,7 +89,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('typing:start')
-  handleTypingStart(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+  handleTypingStart(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
     client.to(`chat:${chatId}`).emit('typing:indicator', {
       userId: client.data.userId,
       chatId,
@@ -97,7 +98,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('typing:stop')
-  handleTypingStop(@ConnectedSocket() client: Socket, @MessageBody() chatId: string) {
+  handleTypingStop(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
     client.to(`chat:${chatId}`).emit('typing:indicator', {
       userId: client.data.userId,
       chatId,
@@ -105,7 +106,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
   }
 
-  sendNotification(userId: string, event: string, payload: any) {
+  sendNotification(userId: number, event: string, payload: any) {
     const socketId = this.onlineUsers.get(userId);
     if (socketId) {
       this.server.to(socketId).emit(event, payload);

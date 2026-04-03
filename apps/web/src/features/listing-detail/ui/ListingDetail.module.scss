@@ -8,43 +8,18 @@
 
   @include below(sm) { padding: $spacing-4; }
 
-  // ─── Gallery ─────────────────────────────────────────────────────────
+  // ─── Gallery (PhotoSlider wrapper) ───────────────────────────────────
 
   &__gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto;
-    gap: $spacing-2;
+    height: 420px;
     border-radius: $radius-xl;
     overflow: hidden;
     margin-bottom: $spacing-8;
-    max-height: 480px;
 
     @include below(md) {
-      grid-template-columns: 1fr;
-      max-height: 260px;
-    }
-
-    &__item {
-      position: relative;
-      overflow: hidden;
-
-      &:first-child {
-        grid-column: span 2;
-        grid-row: span 2;
-
-        @include below(md) {
-          grid-column: span 1;
-          grid-row: span 1;
-        }
-      }
-
-      img { transition: transform 0.4s ease; }
-      &:hover img { transform: scale(1.03); }
-    }
-
-    &__item:not(:first-child) {
-      @include below(md) { display: none; }
+      height: 260px;
+      border-radius: $radius-lg;
+      margin-bottom: $spacing-5;
     }
   }
 

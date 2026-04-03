@@ -6,12 +6,11 @@ import {
   Delete,
   Body,
   Param,
+  ParseIntPipe,
   Query,
   UseGuards,
   UseInterceptors,
-  Req,
 } from '@nestjs/common';
-import { Request } from 'express';
 import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -31,25 +30,28 @@ export class ReviewsController {
     @Query('listingId') listingId?: string,
     @Query('providerId') providerId?: string,
   ) {
-    return this.reviewsService.findAll({ listingId, providerId });
+    return this.reviewsService.findAll({
+      listingId: listingId ? parseInt(listingId, 10) : undefined,
+      providerId: providerId ? parseInt(providerId, 10) : undefined,
+    });
   }
 
   @Post()
-  create(@Body() dto: CreateReviewDto, @CurrentUser('id') userId: string) {
+  create(@Body() dto: CreateReviewDto, @CurrentUser('id') userId: number) {
     return this.reviewsService.create(dto, userId);
   }
 
   @Patch(':id')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: Partial<CreateReviewDto>,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') userId: number,
   ) {
     return this.reviewsService.update(id, dto, userId);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser('id') userId: string) {
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.reviewsService.remove(id, userId);
   }
 }

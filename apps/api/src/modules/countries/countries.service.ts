@@ -16,7 +16,7 @@ export class CountriesService {
     }));
   }
 
-  async findCities(countryId: string, locale: string) {
+  async findCities(countryId: number, locale: string) {
     const cities = await this.prisma.city.findMany({
       where: { countryId },
       orderBy: { name: 'asc' },

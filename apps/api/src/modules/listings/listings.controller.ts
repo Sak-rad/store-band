@@ -1,6 +1,6 @@
 import {
   Controller, Get, Post, Patch, Delete, Body, Param,
-  Query, Req, UseGuards, UseInterceptors,
+  Query, Req, UseGuards, UseInterceptors, ParseIntPipe,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ListingsService } from './listings.service';
@@ -26,16 +26,30 @@ export class ListingsController {
     return this.listingsService.findAll(filter, (req as any).locale || 'en');
   }
 
+  // Admin: get pending listings for approval
+  @Get('pending')
+  @Roles('ADMIN')
+  findPending() {
+    return this.listingsService.findPending();
+  }
+
+  // Provider: get own listings
+  @Get('my')
+  @Roles('PROVIDER', 'ADMIN')
+  findMine(@CurrentUser('id') userId: number) {
+    return this.listingsService.findByProvider(userId);
+  }
+
   @Public()
   @Get(':id')
-  findOne(@Param('id') id: string, @Req() req: Request) {
+  findOne(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     return this.listingsService.findOne(id, (req as any).locale || 'en');
   }
 
   @Public()
   @Get(':id/availability')
   getAvailability(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Query('from') from: string,
     @Query('to') to: string,
   ) {
@@ -44,23 +58,35 @@ export class ListingsController {
 
   @Post()
   @Roles('PROVIDER', 'ADMIN')
-  create(@Body() dto: CreateListingDto, @CurrentUser('id') userId: string) {
+  create(@Body() dto: CreateListingDto, @CurrentUser('id') userId: number) {
     return this.listingsService.create(dto, userId);
+  }
+
+  @Patch(':id/approve')
+  @Roles('ADMIN')
+  approve(@Param('id', ParseIntPipe) id: number) {
+    return this.listingsService.approve(id);
+  }
+
+  @Patch(':id/reject')
+  @Roles('ADMIN')
+  reject(@Param('id', ParseIntPipe) id: number) {
+    return this.listingsService.reject(id);
   }
 
   @Patch(':id')
   @Roles('PROVIDER', 'ADMIN')
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateListingDto,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') userId: number,
   ) {
     return this.listingsService.update(id, dto, userId);
   }
 
   @Delete(':id')
   @Roles('PROVIDER', 'ADMIN')
-  remove(@Param('id') id: string, @CurrentUser('id') userId: string) {
+  remove(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.listingsService.remove(id, userId);
   }
 }

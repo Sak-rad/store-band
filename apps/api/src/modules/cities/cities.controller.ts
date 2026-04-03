@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query, Req, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Param, ParseIntPipe, Req, UseInterceptors, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { CitiesService } from './cities.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -18,14 +18,12 @@ export class CitiesController {
   @Get()
   findAll(@Query('countryId') countryId: string | undefined, @Req() req: Request) {
     const locale = (req as any).locale || 'en';
-    return this.citiesService.findAll(countryId, locale);
+    return this.citiesService.findAll(countryId ? parseInt(countryId, 10) : undefined, locale);
   }
 
-  // Admin-only: POST /cities { countryId, nameEn, nameRu }
-  // Providers wanting a new city can request it via support@relocate.dev
   @Roles(UserRole.ADMIN)
   @Post()
-  create(@Body() body: { countryId: string; nameEn: string; nameRu: string }) {
+  create(@Body() body: { countryId: number; nameEn: string; nameRu: string }) {
     return this.citiesService.create(body.countryId, body.nameEn, body.nameRu);
   }
 }

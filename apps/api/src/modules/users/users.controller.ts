@@ -10,18 +10,18 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get('me')
-  me(@CurrentUser('id') userId: string) {
+  me(@CurrentUser('id') userId: number) {
     return this.usersService.findMe(userId);
   }
 
   @Patch('me')
-  update(@CurrentUser('id') userId: string, @Body() dto: UpdateUserDto) {
+  update(@CurrentUser('id') userId: number, @Body() dto: UpdateUserDto) {
     return this.usersService.update(userId, dto);
   }
 
   @Delete('me')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@CurrentUser('id') userId: string) {
+  remove(@CurrentUser('id') userId: number) {
     return this.usersService.remove(userId);
   }
 }

@@ -1,19 +1,20 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as path from 'path';
 import { AppModule } from './app.module';
 import { I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const config = app.get(ConfigService);
   const clientUrl = config.get<string>('CLIENT_URL', 'http://localhost:3000');
 
-  app.use(helmet());
+  app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cookieParser());
 
   app.enableCors({
@@ -30,6 +31,9 @@ async function bootstrap() {
   app.useGlobalFilters(
     new I18nValidationExceptionFilter({ detailedErrors: false }),
   );
+
+  // Serve uploaded files statically at /uploads/<filename>
+  app.useStaticAssets(path.join(process.cwd(), 'uploads'), { prefix: '/uploads' });
 
   app.setGlobalPrefix('api');
 

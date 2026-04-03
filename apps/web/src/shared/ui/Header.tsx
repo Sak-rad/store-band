@@ -9,6 +9,7 @@ import { useCurrencyStore } from '../store/currency.store';
 import { api } from '../lib/api';
 import { useRouter } from '../../navigation';
 import styles from './Header.module.scss';
+import { ROUTES } from '../constants';
 
 export function Header() {
   const t = useTranslations('nav');
@@ -46,9 +47,14 @@ export function Header() {
             {t('listings')}
           </Link>
           {user && (
-            <Link href="/bookings" className={styles.header__nav__link}>
-              {t('bookings')}
-            </Link>
+            <>
+              <Link href="/chats" className={styles.header__nav__link}>
+                {t('chats')}
+              </Link>
+              <Link href="/bookings" className={styles.header__nav__link}>
+                {t('bookings')}
+              </Link>
+            </>
           )}
         </nav>
 
@@ -82,6 +88,10 @@ export function Header() {
                   <div className={styles.header__dropdown}>
                     <Link href="/bookings" className={styles.header__dropdown__item} onClick={() => setMenuOpen(false)}>
                       {t('bookings')}
+                    </Link>
+                    <hr className={styles.header__dropdown__divider} />
+                    <Link href={ROUTES.PROFILE} className={styles.header__dropdown__item} onClick={() => setMenuOpen(false)}>
+                      {t('profile')}
                     </Link>
                     <hr className={styles.header__dropdown__divider} />
                     <button className={styles.header__dropdown__item} onClick={handleLogout}>

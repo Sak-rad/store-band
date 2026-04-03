@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Req, UseInterceptors, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, ParseIntPipe, Req, UseInterceptors, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 import { CountriesService } from './countries.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -23,12 +23,11 @@ export class CountriesController {
 
   @Public()
   @Get(':id/cities')
-  findCities(@Param('id') id: string, @Req() req: Request) {
+  findCities(@Param('id', ParseIntPipe) id: number, @Req() req: Request) {
     const locale = (req as any).locale || 'en';
     return this.countriesService.findCities(id, locale);
   }
 
-  // Admin only: POST /countries { code, nameEn, nameRu }
   @Roles(UserRole.ADMIN)
   @Post()
   create(@Body() body: { code: string; nameEn: string; nameRu: string }) {

@@ -1,0 +1,104 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.slider {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: $color-background-tertiary;
+
+  // ─── Track (horizontal scroll snap) ─────────────────────────────────
+  &__track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  // ─── Individual slide ────────────────────────────────────────────────
+  &__slide {
+    position: relative;
+    flex: 0 0 100%;
+    width: 100%;
+    height: 100%;
+    scroll-snap-align: start;
+    overflow: hidden;
+  }
+
+  // ─── Arrow buttons ───────────────────────────────────────────────────
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-full;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(6px);
+    border: none;
+    cursor: pointer;
+    font-size: 22px;
+    line-height: 1;
+    color: $color-text-primary;
+    @include flex-center;
+    box-shadow: $shadow-md;
+    transition: opacity $transition-fast, transform $transition-fast;
+    z-index: 2;
+
+    &:hover { opacity: 0.95; transform: translateY(-50%) scale(1.08); }
+
+    // Hide on mobile (touch swipe works)
+    @include below(md) { display: none; }
+
+    &--prev { left: $spacing-3; }
+    &--next { right: $spacing-3; }
+  }
+
+  // ─── Dot indicators ──────────────────────────────────────────────────
+  &__dots {
+    position: absolute;
+    bottom: $spacing-3;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: $spacing-1;
+    z-index: 2;
+  }
+
+  &__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: $radius-full;
+    background: rgba(255, 255, 255, 0.55);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: background $transition-base, transform $transition-base;
+
+    &--active {
+      background: #fff;
+      transform: scale(1.3);
+    }
+  }
+
+  // ─── Counter badge ───────────────────────────────────────────────────
+  &__counter {
+    position: absolute;
+    top: $spacing-3;
+    right: $spacing-3;
+    padding: 3px $spacing-2;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-size: $font-size-xs;
+    font-weight: 500;
+    border-radius: $radius-full;
+    z-index: 2;
+    pointer-events: none;
+  }
+}

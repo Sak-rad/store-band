@@ -6,7 +6,7 @@ import { CreateReviewDto } from './dto/create-review.dto';
 export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(query: { listingId?: string; providerId?: string }) {
+  async findAll(query: { listingId?: number; providerId?: number }) {
     return this.prisma.review.findMany({
       where: {
         ...(query.listingId ? { listingId: query.listingId } : {}),
@@ -19,7 +19,7 @@ export class ReviewsService {
     });
   }
 
-  async create(dto: CreateReviewDto, userId: string) {
+  async create(dto: CreateReviewDto, userId: number) {
     const review = await this.prisma.review.create({
       data: {
         userId,
@@ -40,7 +40,7 @@ export class ReviewsService {
     return review;
   }
 
-  async update(id: string, dto: Partial<CreateReviewDto>, userId: string) {
+  async update(id: number, dto: Partial<CreateReviewDto>, userId: number) {
     const review = await this.prisma.review.findUnique({ where: { id } });
     if (!review) throw new NotFoundException('Review not found');
     if (review.userId !== userId) throw new ForbiddenException();
@@ -63,7 +63,7 @@ export class ReviewsService {
     return updated;
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: number, userId: number) {
     const review = await this.prisma.review.findUnique({ where: { id } });
     if (!review) throw new NotFoundException('Review not found');
     if (review.userId !== userId) throw new ForbiddenException();
@@ -80,7 +80,7 @@ export class ReviewsService {
     return deleted;
   }
 
-  private async updateListingRating(listingId: string) {
+  private async updateListingRating(listingId: number) {
     const agg = await this.prisma.review.aggregate({
       where: { listingId },
       _avg: { rating: true },
@@ -94,7 +94,7 @@ export class ReviewsService {
     });
   }
 
-  private async updateProviderRating(providerId: string) {
+  private async updateProviderRating(providerId: number) {
     const agg = await this.prisma.review.aggregate({
       where: { providerId },
       _avg: { rating: true },

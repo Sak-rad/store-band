@@ -6,7 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async findMe(userId: string) {
+  async findMe(userId: number) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -18,7 +18,7 @@ export class UsersService {
     return user;
   }
 
-  async update(userId: string, dto: UpdateUserDto) {
+  async update(userId: number, dto: UpdateUserDto) {
     return this.prisma.user.update({
       where: { id: userId },
       data: dto,
@@ -29,7 +29,7 @@ export class UsersService {
     });
   }
 
-  async remove(userId: string) {
+  async remove(userId: number) {
     await this.prisma.user.delete({ where: { id: userId } });
   }
 }

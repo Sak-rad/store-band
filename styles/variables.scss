@@ -117,10 +117,12 @@ $booking-panel-width:  360px;
 
 // ─── Z-index ─────────────────────────────────────────────────────────────────
 
-$z-header:  100;
-$z-modal:   200;
-$z-tooltip: 300;
-$z-toast:   400;
+$z-header:   100;
+$z-sheet:    150;
+$z-modal:    200;
+$z-backdrop: 140;
+$z-tooltip:  300;
+$z-toast:    400;
 
 // ─── Transitions ─────────────────────────────────────────────────────────────
 

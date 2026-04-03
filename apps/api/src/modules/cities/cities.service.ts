@@ -6,7 +6,7 @@ import { resolveI18n } from '../../common/helpers/i18n.helper';
 export class CitiesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(countryId: string | undefined, locale: string) {
+  async findAll(countryId: number | undefined, locale: string) {
     const cities = await this.prisma.city.findMany({
       where: countryId ? { countryId } : {},
       orderBy: { name: 'asc' },
@@ -17,7 +17,7 @@ export class CitiesService {
     }));
   }
 
-  async create(countryId: string, nameEn: string, nameRu: string) {
+  async create(countryId: number, nameEn: string, nameRu: string) {
     return this.prisma.city.create({
       data: {
         name: nameEn,

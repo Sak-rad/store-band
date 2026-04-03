@@ -18,9 +18,10 @@ $color-background-tertiary:  #F1F5F9;
 $color-surface:        #FFFFFF;
 $color-surface-raised: #FFFFFF;
 
-$color-border:         #E2E8F0;
-$color-border-light:   #F1F5F9;
-$color-border-focus:   #0EA5E9;
+$color-border:           #E2E8F0;
+$color-border-light:     #F1F5F9;
+$color-border-secondary: #CBD5E1;
+$color-border-focus:     #0EA5E9;
 
 $color-success:        #10B981;
 $color-success-bg:     #D1FAE5;
@@ -102,6 +103,15 @@ $header-height-mobile:  56px;
 $container-max-width:   1200px;
 $sidebar-width:         280px;
 $booking-panel-width:   360px;
+
+// ─── Z-index ─────────────────────────────────────────────────────────────────
+
+$z-header:   100;
+$z-backdrop: 140;
+$z-sheet:    150;
+$z-modal:    200;
+$z-tooltip:  300;
+$z-toast:    400;
 
 // ─── Transitions ─────────────────────────────────────────────────────────────
 
