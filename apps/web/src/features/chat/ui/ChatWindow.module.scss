@@ -7,6 +7,62 @@
   height: calc(100dvh - $header-height - 2px);
   background: $color-surface;
 
+  // ─── Listing card (inside message list) ─────────────────────────────────────
+
+  &__listing {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    padding: $spacing-3;
+    background: $color-surface;
+    border: 1.5px solid $color-border-light;
+    border-radius: $radius-xl;
+    align-self: center;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: $shadow-sm;
+    margin-bottom: $spacing-2;
+
+    &__img {
+      width: 56px;
+      height: 56px;
+      border-radius: $radius-lg;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    &__label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: $color-text-muted;
+    }
+
+    &__title {
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $color-text-primary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 220px;
+    }
+
+    &__price {
+      font-size: $font-size-sm;
+      font-weight: 700;
+      color: $color-primary;
+    }
+  }
+
   // ─── Messages list ──────────────────────────────────────────────────────────
 
   &__messages {

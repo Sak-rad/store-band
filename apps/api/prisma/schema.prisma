@@ -196,6 +196,7 @@ model Listing {
   providerId      Int
   listingType     String    @default("rent")
   isPublished     Boolean   @default(false)
+  isActive        Boolean   @default(true)
   isFeatured      Boolean   @default(false)
   rating          Float     @default(0)
   reviewCount     Int       @default(0)
@@ -250,7 +251,7 @@ model Chat {
   listing  Listing?  @relation(fields: [listingId], references: [id], onDelete: SetNull)
   messages Message[]
 
-  @@unique([userId, providerId, listingId])
+  @@unique([userId, providerId])
   @@index([userId])
   @@index([providerId])
 }

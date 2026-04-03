@@ -103,6 +103,11 @@ export function ChatWindow({ chatId }: Props) {
   const inputRef    = useRef<HTMLInputElement>(null);
   const fileRef     = useRef<HTMLInputElement>(null);
 
+  const { data: chatData } = useQuery({
+    queryKey: ['chat', chatIdNum],
+    queryFn: () => api.get(`/chats/${chatIdNum}`).then((r) => r.data),
+  });
+
   const { data: messagesData } = useQuery({
     queryKey: ['messages', chatIdNum],
     queryFn: () => api.get(`/chats/${chatIdNum}/messages`).then((r) => r.data),
@@ -191,11 +196,34 @@ export function ChatWindow({ chatId }: Props) {
   };
 
   const messages = messagesData?.data || [];
+  const listing = chatData?.listing;
 
   return (
     <div className={styles.chat}>
+
       {/* Messages */}
       <div className={styles.chat__messages}>
+
+        {/* Listing card — pinned at top of messages */}
+        {listing && (
+          <div className={styles.chat__listing}>
+            {listing.media?.[0] && (
+              <img
+                src={listing.media[0].thumbUrl || listing.media[0].url}
+                alt=""
+                className={styles.chat__listing__img}
+              />
+            )}
+            <div className={styles.chat__listing__body}>
+              <span className={styles.chat__listing__label}>Объявление</span>
+              <span className={styles.chat__listing__title}>{listing.title}</span>
+              <span className={styles.chat__listing__price}>
+                {listing.priceOnRequest ? 'По договорённости' : `$${Number(listing.priceMin).toLocaleString()}/mo`}
+              </span>
+            </div>
+          </div>
+        )}
+
         {messages.map((msg: any) => (
           <MessageBubble
             key={msg.id}
