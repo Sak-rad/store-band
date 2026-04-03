@@ -57,6 +57,24 @@
   }
 }
 
+.count {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin-bottom: $spacing-4;
+}
+
+.sentinel {
+  height: 1px;
+  margin-top: $spacing-6;
+}
+
+.end {
+  text-align: center;
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  padding: $spacing-8 0;
+}
+
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

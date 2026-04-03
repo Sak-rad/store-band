@@ -68,24 +68,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('message:send')
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: number; text: string; replyToMessageId?: number },
+    @MessageBody() data: { chatId: number | string; text: string; replyToMessageId?: number | string },
   ) {
     const userId: number = client.data.userId;
-    const message = await this.chatService.createMessage(userId, data);
-    this.server.to(`chat:${data.chatId}`).emit('message:new', message);
+    const chatId = Number(data.chatId);
+    const replyToMessageId = data.replyToMessageId ? Number(data.replyToMessageId) : undefined;
+    const message = await this.chatService.createMessage(userId, { chatId, text: data.text, replyToMessageId });
+    this.server.to(`chat:${chatId}`).emit('message:new', message);
     return message;
   }
 
   @SubscribeMessage('message:read')
   async handleRead(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: number; messageId: number },
+    @MessageBody() data: { chatId: number | string; messageId: number | string },
   ) {
     const userId: number = client.data.userId;
-    await this.chatService.markRead(data.messageId, userId);
+    const chatId = Number(data.chatId);
+    const messageId = Number(data.messageId);
+    await this.chatService.markRead(messageId, userId);
     this.server
-      .to(`chat:${data.chatId}`)
-      .emit('message:read', { messageId: data.messageId, userId });
+      .to(`chat:${chatId}`)
+      .emit('message:read', { messageId, userId });
   }
 
   @SubscribeMessage('typing:start')

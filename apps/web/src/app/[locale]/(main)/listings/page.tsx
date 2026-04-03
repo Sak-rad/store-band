@@ -26,12 +26,21 @@ export default async function ListingsPage({ params, searchParams }: Props) {
       <div className={styles.page__search}>
         <SearchBar />
       </div>
+
       <div className={styles.page__body}>
+        {/* Desktop: sticky left sidebar */}
         <aside className={styles.page__sidebar}>
           <FilterPanel />
         </aside>
+
         <main className={styles.page__main}>
           <h1 className={styles.page__title}>{t('searchTitle')}</h1>
+
+          {/* Mobile: filter toggle button (opens bottom sheet) */}
+          <div className={styles.page__mobile_filter}>
+            <FilterPanel />
+          </div>
+
           <ListingGrid searchParams={sp} locale={locale} />
         </main>
       </div>

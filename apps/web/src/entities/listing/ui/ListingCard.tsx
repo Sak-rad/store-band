@@ -26,7 +26,7 @@ export function ListingCard({ listing }: Props) {
   const location = [listing.city?.name, listing.country?.name].filter(Boolean).join(', ');
 
   return (
-    <Link href={`/listings/${listing.id}`} className={styles.card}>
+    <Link href={`/listings/${listing.id}`} scroll={false} className={styles.card}>
       <div className={styles.card__img}>
         {thumb ? (
           <Image

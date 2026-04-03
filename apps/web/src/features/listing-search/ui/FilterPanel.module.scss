@@ -1,6 +1,91 @@
 @import '../../../../styles/variables';
 @import '../../../../styles/mixins';
 
+// ─── Mobile toggle button (visible only on mobile) ───────────────────────────
+
+.filter__toggle {
+  display: none;
+
+  @include below(lg) {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2;
+    position: relative;
+    padding: $spacing-2 $spacing-4;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-full;
+    background: $color-surface;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: border-color $transition-fast, color $transition-fast;
+
+    &:hover {
+      border-color: $color-primary;
+      color: $color-primary;
+    }
+
+    &--active {
+      border-color: $color-primary;
+      color: $color-primary;
+      background: $color-primary-light;
+    }
+  }
+
+  &__dot {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: $color-primary;
+  }
+}
+
+// ─── Desktop panel wrapper (hidden on mobile) ─────────────────────────────────
+
+.filter__desktop {
+  @include below(lg) { display: none; }
+}
+
+// ─── Mobile overlay + bottom sheet ───────────────────────────────────────────
+
+.filter__overlay {
+  display: none;
+
+  @include below(lg) {
+    display: flex;
+    align-items: flex-end;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: $z-sheet;
+    animation: fade-in 0.2s ease;
+  }
+}
+
+.filter__sheet {
+  width: 100%;
+  max-height: 85dvh;
+  overflow-y: auto;
+  border-radius: $radius-2xl $radius-2xl 0 0;
+  animation: slide-up 0.25s ease;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+// ─── Panel itself ─────────────────────────────────────────────────────────────
+
 .filter {
   background: $color-surface;
   border: 1.5px solid $color-border;
@@ -9,15 +94,27 @@
   position: sticky;
   top: calc($header-height + $spacing-4);
 
-  @include below(lg) { position: static; }
+  // Inside the bottom sheet: no border/radius on sides
+  .filter__sheet & {
+    border-radius: $radius-2xl $radius-2xl 0 0;
+    border: none;
+    border-top: 1px solid $color-border-light;
+    position: static;
+  }
 
-  // ─── Head ────────────────────────────────────────────────────────────
+  // ─── Head ──────────────────────────────────────────────────────────────
 
   &__head {
     @include flex-between;
     margin-bottom: $spacing-5;
     padding-bottom: $spacing-4;
     border-bottom: 1px solid $color-border-light;
+
+    &__right {
+      display: flex;
+      align-items: center;
+      gap: $spacing-3;
+    }
   }
 
   &__title {
@@ -37,11 +134,27 @@
     &:hover { text-decoration: underline; }
   }
 
-  // ─── Section ─────────────────────────────────────────────────────────
+  // Close button — only shown inside bottom sheet (mobile)
+  &__close {
+    display: none;
+    width: 28px;
+    height: 28px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: $color-background-secondary;
+    border-radius: 50%;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+
+    .filter__sheet & { display: flex; }
+  }
+
+  // ─── Section ───────────────────────────────────────────────────────────
 
   &__section {
     margin-bottom: $spacing-5;
-
     &:last-child { margin-bottom: 0; }
 
     &__label {
@@ -52,7 +165,7 @@
     }
   }
 
-  // ─── Chips ───────────────────────────────────────────────────────────
+  // ─── Chips ─────────────────────────────────────────────────────────────
 
   &__chips {
     display: flex;
@@ -98,7 +211,7 @@
     }
   }
 
-  // ─── Price ───────────────────────────────────────────────────────────
+  // ─── Price ─────────────────────────────────────────────────────────────
 
   &__price {
     display: flex;
