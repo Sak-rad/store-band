@@ -1,6 +1,7 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { api } from '../../../shared/lib/api';
 import { ListingCard } from '../../../entities/listing/ui/ListingCard';
@@ -26,12 +27,46 @@ function SkeletonCard() {
 
 export function ListingGrid({ searchParams, locale }: Props) {
   const t = useTranslations('listings');
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
-  const { data, isLoading, isError } = useQuery({
+  const {
+    data,
+    isLoading,
+    isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: ['listings', searchParams, locale],
-    queryFn: () =>
-      api.get('/listings', { params: { ...searchParams, lang: locale } }).then((r) => r.data),
+    queryFn: ({ pageParam }) =>
+      api
+        .get('/listings', {
+          params: {
+            ...searchParams,
+            lang: locale,
+            limit: 15,
+            ...(pageParam ? { cursor: pageParam } : {}),
+          },
+        })
+        .then((r) => r.data),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
+
+  useEffect(() => {
+    const el = sentinelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: '200px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
   if (isLoading) {
     return (
@@ -42,13 +77,34 @@ export function ListingGrid({ searchParams, locale }: Props) {
   }
 
   if (isError) return <p className={styles.empty}>Something went wrong. Please try again.</p>;
-  if (!data?.data?.length) return <p className={styles.empty}>{t('noListings')}</p>;
+
+  const listings = data?.pages.flatMap((p) => p.data) ?? [];
+  const total = data?.pages[0]?.total ?? 0;
+
+  if (!listings.length) return <p className={styles.empty}>{t('noListings')}</p>;
 
   return (
-    <div className={styles.grid}>
-      {data.data.map((listing: any) => (
-        <ListingCard key={listing.id} listing={listing} locale={locale} />
-      ))}
-    </div>
+    <>
+      {total > 0 && (
+        <p className={styles.count}>{total} {t('allListings')}</p>
+      )}
+      <div className={styles.grid}>
+        {listings.map((listing: any) => (
+          <ListingCard key={listing.id} listing={listing} locale={locale} />
+        ))}
+      </div>
+
+      <div ref={sentinelRef} className={styles.sentinel} />
+
+      {isFetchingNextPage && (
+        <div className={styles.loading}>
+          {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+        </div>
+      )}
+
+      {!hasNextPage && listings.length > 0 && (
+        <p className={styles.end}>— {t('allListings')} —</p>
+      )}
+    </>
   );
 }

@@ -2,9 +2,9 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
-import { Link, useRouter } from '../../../navigation';
+import { useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
 import { CreateBookingForm } from '../../create-booking/ui/CreateBookingForm';
@@ -31,23 +31,33 @@ export function ListingSheet({ id, locale }: Props) {
 
   const close = useCallback(() => router.back(), [router]);
 
+  useLayoutEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = ''; };
+  }, []);
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
     document.addEventListener('keydown', onKey);
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      document.body.style.overflow = '';
-    };
+    return () => { document.removeEventListener('keydown', onKey); };
   }, [close]);
 
   const locationStr = listing
     ? [listing.city?.name, listing.country?.name].filter(Boolean).join(', ')
     : '';
 
-  const handleContact = () => {
+  const handleContact = async () => {
     if (!listing?.provider) return;
-    router.push(`/chats?providerId=${listing.provider.id}&listingId=${listing.id}`);
+    try {
+      const res = await api.post('/chats', {
+        providerId: listing.provider.id,
+        listingId: listing.id,
+      });
+      const chatId = res.data.id;
+      window.location.href = `/${locale}/chats/${chatId}`;
+    } catch {
+      window.location.href = `/${locale}/chats`;
+    }
   };
 
   const hasPhotos = (listing?.media?.length ?? 0) > 0;
@@ -142,9 +152,9 @@ export function ListingSheet({ id, locale }: Props) {
                   <CreateBookingForm listing={listing} />
                 </div>
 
-                <Link href={`/listings/${listing.id}`} className={styles.content__fullpage}>
+                <a href={`/${locale}/listings/${listing.id}`} className={styles.content__fullpage}>
                   {t('viewFullPage')} →
-                </Link>
+                </a>
               </>
             )}
           </div>

@@ -21,32 +21,48 @@
     @include below(lg) {
       grid-template-columns: 1fr;
       padding: $spacing-6 $spacing-4;
+      gap: 0;
     }
 
     @include below(sm) {
       padding: $spacing-4;
-      gap: $spacing-4;
     }
   }
 
+  // Desktop: sticky sidebar. Mobile: hidden (filter opens as bottom sheet)
   &__sidebar {
-    @include below(lg) { order: 2; }
+    position: sticky;
+    top: calc($header-height + $spacing-4);
+
+    @include below(lg) {
+      display: none;
+    }
   }
 
   &__main {
     min-width: 0;
-    @include below(lg) { order: 1; }
+  }
+
+  // Mobile filter trigger bar shown above the grid
+  &__mobile_filter {
+    display: none;
+    align-items: center;
+    gap: $spacing-3;
+    margin-bottom: $spacing-4;
+
+    @include below(lg) {
+      display: flex;
+    }
   }
 
   &__title {
     font-size: $font-size-2xl;
     font-weight: 700;
     color: $color-text-primary;
-    margin-bottom: $spacing-6;
+    margin-bottom: $spacing-4;
 
     @include below(sm) {
       font-size: $font-size-xl;
-      margin-bottom: $spacing-4;
     }
   }
 }

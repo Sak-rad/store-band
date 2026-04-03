@@ -4,8 +4,10 @@
 .chat {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - $header-height - 2px);
+  height: calc(100dvh - $header-height - 2px);
   background: $color-surface;
+
+  // ─── Messages list ──────────────────────────────────────────────────────────
 
   &__messages {
     flex: 1;
@@ -13,60 +15,10 @@
     padding: $spacing-6;
     display: flex;
     flex-direction: column;
-    gap: $spacing-4;
+    gap: $spacing-2;
     scroll-behavior: smooth;
 
-    @include below(sm) { padding: $spacing-4; }
-  }
-
-  &__day {
-    text-align: center;
-    font-size: $font-size-xs;
-    color: $color-text-muted;
-    font-weight: 500;
-    letter-spacing: 0.04em;
-  }
-
-  &__message {
-    display: flex;
-    flex-direction: column;
-    max-width: 68%;
-    align-self: flex-start;
-
-    &--own {
-      align-self: flex-end;
-
-      .chat__message__text {
-        background: $color-primary;
-        color: #fff;
-        border-radius: $radius-lg $radius-lg $radius-sm $radius-lg;
-      }
-    }
-
-    &__author {
-      font-size: $font-size-xs;
-      color: $color-text-muted;
-      font-weight: 500;
-      margin-bottom: $spacing-1;
-      padding-left: $spacing-2;
-    }
-
-    &__text {
-      background: $color-background-secondary;
-      padding: $spacing-3 $spacing-4;
-      border-radius: $radius-lg $radius-lg $radius-lg $radius-sm;
-      font-size: $font-size-base;
-      line-height: 1.55;
-      word-break: break-word;
-    }
-
-    &__time {
-      font-size: $font-size-xs;
-      color: $color-text-muted;
-      margin-top: $spacing-1;
-      padding: 0 $spacing-2;
-      align-self: flex-end;
-    }
+    @include below(sm) { padding: $spacing-3; }
   }
 
   &__typing {
@@ -74,21 +26,224 @@
     color: $color-text-muted;
     font-style: italic;
     padding: 0 $spacing-2;
+    align-self: flex-start;
   }
+
+  // ─── Message bubble ─────────────────────────────────────────────────────────
+
+  &__msg {
+    display: flex;
+    align-items: flex-end;
+    gap: $spacing-2;
+    max-width: 72%;
+    align-self: flex-start;
+    position: relative;
+
+    &--own {
+      align-self: flex-end;
+      flex-direction: row-reverse;
+
+      .chat__msg__wrap {
+        align-items: flex-end;
+      }
+
+      .chat__msg__text {
+        background: $color-primary;
+        color: #fff;
+        border-radius: $radius-lg $radius-lg $radius-sm $radius-lg;
+      }
+
+      .chat__msg__quote {
+        background: rgba(255,255,255,0.15);
+        border-left-color: rgba(255,255,255,0.6);
+      }
+
+      .chat__msg__reply_btn {
+        order: 1;
+        right: auto;
+        left: calc(100% + $spacing-1);
+      }
+    }
+
+    &__reply_btn {
+      position: absolute;
+      right: calc(100% + $spacing-1);
+      bottom: $spacing-2;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: $color-background-tertiary;
+      border-radius: 50%;
+      font-size: 14px;
+      cursor: pointer;
+      color: $color-text-secondary;
+      opacity: 0;
+      transition: opacity $transition-fast;
+
+      .chat__msg:hover & { opacity: 1; }
+
+      &:hover { background: $color-border; }
+    }
+
+    &__wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      align-items: flex-start;
+    }
+
+    &__author {
+      font-size: $font-size-xs;
+      color: $color-text-muted;
+      font-weight: 500;
+      padding-left: $spacing-2;
+    }
+
+    // Quoted reply inside bubble
+    &__quote {
+      background: $color-background-tertiary;
+      border-left: 3px solid $color-primary;
+      border-radius: $radius-sm;
+      padding: $spacing-1 $spacing-2;
+      margin-bottom: 2px;
+      max-width: 100%;
+      overflow: hidden;
+
+      &__name {
+        display: block;
+        font-size: $font-size-xs;
+        font-weight: 600;
+        color: $color-primary;
+        margin-bottom: 1px;
+      }
+
+      &__text {
+        display: block;
+        font-size: $font-size-xs;
+        color: $color-text-secondary;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 240px;
+      }
+    }
+
+    &__text {
+      background: $color-background-secondary;
+      padding: $spacing-2 $spacing-3;
+      border-radius: $radius-lg $radius-lg $radius-lg $radius-sm;
+      font-size: $font-size-base;
+      line-height: 1.55;
+      word-break: break-word;
+    }
+
+    &__image {
+      max-width: 260px;
+      max-height: 320px;
+      border-radius: $radius-lg;
+      object-fit: cover;
+      display: block;
+      cursor: pointer;
+
+      @include below(sm) { max-width: 200px; }
+    }
+
+    &__time {
+      font-size: 11px;
+      color: $color-text-muted;
+      padding: 0 $spacing-1;
+      align-self: flex-end;
+    }
+  }
+
+  // ─── Reply preview bar (above input) ────────────────────────────────────────
+
+  &__reply {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    padding: $spacing-2 $spacing-6;
+    border-top: 1px solid $color-border-light;
+    background: $color-background-secondary;
+
+    @include below(sm) { padding: $spacing-2 $spacing-4; }
+
+    &__body {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      border-left: 3px solid $color-primary;
+      padding-left: $spacing-2;
+    }
+
+    &__name {
+      font-size: $font-size-xs;
+      font-weight: 700;
+      color: $color-primary;
+    }
+
+    &__text {
+      font-size: $font-size-sm;
+      color: $color-text-secondary;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &__close {
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: none;
+      color: $color-text-muted;
+      font-size: $font-size-sm;
+      cursor: pointer;
+      border-radius: 50%;
+      flex-shrink: 0;
+
+      &:hover { background: $color-border; color: $color-text-primary; }
+    }
+  }
+
+  // ─── Input area ─────────────────────────────────────────────────────────────
 
   &__input {
     display: flex;
     align-items: center;
-    gap: $spacing-3;
-    padding: $spacing-4 $spacing-6;
+    gap: $spacing-2;
+    padding: $spacing-3 $spacing-4;
     border-top: 1px solid $color-border-light;
     background: $color-surface;
 
-    @include below(sm) { padding: $spacing-3 $spacing-4; }
+    &__file { display: none; }
 
-    input {
+    &__attach {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: $color-text-muted;
+      cursor: pointer;
+      transition: background $transition-fast, color $transition-fast;
+
+      &:hover { background: $color-background-secondary; color: $color-primary; }
+
+      &--loading { color: $color-primary; }
+    }
+
+    input[type="text"] {
       flex: 1;
-      padding: $spacing-3 $spacing-4;
+      padding: $spacing-2 $spacing-4;
       border: 1.5px solid $color-border;
       border-radius: $radius-full;
       font-size: $font-size-base;
@@ -107,22 +262,24 @@
       }
     }
 
-    button {
+    button[type="submit"] {
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 42px;
-      height: 42px;
       background: $color-primary;
       color: #fff;
       border: none;
       border-radius: 50%;
       cursor: pointer;
-      flex-shrink: 0;
+      padding-left: 2px; // optical center for the send arrow
       transition: background $transition-fast, transform $transition-fast;
 
-      &:hover { background: $color-primary-dark; }
-      &:active { transform: scale(0.94); }
+      &:hover:not(:disabled) { background: $color-primary-dark; }
+      &:active:not(:disabled) { transform: scale(0.93); }
+      &:disabled { opacity: 0.5; cursor: not-allowed; }
     }
   }
 }

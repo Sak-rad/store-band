@@ -5,6 +5,9 @@ const withNextIntl = createNextIntlPlugin('./src/i18n.ts');
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  sassOptions: {
+    silenceDeprecations: ['import', 'legacy-js-api'],
+  },
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
