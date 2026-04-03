@@ -5,7 +5,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 export class FavoritesService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(userId: string) {
+  async findAll(userId: number) {
     return this.prisma.favorite.findMany({
       where: { userId },
       include: {
@@ -22,7 +22,7 @@ export class FavoritesService {
     });
   }
 
-  async add(userId: string, listingId: string) {
+  async add(userId: number, listingId: number) {
     return this.prisma.favorite.upsert({
       where: { userId_listingId: { userId, listingId } },
       create: { userId, listingId },
@@ -30,7 +30,7 @@ export class FavoritesService {
     });
   }
 
-  async remove(userId: string, listingId: string) {
+  async remove(userId: number, listingId: number) {
     return this.prisma.favorite.delete({
       where: { userId_listingId: { userId, listingId } },
     });

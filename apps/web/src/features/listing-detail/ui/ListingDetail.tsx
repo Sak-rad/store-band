@@ -7,6 +7,7 @@ import { Link, useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
 import { CreateBookingForm } from '../../create-booking/ui/CreateBookingForm';
+import { PhotoSlider } from './PhotoSlider';
 import styles from './ListingDetail.module.scss';
 
 interface Props {
@@ -36,21 +37,16 @@ export function ListingDetail({ id, locale }: Props) {
 
   return (
     <div className={styles.detail}>
-      {/* ── Gallery ──────────────────────────────── */}
+      {/* ── Photo slider ──────────────────────────────── */}
       {listing.media?.length > 0 && (
         <div className={styles.detail__gallery}>
-          {listing.media.map((m: any, i: number) => (
-            <div key={i} className={styles['detail__gallery__item']}>
-              <Image src={m.url} alt={listing.title} fill style={{ objectFit: 'cover' }} sizes="800px" />
-            </div>
-          ))}
+          <PhotoSlider photos={listing.media} priority />
         </div>
       )}
 
       {/* ── Two-column layout ────────────────────── */}
       <div className={styles.detail__layout}>
         <div className={styles.detail__info}>
-
           {/* Breadcrumb */}
           <nav className={styles.detail__breadcrumb}>
             <Link href="/listings">{t('allListings')}</Link>
@@ -65,7 +61,7 @@ export function ListingDetail({ id, locale }: Props) {
 
           <h1 className={styles.detail__title}>{listing.title}</h1>
 
-          {/* Meta row: location + rating */}
+          {/* Meta: location + rating */}
           <div className={styles.detail__meta}>
             {locationStr && (
               <div className={styles.detail__location}>
@@ -105,7 +101,13 @@ export function ListingDetail({ id, locale }: Props) {
             <div className={styles.detail__provider}>
               <div className={styles.detail__provider__avatar}>
                 {listing.provider.avatarUrl ? (
-                  <Image src={listing.provider.avatarUrl} alt={listing.provider.name} fill style={{ objectFit: 'cover' }} sizes="48px" />
+                  <Image
+                    src={listing.provider.avatarUrl}
+                    alt={listing.provider.name}
+                    fill
+                    sizes="48px"
+                    style={{ objectFit: 'cover' }}
+                  />
                 ) : (
                   <span>{listing.provider.name?.[0]?.toUpperCase()}</span>
                 )}

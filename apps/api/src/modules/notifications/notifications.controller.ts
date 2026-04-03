@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Patch, Param, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
@@ -10,19 +10,19 @@ export class NotificationsController {
 
   @Get()
   findAll(
-    @CurrentUser('id') userId: string,
+    @CurrentUser('id') userId: number,
     @Query('read') read?: string,
   ) {
     return this.notificationsService.findAll(userId, read === 'false');
   }
 
   @Patch(':id/read')
-  markRead(@Param('id') id: string, @CurrentUser('id') userId: string) {
+  markRead(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
     return this.notificationsService.markRead(id, userId);
   }
 
   @Patch('read-all')
-  markAllRead(@CurrentUser('id') userId: string) {
+  markAllRead(@CurrentUser('id') userId: number) {
     return this.notificationsService.markAllRead(userId);
   }
 }

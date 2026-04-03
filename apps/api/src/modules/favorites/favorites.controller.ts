@@ -5,6 +5,7 @@ import {
   Delete,
   Body,
   Param,
+  ParseIntPipe,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -20,22 +21,22 @@ export class FavoritesController {
   constructor(private favoritesService: FavoritesService) {}
 
   @Get()
-  findAll(@CurrentUser('id') userId: string) {
+  findAll(@CurrentUser('id') userId: number) {
     return this.favoritesService.findAll(userId);
   }
 
   @Post()
   add(
-    @CurrentUser('id') userId: string,
-    @Body('listingId') listingId: string,
+    @CurrentUser('id') userId: number,
+    @Body('listingId', ParseIntPipe) listingId: number,
   ) {
     return this.favoritesService.add(userId, listingId);
   }
 
   @Delete(':listingId')
   remove(
-    @CurrentUser('id') userId: string,
-    @Param('listingId') listingId: string,
+    @CurrentUser('id') userId: number,
+    @Param('listingId', ParseIntPipe) listingId: number,
   ) {
     return this.favoritesService.remove(userId, listingId);
   }

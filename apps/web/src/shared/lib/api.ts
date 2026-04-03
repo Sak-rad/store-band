@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/auth.store';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
@@ -14,6 +15,11 @@ api.interceptors.request.use((config) => {
       .find((row) => row.startsWith('NEXT_LOCALE='))
       ?.split('=')[1] || 'en';
     config.headers['Accept-Language'] = locale;
+
+    const token = useAuthStore.getState().accessToken;
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
   }
   return config;
 });

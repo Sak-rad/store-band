@@ -1,12 +1,9 @@
-import { IsString, IsOptional, IsBoolean, IsNumber, IsObject, ValidateNested } from 'class-validator';
+import { IsString, IsOptional, IsNumber, IsObject, ValidateNested, IsInt, IsBoolean, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class I18nField {
-  @IsString()
-  en: string;
-
-  @IsString()
-  ru: string;
+  @IsString() en: string;
+  @IsString() ru: string;
 }
 
 export class CreateListingDto {
@@ -20,24 +17,35 @@ export class CreateListingDto {
   @Type(() => I18nField)
   descriptionI18n: I18nField;
 
-  @IsNumber()
-  priceMin: number;
-
-  @IsNumber()
   @IsOptional()
+  @IsBoolean()
+  priceOnRequest?: boolean;
+
+  @IsOptional()
+  @IsNumber()
+  priceMin?: number;
+
+  @IsOptional()
+  @IsNumber()
   priceMax?: number;
 
+  @IsOptional()
   @IsString()
-  currency: string;
+  currency?: string;
 
-  @IsString()
-  categoryId: string;
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  photoUrls?: string[];
 
-  @IsString()
-  cityId: string;
+  @IsInt()
+  categoryId: number;
 
-  @IsString()
-  countryId: string;
+  @IsInt()
+  cityId: number;
+
+  @IsInt()
+  countryId: number;
 
   @IsOptional()
   @IsNumber()
@@ -52,6 +60,6 @@ export class CreateListingDto {
   address?: string;
 
   @IsOptional()
-  @IsBoolean()
-  isPublished?: boolean;
+  @IsString()
+  listingType?: string;
 }

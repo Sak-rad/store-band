@@ -7,6 +7,7 @@
     "loading": "Loading...",
     "error": "Something went wrong",
     "noResults": "No results found",
+    "verified": "Verified",
     "search": "Search",
     "filters": "Filters",
     "showMore": "Show more",
@@ -68,6 +69,7 @@
     "allListings": "All listings",
     "reviews": "reviews",
     "aboutListing": "About this listing",
+    "viewFullPage": "Open full listing page",
     "realEstate": "🏘 Real Estate",
     "services": "🛎 Services",
     "listingType": {
@@ -77,6 +79,7 @@
     }
   },
   "chat": {
+    "title": "Messages",
     "placeholder": "Write a message...",
     "typing": "{name} is typing...",
     "online": "Online",
@@ -130,9 +133,14 @@
     "languageRu": "Russian",
     "editProfile": "Edit profile",
     "myBookings": "My bookings",
+    "myListings": "My listings",
     "myFavorites": "Saved",
     "providerDashboard": "Provider dashboard",
-    "savedListings": "Saved listings"
+    "savedListings": "Saved listings",
+    "addListing": "Add listing",
+    "noListings": "No listings yet",
+    "noBookings": "No bookings yet",
+    "loginToView": "Sign in to view your profile"
   },
   "meta": {
     "homeTitle": "Relocation Platform — Find housing abroad",
@@ -159,7 +167,10 @@
     "editListing": "Edit listing",
     "listingFormTabEn": "English",
     "listingFormTabRu": "Russian",
-    "bothLanguagesRequired": "Please fill in both English and Russian"
+    "bothLanguagesRequired": "Please fill in both English and Russian",
+    "createListingHint": "Fill in the details below. Your listing will be reviewed before publishing.",
+    "listingSubmitted": "Listing submitted!",
+    "listingAwaitingApproval": "Your listing is awaiting admin approval."
   },
   "upload": {
     "dragDrop": "Drag and drop files here",

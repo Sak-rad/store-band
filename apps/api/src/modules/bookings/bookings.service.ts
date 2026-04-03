@@ -18,7 +18,7 @@ export class BookingsService {
     @InjectQueue('notifications') private notifQueue: Queue,
   ) {}
 
-  async create(dto: CreateBookingDto, userId: string, lang: string) {
+  async create(dto: CreateBookingDto, userId: number, lang: string) {
     const checkIn = new Date(dto.checkIn);
     const checkOut = new Date(dto.checkOut);
 
@@ -74,7 +74,7 @@ export class BookingsService {
     return booking;
   }
 
-  async findAll(userId: string, role: string) {
+  async findAll(userId: number, role: string) {
     const where = role === 'USER' ? { userId } : {};
     return this.prisma.booking.findMany({
       where,
@@ -86,7 +86,7 @@ export class BookingsService {
     });
   }
 
-  async findOne(id: string, userId: string) {
+  async findOne(id: number, userId: number) {
     const booking = await this.prisma.booking.findUnique({
       where: { id },
       include: {
@@ -98,7 +98,7 @@ export class BookingsService {
     return booking;
   }
 
-  async update(id: string, status: string, lang: string) {
+  async update(id: number, status: string, lang: string) {
     const booking = await this.prisma.booking.findUnique({ where: { id } });
     if (!booking) throw new NotFoundException();
 
@@ -114,7 +114,7 @@ export class BookingsService {
     return updated;
   }
 
-  async remove(id: string, userId: string) {
+  async remove(id: number, userId: number) {
     const booking = await this.prisma.booking.findUnique({ where: { id } });
     if (!booking || booking.userId !== userId) throw new NotFoundException();
     return this.prisma.booking.update({

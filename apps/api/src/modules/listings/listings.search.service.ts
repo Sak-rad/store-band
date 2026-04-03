@@ -61,7 +61,7 @@ export class ListingsSearchService {
       }),
     ]);
 
-    let nextCursor: string | null = null;
+    let nextCursor: number | null = null;
     if (items.length > take) {
       const next = items.pop();
       nextCursor = next!.id;

@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { api } from '../../../shared/lib/api';
 import styles from './CreateBookingForm.module.scss';
+import { useCurrencyStore } from '@/shared/store/currency.store';
 
 interface Props { listing: any; }
 
@@ -22,6 +23,7 @@ type FormData = z.infer<typeof schema>;
 
 export function CreateBookingForm({ listing }: Props) {
   const t = useTranslations('booking');
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
 
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -46,7 +48,7 @@ export function CreateBookingForm({ listing }: Props) {
     <form className={styles.form} onSubmit={handleSubmit((d) => mutation.mutate(d))}>
       <div className={styles.form__header}>
         <div className={styles['form__header__price']}>
-          {Number(listing.priceMin).toLocaleString()} {listing.currency}
+          {formatPrice(listing.priceMin)}
           <span> / мес.</span>
         </div>
         {listing.reviewCount > 0 && (

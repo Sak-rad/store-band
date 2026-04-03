@@ -14,7 +14,7 @@ export class ProvidersService {
     return providers.map((p) => this.resolveProvider(p, locale));
   }
 
-  async findOne(id: string, locale: string) {
+  async findOne(id: number, locale: string) {
     const provider = await this.prisma.provider.findUnique({
       where: { id },
       include: {
@@ -25,7 +25,7 @@ export class ProvidersService {
     return this.resolveProvider(provider, locale);
   }
 
-  async create(dto: CreateProviderDto, userId: string) {
+  async create(dto: CreateProviderDto, userId: number) {
     const provider = await this.prisma.provider.create({
       data: {
         userId,
@@ -40,7 +40,7 @@ export class ProvidersService {
     return provider;
   }
 
-  async update(id: string, dto: Partial<CreateProviderDto>, userId: string) {
+  async update(id: number, dto: Partial<CreateProviderDto>, userId: number) {
     const provider = await this.prisma.provider.findUnique({ where: { id } });
     if (!provider) throw new NotFoundException('Provider not found');
     if (provider.userId !== userId) throw new ForbiddenException();
@@ -60,7 +60,7 @@ export class ProvidersService {
     return this.prisma.provider.update({ where: { id }, data });
   }
 
-  async getListings(id: string, locale: string) {
+  async getListings(id: number, locale: string) {
     const listings = await this.prisma.listing.findMany({
       where: { providerId: id, deletedAt: null },
       include: {
@@ -78,7 +78,7 @@ export class ProvidersService {
     }));
   }
 
-  async getReviews(id: string) {
+  async getReviews(id: number) {
     return this.prisma.review.findMany({
       where: { providerId: id },
       include: {
