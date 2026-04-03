@@ -169,11 +169,14 @@
 .listing {
   display: flex;
   align-items: center;
-  gap: $spacing-4;
-  padding: $spacing-4;
+  gap: $spacing-3;
+  padding: $spacing-3 $spacing-4;
   background: $color-surface;
   border: 1px solid $color-border-light;
   border-radius: $radius-xl;
+  transition: opacity $transition-fast;
+
+  &--inactive { opacity: 0.55; }
 
   &__thumb {
     width: 52px;
@@ -213,10 +216,97 @@
     padding: 3px $spacing-3;
     border-radius: $radius-full;
     flex-shrink: 0;
+    white-space: nowrap;
 
-    &--live      { background: $color-success-bg; color: $color-success-text; }
-    &--pending   { background: $color-warning-bg; color: $color-warning-text; }
-    &--confirmed { background: $color-success-bg; color: $color-success-text; }
-    &--cancelled { background: $color-error-bg;   color: $color-error-text;   }
+    &--live      { background: $color-success-bg;  color: $color-success-text; }
+    &--pending   { background: $color-warning-bg;  color: $color-warning-text; }
+    &--inactive  { background: $color-background-tertiary; color: $color-text-muted; }
+    &--confirmed { background: $color-success-bg;  color: $color-success-text; }
+    &--cancelled { background: $color-error-bg;    color: $color-error-text;   }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-1;
+    flex-shrink: 0;
+  }
+
+  &__btn {
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-md;
+    border: none;
+    background: $color-background-secondary;
+    cursor: pointer;
+    font-size: 14px;
+    @include flex-center;
+    transition: background $transition-fast;
+    text-decoration: none;
+    color: inherit;
+
+    &:hover { background: $color-border; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    &--delete:hover { background: $color-error-bg; }
+  }
+}
+
+// ─── Delete confirmation dialog ───────────────────────────────────────────────
+
+.dialog {
+  background: $color-surface;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+  max-width: 340px;
+  width: 100%;
+  box-shadow: $shadow-xl;
+
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: $z-modal;
+    padding: $spacing-4;
+  }
+
+  &__text {
+    font-size: $font-size-base;
+    color: $color-text-primary;
+    margin-bottom: $spacing-5;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-3;
+    justify-content: flex-end;
+  }
+
+  &__cancel {
+    padding: $spacing-2 $spacing-5;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-full;
+    background: none;
+    font-size: $font-size-sm;
+    color: $color-text-secondary;
+    cursor: pointer;
+    &:hover { background: $color-background-secondary; }
+  }
+
+  &__confirm {
+    padding: $spacing-2 $spacing-5;
+    border: none;
+    border-radius: $radius-full;
+    background: $color-error;
+    color: #fff;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    &:hover { opacity: 0.88; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
   }
 }

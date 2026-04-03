@@ -23,9 +23,15 @@ export class ChatService {
     const chat = await this.prisma.chat.findUnique({
       where: { id },
       include: {
-        listing: true,
+        listing: {
+          select: {
+            id: true, title: true, titleI18n: true,
+            priceMin: true, priceOnRequest: true, currency: true,
+            media: { take: 1, orderBy: { order: 'asc' } },
+          },
+        },
         user: { select: { id: true, name: true, avatarUrl: true } },
-        provider: { select: { id: true, name: true, nameI18n: true, avatarUrl: true } },
+        provider: { select: { id: true, name: true, nameI18n: true, avatarUrl: true, userId: true } },
       },
     });
     if (!chat) throw new NotFoundException();
@@ -36,15 +42,21 @@ export class ChatService {
     const provider = await this.prisma.provider.findUnique({ where: { id: dto.providerId } });
     if (!provider) throw new NotFoundException('Provider not found');
 
-    // upsert with nullable listingId doesn't work in PG (NULLs not equal in unique index)
+    // One chat per user-provider pair — find by userId + providerId only
     const existing = await this.prisma.chat.findFirst({
-      where: {
-        userId,
-        providerId: dto.providerId,
-        listingId: dto.listingId ?? null,
-      },
+      where: { userId, providerId: dto.providerId },
     });
-    if (existing) return existing;
+
+    if (existing) {
+      // Update context listing if a new one is provided
+      if (dto.listingId && existing.listingId !== dto.listingId) {
+        return this.prisma.chat.update({
+          where: { id: existing.id },
+          data: { listingId: dto.listingId },
+        });
+      }
+      return existing;
+    }
 
     return this.prisma.chat.create({
       data: {

@@ -74,6 +74,15 @@ export class ListingsController {
     return this.listingsService.reject(id);
   }
 
+  @Patch(':id/toggle-active')
+  @Roles('PROVIDER', 'ADMIN')
+  toggleActive(
+    @Param('id', ParseIntPipe) id: number,
+    @CurrentUser('id') userId: number,
+  ) {
+    return this.listingsService.toggleActive(id, userId);
+  }
+
   @Patch(':id')
   @Roles('PROVIDER', 'ADMIN')
   update(

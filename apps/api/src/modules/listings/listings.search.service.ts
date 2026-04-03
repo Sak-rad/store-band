@@ -21,6 +21,7 @@ export class ListingsSearchService {
 
     const where: any = {
       isPublished: true,
+      isActive: true,
       deletedAt: null,
     };
 

@@ -129,22 +129,69 @@ export class ListingsService {
     });
   }
 
-  async update(id: number, dto: UpdateListingDto, providerId: number) {
-    const listing = await this.prisma.listing.findUnique({ where: { id } });
-    if (!listing) throw new NotFoundException();
-    if (listing.providerId !== providerId) throw new ForbiddenException();
+  async update(id: number, dto: UpdateListingDto, userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    const isAdmin = user?.role === 'ADMIN';
 
-    const data: any = { ...dto };
-    if (dto.titleI18n) data.title = dto.titleI18n.en;
-    if (dto.descriptionI18n) data.description = dto.descriptionI18n.en;
+    const listing = await this.prisma.listing.findFirst({ where: { id, deletedAt: null } });
+    if (!listing) throw new NotFoundException();
+
+    if (!isAdmin) {
+      const provider = await this.prisma.provider.findUnique({ where: { userId } });
+      if (!provider || listing.providerId !== provider.id) throw new ForbiddenException();
+    }
+
+    const data: any = {};
+    if (dto.titleI18n) { data.titleI18n = dto.titleI18n; data.title = dto.titleI18n.en; }
+    if (dto.descriptionI18n) { data.descriptionI18n = dto.descriptionI18n; data.description = dto.descriptionI18n.en; }
+    if (dto.priceMin !== undefined) data.priceMin = dto.priceMin;
+    if (dto.priceMax !== undefined) data.priceMax = dto.priceMax;
+    if (dto.priceOnRequest !== undefined) data.priceOnRequest = dto.priceOnRequest;
+    if (dto.currency) data.currency = dto.currency;
+    if (dto.listingType) data.listingType = dto.listingType;
+    if (dto.categoryId) data.categoryId = dto.categoryId;
+    if (dto.cityId) data.cityId = dto.cityId;
+    if (dto.countryId) data.countryId = dto.countryId;
+    if (dto.address !== undefined) data.address = dto.address;
+    if (dto.lat !== undefined) data.lat = dto.lat;
+    if (dto.lng !== undefined) data.lng = dto.lng;
+
+    // Provider edit → needs re-approval (unless only toggling isActive)
+    const contentKeys = ['titleI18n', 'descriptionI18n', 'priceMin', 'priceMax', 'priceOnRequest', 'categoryId', 'cityId', 'countryId'];
+    if (!isAdmin && contentKeys.some(k => data[k] !== undefined)) {
+      data.isPublished = false;
+    }
 
     return this.prisma.listing.update({ where: { id }, data });
   }
 
-  async remove(id: number, providerId: number) {
-    const listing = await this.prisma.listing.findUnique({ where: { id } });
+  async toggleActive(id: number, userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    const isAdmin = user?.role === 'ADMIN';
+
+    const listing = await this.prisma.listing.findFirst({ where: { id, deletedAt: null } });
     if (!listing) throw new NotFoundException();
-    if (listing.providerId !== providerId) throw new ForbiddenException();
+
+    if (!isAdmin) {
+      const provider = await this.prisma.provider.findUnique({ where: { userId } });
+      if (!provider || listing.providerId !== provider.id) throw new ForbiddenException();
+    }
+
+    return this.prisma.listing.update({ where: { id }, data: { isActive: !listing.isActive } });
+  }
+
+  async remove(id: number, userId: number) {
+    const user = await this.prisma.user.findUnique({ where: { id: userId }, select: { role: true } });
+    const isAdmin = user?.role === 'ADMIN';
+
+    const listing = await this.prisma.listing.findFirst({ where: { id, deletedAt: null } });
+    if (!listing) throw new NotFoundException();
+
+    if (!isAdmin) {
+      const provider = await this.prisma.provider.findUnique({ where: { userId } });
+      if (!provider || listing.providerId !== provider.id) throw new ForbiddenException();
+    }
+
     return this.prisma.listing.update({ where: { id }, data: { deletedAt: new Date() } });
   }
 
@@ -169,6 +216,7 @@ export class ListingsService {
       include: {
         category: true,
         city: true,
+        country: true,
         media: { orderBy: { order: 'asc' }, take: 1 },
       },
       orderBy: { createdAt: 'desc' },

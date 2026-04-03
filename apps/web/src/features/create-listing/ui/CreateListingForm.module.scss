@@ -213,3 +213,21 @@
     &:hover { background: rgba(0, 0, 0, 0.8); }
   }
 }
+
+.form__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: $spacing-3;
+}
+
+.form__back {
+  padding: $spacing-3 $spacing-6;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-full;
+  background: none;
+  font-size: $font-size-base;
+  color: $color-text-secondary;
+  cursor: pointer;
+  &:hover { background: $color-background-secondary; }
+}
