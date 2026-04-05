@@ -17,10 +17,41 @@
       "thb": "฿ THB",
       "aed": "AED"
     },
-    "clearAll": "Clear all"
+    "clearAll": "Clear all",
+    "location": "Location",
+    "allCountries": "All countries",
+    "allCities": "All cities"
   },
   "home": {
-
+    "trustBadge": "Trusted by 2,000+ travellers & expats worldwide",
+    "heroTitle": "Live, travel, explore —",
+    "heroAccent": "we've got you covered",
+    "heroSub": "Apartments, tours, doctors, restaurants and more — whether you're moving abroad or planning your next trip",
+    "searchBtn": "Explore",
+    "viewAll": "View all",
+    "stats": {
+      "listingsLabel": "Listings",
+      "citiesLabel": "Cities",
+      "countriesLabel": "Countries",
+      "providersLabel": "Providers"
+    },
+    "steps": {
+      "title": "Plan your stay in three steps",
+      "step1": { "title": "Choose your destination", "desc": "Browse listings across 40+ cities in 8 countries" },
+      "step2": { "title": "Find what you need", "desc": "Housing, tours, services, food — filter by category, price and location" },
+      "step3": { "title": "Book with confidence", "desc": "Connect directly with verified providers — no middlemen" }
+    },
+    "usp": {
+      "title": "For travellers and expats alike",
+      "verified": { "title": "Verified providers", "desc": "Every provider is manually reviewed for reliability and quality" },
+      "reviews": { "title": "Honest reviews", "desc": "Real feedback from people who've been there — tourists and locals" },
+      "prices": { "title": "Zero commissions", "desc": "Contact providers directly — no hidden fees, ever" }
+    },
+    "cta": {
+      "title": "Your next adventure starts here",
+      "desc": "Whether you're relocating or just visiting — find everything you need in one place",
+      "btn": "Browse all listings"
+    }
   },
   "auth": {
     "loginTitle": "Sign in",
@@ -42,8 +73,8 @@
     }
   },
   "listings": {
-    "searchTitle": "Find your home abroad",
-    "searchPlaceholder": "City, country or keyword...",
+    "searchTitle": "Everything for life abroad",
+    "searchPlaceholder": "Apartment, doctor, restaurant, tour...",
     "filterPrice": "Price",
     "filterCategory": "Category",
     "filterCountry": "Country",
@@ -56,6 +87,7 @@
     "removeFromFavorites": "Saved",
     "noListings": "No listings match your filters",
     "categories": {
+      "real-estate": "Real Estate",
       "apartments": "Apartments",
       "villas": "Villas",
       "excursions": "Excursions",
@@ -76,6 +108,42 @@
       "rent": "Rent",
       "buy": "Buy",
       "short-term": "Short-term"
+    },
+    "alsoShortTerm": "Also short-term",
+    "sort": {
+      "label": "Sort",
+      "newest":     "Newest",
+      "price_asc":  "Price: low to high",
+      "price_desc": "Price: high to low",
+      "rating_desc": "Top rated"
+    },
+    "pageTitleInCountry": "{title} in {country}",
+    "pageTitleInCity":    "{title} in {city}, {country}",
+    "pageDescSuffix":     "Find options in {location}.",
+    "pageTitle": {
+      "default":    "Housing, services & local life abroad",
+      "apartments": "Apartments for rent abroad",
+      "villas":     "Villas for rent abroad",
+      "services":   "Services & local help abroad",
+      "excursions": "Excursions & tours abroad",
+      "transport":  "Transport & car rental abroad",
+      "food":       "Restaurants & cafes abroad",
+      "healthcare": "Doctors & clinics abroad",
+      "education":  "Schools & courses abroad",
+      "rent":       "Long-term rentals abroad",
+      "buy":        "Property for sale abroad",
+      "short-term": "Short-term rentals abroad"
+    },
+    "pageDesc": {
+      "default":    "Apartments, restaurants, doctors, schools and transport — everything you need abroad in one place. Verified providers, real reviews.",
+      "apartments": "Apartments for rent abroad — long-term and short-stay. Real photos, tenant reviews, direct contact with landlords.",
+      "villas":     "Villas for rent abroad. Pools, sea views, for families and groups. Verified owners.",
+      "services":   "Useful services for life abroad: legal help, delivery, language courses, medical care and more.",
+      "excursions": "Excursions and tours abroad from local guides. Easy to find and book directly.",
+      "transport":  "Car rental, transfers and transport services abroad. No middlemen.",
+      "food":       "Restaurants, cafes and food delivery abroad. Places recommended by expats who live there.",
+      "healthcare": "Doctors, dentists and clinics abroad. Find a specialist near you.",
+      "education":  "Language schools, kindergartens and courses abroad. For children and adults."
     }
   },
   "chat": {
@@ -117,10 +185,20 @@
   "reviews": {
     "title": "Reviews",
     "writeReview": "Write a review",
-    "rating": "Rating",
-    "comment": "Comment",
-    "submitReview": "Submit review",
-    "noReviews": "No reviews yet"
+    "editReview": "Edit your review",
+    "rating": "Your rating",
+    "comment": "Comment (optional)",
+    "commentPlaceholder": "Share your experience...",
+    "submitReview": "Submit",
+    "updateReview": "Update",
+    "deleteReview": "Delete",
+    "noReviews": "No reviews yet. Be the first!",
+    "loginToReview": "Sign in to leave a review",
+    "loginLink": "Sign in",
+    "loadMore": "Show more reviews",
+    "anonymous": "Anonymous",
+    "yourReview": "Your review",
+    "alreadyReviewed": "You have already left a review"
   },
   "favorites": {
     "title": "Saved listings",
@@ -132,6 +210,8 @@
     "languageEn": "English",
     "languageRu": "Russian",
     "editProfile": "Edit profile",
+    "myReviews": "My reviews",
+    "noReviews": "You haven't left any reviews yet",
     "myBookings": "My bookings",
     "myListings": "My listings",
     "myFavorites": "Saved",
@@ -143,8 +223,11 @@
     "loginToView": "Sign in to view your profile"
   },
   "meta": {
-    "homeTitle": "Relocation Platform — Find housing abroad",
-    "homeDescription": "Find apartments, services and excursions for relocants"
+    "homeTitle": "Everything for expats abroad — housing, services & more",
+    "homeDescription": "Apartments, restaurants, doctors, transport and excursions in one place. For those moving abroad and those already living there.",
+    "listingsTitle": "Housing, services & local life abroad",
+    "listingsDescription": "Apartments, restaurants, doctors, schools, transport — everything you need abroad in one place. Verified providers, real reviews.",
+    "listingsSiteName": "Relocation Platform"
   },
   "nav": {
     "home": "Home",
@@ -159,18 +242,68 @@
   },
   "provider": {
     "contact": "Contact",
+    "message": "Send message",
     "verified": "Verified",
     "listings": "Listings",
     "reviews": "Reviews",
     "becomeProvider": "Become a provider",
+    "viewProfile": "View profile",
+    "memberSince": "Member since {date}",
+    "noListings": "No listings yet",
+    "phone": "Phone",
+    "website": "Website",
     "createListing": "Create listing",
     "editListing": "Edit listing",
+    "saveChanges": "Save changes",
     "listingFormTabEn": "English",
     "listingFormTabRu": "Russian",
     "bothLanguagesRequired": "Please fill in both English and Russian",
     "createListingHint": "Fill in the details below. Your listing will be reviewed before publishing.",
+    "editListingHint": "Changes will be sent for admin review before going live.",
     "listingSubmitted": "Listing submitted!",
-    "listingAwaitingApproval": "Your listing is awaiting admin approval."
+    "listingUpdated": "Listing updated!",
+    "listingAwaitingApproval": "Your listing is awaiting admin approval.",
+    "listingUpdatedApproval": "Your changes have been submitted for review.",
+    "titleEn": "Title (EN)",
+    "titleRu": "Title (RU)",
+    "descriptionEn": "Description (EN)",
+    "descriptionRu": "Description (RU)",
+    "titleEnPlaceholder": "e.g. Modern studio near the beach",
+    "titleRuPlaceholder": "e.g. Современная студия у пляжа",
+    "descriptionEnPlaceholder": "Describe in English...",
+    "descriptionRuPlaceholder": "Describe in Russian...",
+    "priceSection": "Price",
+    "priceOnRequest": "Price on request",
+    "priceUsd": "Price (USD/month)",
+    "pricePlaceholder": "e.g. 800",
+    "listingType": "Listing type",
+    "typeRent": "Rent",
+    "typeBuy": "Buy / Sale",
+    "typeShortTerm": "Short-term",
+    "photosSection": "Photos",
+    "addPhotos": "+ Add photos",
+    "categorySection": "Category",
+    "selectCategory": "Select category",
+    "locationSection": "Location",
+    "selectCountry": "Select country",
+    "selectCity": "Select city",
+    "address": "Address",
+    "addressPlaceholder": "e.g. 12 Beach Road",
+    "searchHere": "Search...",
+    "nothingFound": "Nothing found",
+    "back": "← Back",
+    "isShortTermAvailable": "Also available for short-term rental",
+    "isShortTermAvailableHint": "The listing will also appear when visitors filter by short-term rentals.",
+    "shortTermDisclaimer": "Short-term rental means daily or weekly rental — guests pay per night or per week. Choose this type if you rent out your property for short stays (tourists, business trips, etc.).",
+    "shortTermRentDisclaimer": "Long-term rental means monthly rental — tenants pay per month for extended stays (relocation, work, study). Enable the option below if the property can also be rented short-term."
+  },
+  "notFound": {
+    "code": "404",
+    "title": "Page not found",
+    "subtitle": "Something went wrong",
+    "description": "The page you're looking for doesn't exist or has been moved.",
+    "explore": "Or explore by category",
+    "button": "All listings"
   },
   "upload": {
     "dragDrop": "Drag and drop files here",

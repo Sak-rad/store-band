@@ -25,13 +25,13 @@ export class AuthController {
   @Post('register')
   async register(@Body() dto: RegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const lang = (req as any).locale || 'en';
-    const { accessToken, user } = await this.authService.register(
+    const { accessToken, refreshToken, user } = await this.authService.register(
       dto,
       req.ip,
       req.headers['user-agent'],
       lang,
     );
-    this.setRefreshCookie(res, accessToken);
+    this.setRefreshCookie(res, refreshToken);
     return { accessToken, user };
   }
 
@@ -40,13 +40,13 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const lang = (req as any).locale || 'en';
-    const { accessToken, user } = await this.authService.login(
+    const { accessToken, refreshToken, user } = await this.authService.login(
       dto,
       req.ip,
       req.headers['user-agent'],
       lang,
     );
-    this.setRefreshCookie(res, accessToken);
+    this.setRefreshCookie(res, refreshToken);
     return { accessToken, user };
   }
 
@@ -55,12 +55,12 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.['refresh_token'];
-    const { accessToken, user } = await this.authService.refresh(
+    const { accessToken, refreshToken: newRefresh, user } = await this.authService.refresh(
       refreshToken,
       req.ip,
       req.headers['user-agent'],
     );
-    this.setRefreshCookie(res, accessToken);
+    this.setRefreshCookie(res, newRefresh);
     return { accessToken, user };
   }
 
@@ -82,9 +82,9 @@ export class AuthController {
     res.cookie('refresh_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
-      path: '/api/auth',
+      path: '/',
     });
   }
 }

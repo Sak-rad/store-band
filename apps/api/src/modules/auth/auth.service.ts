@@ -43,7 +43,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(user.id);
     await this.createSession(user.id, refreshToken, ip, userAgent);
 
-    return { accessToken, user: this.sanitizeUser(user) };
+    return { accessToken, refreshToken, user: this.sanitizeUser(user) };
   }
 
   async login(dto: LoginDto, ip: string, userAgent: string, lang: string) {
@@ -64,7 +64,7 @@ export class AuthService {
     const { accessToken, refreshToken } = await this.generateTokens(user.id);
     await this.createSession(user.id, refreshToken, ip, userAgent);
 
-    return { accessToken, user: this.sanitizeUser(user) };
+    return { accessToken, refreshToken, user: this.sanitizeUser(user) };
   }
 
   async refresh(refreshToken: string, ip: string, userAgent: string) {
@@ -82,7 +82,7 @@ export class AuthService {
     const { accessToken, refreshToken: newRefresh } = await this.generateTokens(session.userId);
     await this.createSession(session.userId, newRefresh, ip, userAgent);
 
-    return { accessToken, user: this.sanitizeUser(session.user) };
+    return { accessToken, refreshToken: newRefresh, user: this.sanitizeUser(session.user) };
   }
 
   async logout(refreshToken: string) {

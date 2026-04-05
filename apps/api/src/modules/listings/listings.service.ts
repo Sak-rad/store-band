@@ -91,6 +91,7 @@ export class ListingsService {
         countryId: dto.countryId,
         providerId: provider.id,
         listingType: dto.listingType ?? 'rent',
+        isShortTermAvailable: dto.isShortTermAvailable ?? false,
         isPublished: false,
         ...(photos.length > 0 && {
           media: {
@@ -149,6 +150,7 @@ export class ListingsService {
     if (dto.priceOnRequest !== undefined) data.priceOnRequest = dto.priceOnRequest;
     if (dto.currency) data.currency = dto.currency;
     if (dto.listingType) data.listingType = dto.listingType;
+    if (dto.isShortTermAvailable !== undefined) data.isShortTermAvailable = dto.isShortTermAvailable;
     if (dto.categoryId) data.categoryId = dto.categoryId;
     if (dto.cityId) data.cityId = dto.cityId;
     if (dto.countryId) data.countryId = dto.countryId;

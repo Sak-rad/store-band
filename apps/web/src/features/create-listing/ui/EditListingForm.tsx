@@ -1,10 +1,14 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
+import { Select } from '../../../shared/ui/Select';
+import { Checkbox } from '../../../shared/ui/Checkbox';
+import { GeoSelect } from '../../../shared/ui/GeoSelect';
+import type { GeoItem } from '../../../shared/ui/GeoSelect';
 import styles from './CreateListingForm.module.scss';
 
 interface FormData {
@@ -16,45 +20,46 @@ interface FormData {
   priceOnRequest: boolean;
   currency: string;
   listingType: string;
-  categoryId: number;
-  countryId: number;
-  cityId: number;
+  isShortTermAvailable: boolean;
+  categoryId: string;
+  countryId: string;
+  cityId: string;
   address: string;
 }
 
-interface Country  { id: number; name: string }
-interface City     { id: number; name: string }
 interface Category { id: number; name: string; slug: string; parentId: number | null }
 
 interface Props { locale: string; listingId: string }
 
 export function EditListingForm({ locale, listingId }: Props) {
+  const t = useTranslations('provider');
   const tCommon = useTranslations('common');
   const router = useRouter();
 
-  const [countries, setCountries]   = useState<Country[]>([]);
-  const [cities, setCities]         = useState<City[]>([]);
+  const [countries, setCountries]   = useState<GeoItem[]>([]);
+  const [cities, setCities]         = useState<GeoItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess]   = useState(false);
-  const [error, setError]       = useState('');
-  const [loading, setLoading]   = useState(true);
+  const [success, setSuccess] = useState(false);
+  const [error, setError]     = useState('');
+  const [loading, setLoading] = useState(true);
 
   const [photos, setPhotos]       = useState<{ url: string; preview: string }[]>([]);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<FormData>({
-    defaultValues: { currency: 'USD', listingType: 'rent', priceOnRequest: false },
+  const { register, handleSubmit, watch, setValue, control, reset, formState: { errors } } = useForm<FormData>({
+    defaultValues: { currency: 'USD', listingType: 'rent', isShortTermAvailable: false, priceOnRequest: false, countryId: '', cityId: '', categoryId: '' },
   });
 
-  const selectedCountry = watch('countryId');
-  const priceOnRequest  = watch('priceOnRequest');
+  const priceOnRequest       = watch('priceOnRequest');
+  const countryId            = watch('countryId');
+  const listingType          = watch('listingType');
+  const isShortTermAvailable = watch('isShortTermAvailable');
 
-  // Load static data + existing listing
   useEffect(() => {
     Promise.all([
-      api.get('/countries').then(r => r.data),
+      api.get('/countries', { params: { lang: locale } }).then(r => r.data),
       api.get('/categories').then(r => r.data),
       api.get(`/listings/${listingId}`, { params: { lang: locale } }).then(r => r.data),
     ]).then(([countriesData, catsData, listing]) => {
@@ -70,9 +75,10 @@ export function EditListingForm({ locale, listingId }: Props) {
         priceOnRequest: listing.priceOnRequest,
         currency: listing.currency,
         listingType: listing.listingType,
-        categoryId: listing.categoryId,
-        countryId: listing.countryId,
-        cityId: listing.cityId,
+        isShortTermAvailable: listing.isShortTermAvailable ?? false,
+        categoryId: String(listing.categoryId),
+        countryId: listing.country?.slug ?? '',
+        cityId: listing.city?.slug ?? '',
         address: listing.address ?? '',
       });
 
@@ -80,17 +86,20 @@ export function EditListingForm({ locale, listingId }: Props) {
         setPhotos(listing.media.map((m: any) => ({ url: m.url, preview: m.thumbUrl || m.url })));
       }
 
-      // Load cities for selected country
-      api.get(`/countries/${listing.countryId}/cities`).then(r => setCities(r.data));
+      if (listing.country?.slug) {
+        api.get(`/countries/${listing.country.slug}/cities`, { params: { lang: locale } }).then(r => setCities(r.data));
+      }
       setLoading(false);
     }).catch(() => setLoading(false));
   }, [listingId, locale, reset]);
 
   useEffect(() => {
-    if (selectedCountry) {
-      api.get(`/countries/${selectedCountry}/cities`).then(r => setCities(r.data));
+    if (countryId) {
+      api.get(`/countries/${countryId}/cities`, { params: { lang: locale } }).then(r => setCities(r.data)).catch(() => {});
+    } else {
+      setCities([]);
     }
-  }, [selectedCountry]);
+  }, [countryId, locale]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -110,7 +119,7 @@ export function EditListingForm({ locale, listingId }: Props) {
       );
       setPhotos(prev => [...prev, ...uploaded]);
     } catch {
-      setError('Failed to upload one or more photos');
+      setError('Failed to upload photos');
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -123,16 +132,19 @@ export function EditListingForm({ locale, listingId }: Props) {
     setIsSubmitting(true);
     setError('');
     try {
+      const countryRecord = countries.find(c => c.slug === data.countryId);
+      const cityRecord    = cities.find(c => c.slug === data.cityId);
       await api.patch(`/listings/${listingId}`, {
         titleI18n:       { en: data.titleEn, ru: data.titleRu },
         descriptionI18n: { en: data.descriptionEn, ru: data.descriptionRu },
         priceOnRequest:  data.priceOnRequest,
         priceMin:        data.priceOnRequest ? 0 : Number(data.priceMin),
         currency:        data.currency,
-        listingType:     data.listingType,
-        categoryId:      Number(data.categoryId),
-        cityId:          Number(data.cityId),
-        countryId:       Number(data.countryId),
+        listingType:          data.listingType,
+        isShortTermAvailable: data.listingType === 'rent' ? data.isShortTermAvailable : false,
+        categoryId:           Number(data.categoryId),
+        cityId:          cityRecord?.id,
+        countryId:       countryRecord?.id,
         address:         data.address,
         photoUrls:       photos.map(p => p.url),
       });
@@ -146,7 +158,7 @@ export function EditListingForm({ locale, listingId }: Props) {
   };
 
   if (loading) {
-    return <div className={styles.page}><p style={{ color: 'var(--color-text-muted)' }}>Loading...</p></div>;
+    return <div className={styles.page}><p style={{ color: 'var(--color-text-muted)', padding: '2rem' }}>{tCommon('loading')}</p></div>;
   }
 
   if (success) {
@@ -154,8 +166,8 @@ export function EditListingForm({ locale, listingId }: Props) {
       <div className={styles.page}>
         <div className={styles.success}>
           <span>✅</span>
-          <h2>Listing updated</h2>
-          <p>Your changes have been submitted for review.</p>
+          <h2>{t('listingUpdated')}</h2>
+          <p>{t('listingUpdatedApproval')}</p>
         </div>
       </div>
     );
@@ -164,77 +176,110 @@ export function EditListingForm({ locale, listingId }: Props) {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.header__title}>Edit Listing</h1>
-        <p className={styles.header__sub}>Changes will be reviewed by admin before going live.</p>
+        <h1 className={styles.header__title}>{t('editListing')}</h1>
+        <p className={styles.header__sub}>{t('editListingHint')}</p>
       </div>
 
       <form className={styles.form} onSubmit={handleSubmit(onSubmit)} noValidate>
 
-        {/* ── Titles ─────────────────────────────────── */}
+        {/* ── English ────────────────────────────────── */}
         <div className={styles.form__section}>
-          <h3 className={styles.form__section__title}>📝 English</h3>
+          <h3 className={styles.form__section__title}>📝 {t('listingFormTabEn')}</h3>
           <div className={styles.form__field}>
-            <label>Title (EN)</label>
-            <input {...register('titleEn', { required: 'Required' })} placeholder="e.g. Modern studio near the beach" />
+            <label>{t('titleEn')}</label>
+            <input {...register('titleEn', { required: tCommon('error') })} placeholder={t('titleEnPlaceholder')} />
             {errors.titleEn && <span className={styles.form__error}>{errors.titleEn.message}</span>}
           </div>
           <div className={styles.form__field}>
-            <label>Description (EN)</label>
-            <textarea {...register('descriptionEn', { required: 'Required' })} rows={4} />
+            <label>{t('descriptionEn')}</label>
+            <textarea {...register('descriptionEn', { required: tCommon('error') })} rows={4} placeholder={t('descriptionEnPlaceholder')} />
             {errors.descriptionEn && <span className={styles.form__error}>{errors.descriptionEn.message}</span>}
           </div>
         </div>
 
+        {/* ── Russian ────────────────────────────────── */}
         <div className={styles.form__section}>
-          <h3 className={styles.form__section__title}>📝 Русский</h3>
+          <h3 className={styles.form__section__title}>📝 {t('listingFormTabRu')}</h3>
           <div className={styles.form__field}>
-            <label>Заголовок (RU)</label>
-            <input {...register('titleRu', { required: 'Обязательно' })} />
+            <label>{t('titleRu')}</label>
+            <input {...register('titleRu', { required: tCommon('error') })} placeholder={t('titleRuPlaceholder')} />
             {errors.titleRu && <span className={styles.form__error}>{errors.titleRu.message}</span>}
           </div>
           <div className={styles.form__field}>
-            <label>Описание (RU)</label>
-            <textarea {...register('descriptionRu', { required: 'Обязательно' })} rows={4} />
+            <label>{t('descriptionRu')}</label>
+            <textarea {...register('descriptionRu', { required: tCommon('error') })} rows={4} placeholder={t('descriptionRuPlaceholder')} />
             {errors.descriptionRu && <span className={styles.form__error}>{errors.descriptionRu.message}</span>}
           </div>
         </div>
 
-        {/* ── Price & Type ────────────────────────────── */}
+        {/* ── Price ──────────────────────────────────── */}
         <div className={styles.form__section}>
-          <h3 className={styles.form__section__title}>💰 Price</h3>
+          <h3 className={styles.form__section__title}>💰 {t('priceSection')}</h3>
           <div className={styles.form__field}>
-            <label className={styles.form__checkbox}>
-              <input type="checkbox" {...register('priceOnRequest')} />
-              <span>Price on request / По договорённости</span>
-            </label>
+            <Checkbox
+              checked={!!priceOnRequest}
+              onChange={v => setValue('priceOnRequest', v)}
+              label={t('priceOnRequest')}
+            />
           </div>
           <div className={styles.form__row}>
             <div className={styles.form__field}>
-              <label>Price (USD/month)</label>
+              <label>{t('priceUsd')}</label>
               <input
                 type="number"
                 min="0"
                 disabled={priceOnRequest}
-                {...register('priceMin', { required: !priceOnRequest && 'Required', min: 1 })}
-                placeholder={priceOnRequest ? 'По договорённости' : 'e.g. 800'}
+                {...register('priceMin', { required: !priceOnRequest && tCommon('error'), min: 1 })}
+                placeholder={priceOnRequest ? t('priceOnRequest') : t('pricePlaceholder')}
                 className={priceOnRequest ? styles['form__input--disabled'] : ''}
               />
               {errors.priceMin && !priceOnRequest && <span className={styles.form__error}>{errors.priceMin.message}</span>}
             </div>
             <div className={styles.form__field}>
-              <label>Listing type</label>
-              <select {...register('listingType')}>
-                <option value="rent">Rent</option>
-                <option value="buy">Buy / Sale</option>
-                <option value="short-term">Short-term</option>
-              </select>
+              <label>
+                {t('listingType')}
+                {listingType === 'rent' && (
+                  <span className={styles.form__tip}>
+                    ?
+                    <span className={styles['form__tip-body']}>{t('shortTermRentDisclaimer')}</span>
+                  </span>
+                )}
+              </label>
+              <Controller
+                name="listingType"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={[
+                      { value: 'rent',       label: t('typeRent') },
+                      { value: 'buy',        label: t('typeBuy') },
+                      { value: 'short-term', label: t('typeShortTerm') },
+                    ]}
+                  />
+                )}
+              />
+              {listingType === 'short-term' && (
+                <p className={styles.form__callout}>{t('shortTermDisclaimer')}</p>
+              )}
             </div>
           </div>
+          {listingType === 'rent' && (
+            <div className={styles.form__field}>
+              <Checkbox
+                checked={!!isShortTermAvailable}
+                onChange={v => setValue('isShortTermAvailable', v)}
+                label={t('isShortTermAvailable')}
+                hint={t('isShortTermAvailableHint')}
+              />
+            </div>
+          )}
         </div>
 
-        {/* ── Photos ──────────────────────────────────── */}
+        {/* ── Photos ─────────────────────────────────── */}
         <div className={styles.form__section}>
-          <h3 className={styles.form__section__title}>📷 Photos</h3>
+          <h3 className={styles.form__section__title}>📷 {t('photosSection')}</h3>
           <div className={styles.uploader}>
             <input
               ref={fileInputRef}
@@ -246,14 +291,14 @@ export function EditListingForm({ locale, listingId }: Props) {
               onChange={handleFileChange}
             />
             <label htmlFor="photo-upload" className={styles.uploader__label}>
-              {uploading ? 'Uploading...' : '+ Add photos'}
+              {uploading ? tCommon('loading') : t('addPhotos')}
             </label>
           </div>
           {photos.length > 0 && (
             <div className={styles.uploader__grid}>
               {photos.map((p, i) => (
                 <div key={i} className={styles.uploader__thumb}>
-                  <img src={p.preview} alt={`photo ${i + 1}`} />
+                  <img src={p.preview} alt="" />
                   <button type="button" className={styles.uploader__remove} onClick={() => removePhoto(i)}>✕</button>
                 </div>
               ))}
@@ -261,43 +306,76 @@ export function EditListingForm({ locale, listingId }: Props) {
           )}
         </div>
 
-        {/* ── Category ────────────────────────────────── */}
+        {/* ── Category ───────────────────────────────── */}
         <div className={styles.form__section}>
-          <h3 className={styles.form__section__title}>🏷 Category</h3>
+          <h3 className={styles.form__section__title}>🏷 {t('categorySection')}</h3>
           <div className={styles.form__field}>
-            <label>Category</label>
-            <select {...register('categoryId', { required: 'Required' })}>
-              <option value="">Select category</option>
-              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
+            <label>{t('categorySection')}</label>
+            <Controller
+              name="categoryId"
+              control={control}
+              rules={{ required: tCommon('error') }}
+              render={({ field }) => (
+                <Select
+                  value={field.value}
+                  onChange={field.onChange}
+                  options={categories.map(c => ({ value: String(c.id), label: c.name }))}
+                  placeholder={t('selectCategory')}
+                  error={!!errors.categoryId}
+                />
+              )}
+            />
             {errors.categoryId && <span className={styles.form__error}>{errors.categoryId.message}</span>}
           </div>
         </div>
 
-        {/* ── Location ─────────────────────────────────── */}
+        {/* ── Location ───────────────────────────────── */}
         <div className={styles.form__section}>
-          <h3 className={styles.form__section__title}>📍 Location</h3>
+          <h3 className={styles.form__section__title}>📍 {t('locationSection')}</h3>
           <div className={styles.form__row}>
             <div className={styles.form__field}>
-              <label>Country</label>
-              <select {...register('countryId', { required: 'Required' })}>
-                <option value="">Select country</option>
-                {countries.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              <label>{tCommon('location')}</label>
+              <Controller
+                name="countryId"
+                control={control}
+                rules={{ required: tCommon('error') }}
+                render={({ field }) => (
+                  <GeoSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={countries}
+                    placeholder={t('selectCountry')}
+                    searchPlaceholder={t('searchHere')}
+                    emptyLabel={t('nothingFound')}
+                  />
+                )}
+              />
               {errors.countryId && <span className={styles.form__error}>{errors.countryId.message}</span>}
             </div>
             <div className={styles.form__field}>
-              <label>City</label>
-              <select {...register('cityId', { required: 'Required' })} disabled={!selectedCountry}>
-                <option value="">Select city</option>
-                {cities.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-              </select>
+              <label>{t('selectCity')}</label>
+              <Controller
+                name="cityId"
+                control={control}
+                rules={{ required: tCommon('error') }}
+                render={({ field }) => (
+                  <GeoSelect
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={cities}
+                    placeholder={t('selectCity')}
+                    searchPlaceholder={t('searchHere')}
+                    emptyLabel={t('nothingFound')}
+                    disabled={!countryId}
+                  />
+                )}
+              />
               {errors.cityId && <span className={styles.form__error}>{errors.cityId.message}</span>}
             </div>
           </div>
           <div className={styles.form__field}>
-            <label>Address</label>
-            <input {...register('address')} placeholder="e.g. 12 Beach Road, District 1" />
+            <label>{t('address')}</label>
+            <input {...register('address')} placeholder={t('addressPlaceholder')} />
           </div>
         </div>
 
@@ -305,10 +383,10 @@ export function EditListingForm({ locale, listingId }: Props) {
 
         <div className={styles.form__footer}>
           <button type="button" className={styles.form__back} onClick={() => router.back()}>
-            ← Back
+            {t('back')}
           </button>
           <button type="submit" className={styles.form__submit} disabled={isSubmitting || uploading}>
-            {isSubmitting ? tCommon('loading') : 'Save changes'}
+            {isSubmitting ? tCommon('loading') : t('saveChanges')}
           </button>
         </div>
       </form>

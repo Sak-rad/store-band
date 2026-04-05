@@ -16,7 +16,7 @@ export function Providers({ children, locale }: Props) {
   const setDisplayCurrency = useCurrencyStore((s) => s.setDisplayCurrency);
   const setRate = useCurrencyStore((s) => s.setRate);
   const userSet = useCurrencyStore((s) => s.userSet);
-  const { accessToken, setUser } = useAuthStore();
+  const { user, accessToken, setUser, setToken, logout } = useAuthStore();
 
   useEffect(() => {
     // Default to RUB for Russian locale (only if user hasn't changed it manually)
@@ -29,11 +29,31 @@ export function Providers({ children, locale }: Props) {
     }).catch(() => {});
   }, [locale]);
 
-  // Sync user role from server on every app load (catches Prisma Studio changes)
+  // On every app load: if user is persisted but accessToken is gone (page reload),
+  // restore session via refresh cookie, then verify identity.
   useEffect(() => {
-    if (accessToken) {
-      api.get('/users/me').then((r) => setUser(r.data)).catch(() => {});
-    }
+    if (!user) return;
+
+    const restore = async () => {
+      try {
+        let token = accessToken;
+        if (!token) {
+          // accessToken lives in memory — lost on reload, restore via httpOnly cookie
+          const { data } = await api.post('/auth/refresh');
+          token = data.accessToken;
+          setToken(token);
+          if (data.user) setUser(data.user);
+        } else {
+          // Token already in memory — just sync user data
+          const { data } = await api.get('/users/me');
+          setUser(data);
+        }
+      } catch {
+        logout();
+      }
+    };
+
+    restore();
   }, []);
 
   return (

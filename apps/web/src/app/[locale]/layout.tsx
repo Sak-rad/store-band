@@ -6,6 +6,7 @@ import { Providers } from '../../shared/ui/Providers';
 import '../../../styles/globals.scss';
 
 const locales = ['en', 'ru'];
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
 interface Props {
   children: React.ReactNode;
@@ -20,9 +21,9 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     description: t('homeDescription'),
     alternates: {
       languages: {
-        en: '/en',
-        ru: '/ru',
-        'x-default': '/en',
+        en: `${BASE_URL}/en`,
+        ru: `${BASE_URL}/ru`,
+        'x-default': `${BASE_URL}/en`,
       },
     },
   };
@@ -34,7 +35,7 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-scroll-behavior="smooth">
       <body>
         <NextIntlClientProvider messages={messages}>
           <Providers locale={locale}>

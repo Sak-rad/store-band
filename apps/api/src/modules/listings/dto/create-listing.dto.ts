@@ -62,4 +62,8 @@ export class CreateListingDto {
   @IsOptional()
   @IsString()
   listingType?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isShortTermAvailable?: boolean;
 }

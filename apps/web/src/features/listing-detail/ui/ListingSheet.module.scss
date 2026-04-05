@@ -31,7 +31,8 @@
     // ── Desktop: right side panel ──────────────────────────────────────
     @include above(md) {
       width: 520px;
-      height: 100dvh;
+      height: calc(100dvh - $header-height);
+      margin-top: $header-height;
       border-radius: $radius-2xl 0 0 $radius-2xl;
       animation: slideInRight 0.3s cubic-bezier(0.32, 0.72, 0, 1);
       box-shadow: -8px 0 48px rgba(15, 23, 42, 0.18);
@@ -83,56 +84,52 @@
   -webkit-overflow-scrolling: touch;
 
   &::-webkit-scrollbar { display: none; }
+
+  // Mirror the panel's own border-radius so GPU-composited children
+  // (sticky elements, overflow-scrolling tracks) can't bleed outside the corners.
+  @include above(md) {
+    border-radius: $radius-2xl 0 0 $radius-2xl; // matches desktop panel
+  }
+  @include below(md) {
+    border-radius: $radius-2xl $radius-2xl 0 0; // matches mobile panel
+  }
 }
 
 // ─── Photo block ─────────────────────────────────────────────────────────────
-// Mobile: sticky so it stays visible while content scrolls over it
-// Desktop: normal flow at top of panel
+// Sticky on BOTH breakpoints — photo stays pinned at top while content scrolls over it.
 
 .panel__photos {
-  height: 280px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  height: 280px;
 
-  // Mobile: sticky — photo stays at top while content slides over
-  @include below(md) {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-  }
-
-  // Desktop: taller, normal flow
   @include above(md) {
     height: 320px;
-    position: relative;
-    z-index: 0;
   }
 }
 
 // ─── White content card ───────────────────────────────────────────────────────
+// Slides up over the photo with rounded top corners on BOTH breakpoints.
 
 .panel__content {
   position: relative;
+  z-index: 2;
   background: $color-surface;
-  padding: $spacing-5 $spacing-6 $spacing-16;
+  border-radius: $radius-2xl $radius-2xl 0 0;
+  margin-top: -$radius-2xl;
+  padding: $spacing-4 $spacing-6 $spacing-16;
   min-height: 60vh;
 
-  // Mobile: rounded top, overlaps bottom of photo
-  @include below(md) {
-    z-index: 2;
-    border-radius: $radius-2xl $radius-2xl 0 0;
-    margin-top: -$radius-2xl; // slide up over photo edge
-    padding-top: $spacing-4;
-  }
-
-  // Desktop: no overlap, normal top
   @include above(md) {
-    border-radius: 0;
-    margin-top: 0;
+    padding-top: $spacing-5;
   }
 
   &--no-photo {
-    min-height: 100%;
+    border-radius: 0;
     margin-top: 0;
+    min-height: 100%;
     padding-top: $spacing-10;
   }
 }
@@ -279,25 +276,41 @@
 .content__prov-info { flex: 1; min-width: 0; }
 
 .content__prov-name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   font-size: $font-size-base;
   font-weight: 600;
   color: $color-text-primary;
+  text-decoration: none;
   @include truncate(1);
+
+  &:hover { color: $color-primary; text-decoration: underline; }
+}
+
+.content__prov-badge {
+  color: $color-primary;
+  flex-shrink: 0;
 }
 
 .content__prov-verified {
+  display: flex;
+  align-items: center;
+  gap: 3px;
   font-size: $font-size-xs;
-  color: $color-success;
+  color: $color-star;
+  font-weight: 500;
   margin-top: 2px;
 }
 
 .content__prov-btn {
   @include btn-primary;
-  padding: $spacing-2 $spacing-4;
-  font-size: $font-size-sm;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border-radius: $radius-full;
   flex-shrink: 0;
-  white-space: nowrap;
+  @include flex-center;
 }
 
 .content__booking {

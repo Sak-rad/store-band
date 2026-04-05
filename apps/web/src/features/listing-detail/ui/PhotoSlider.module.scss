@@ -89,7 +89,7 @@
   // ─── Counter badge ───────────────────────────────────────────────────
   &__counter {
     position: absolute;
-    top: $spacing-3;
+    bottom: $spacing-3;
     right: $spacing-3;
     padding: 3px $spacing-2;
     background: rgba(0, 0, 0, 0.45);
@@ -100,5 +100,12 @@
     border-radius: $radius-full;
     z-index: 2;
     pointer-events: none;
+  }
+
+  // ─── Overlapped variant (sheet modal) ────────────────────────────────
+  // Content card slides over the photo bottom, so lift indicators up.
+  &--overlapped {
+    .slider__dots    { bottom: calc(#{$spacing-3} + 24px); }
+    .slider__counter { bottom: calc(#{$spacing-3} + 24px); }
   }
 }

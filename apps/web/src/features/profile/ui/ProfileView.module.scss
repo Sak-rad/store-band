@@ -98,6 +98,7 @@
     font-size: $font-size-xl;
     font-weight: 700;
     color: $color-text-primary;
+    margin-bottom: $spacing-4;
   }
 }
 
@@ -176,6 +177,11 @@
   border-radius: $radius-xl;
   transition: opacity $transition-fast;
 
+  @include below(sm) {
+    padding: $spacing-3;
+    gap: $spacing-2;
+  }
+
   &--inactive { opacity: 0.55; }
 
   &__thumb {
@@ -187,6 +193,11 @@
     flex-shrink: 0;
     overflow: hidden;
     font-size: 22px;
+
+    @include below(sm) {
+      width: 44px;
+      height: 44px;
+    }
 
     img {
       width: 100%;
@@ -202,12 +213,16 @@
     font-weight: 600;
     color: $color-text-primary;
     @include truncate(1);
+
+    @include below(sm) { font-size: $font-size-sm; }
   }
 
   &__sub {
     font-size: $font-size-sm;
     color: $color-text-secondary;
     margin-top: 2px;
+
+    @include below(sm) { font-size: $font-size-xs; }
   }
 
   &__status {
@@ -217,6 +232,10 @@
     border-radius: $radius-full;
     flex-shrink: 0;
     white-space: nowrap;
+
+    @include below(sm) {
+      display: none; // скрываем статус на очень маленьких экранах
+    }
 
     &--live      { background: $color-success-bg;  color: $color-success-text; }
     &--pending   { background: $color-warning-bg;  color: $color-warning-text; }
@@ -250,6 +269,26 @@
 
     &--delete:hover { background: $color-error-bg; }
   }
+}
+
+// ─── Review row extras ────────────────────────────────────────────────────────
+
+.review__stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 3px;
+  font-size: $font-size-sm;
+  flex-wrap: wrap;
+}
+
+.review__comment {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-left: $spacing-2;
+  @include truncate(1);
+
+  @include below(sm) { display: none; }
 }
 
 // ─── Delete confirmation dialog ───────────────────────────────────────────────

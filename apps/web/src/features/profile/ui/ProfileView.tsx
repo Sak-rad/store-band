@@ -44,6 +44,17 @@ export function ProfileView({ locale }: Props) {
     enabled: !!user,
   });
 
+  const { data: myReviews } = useQuery({
+    queryKey: ['my-reviews'],
+    queryFn: () => api.get('/reviews/my').then(r => r.data),
+    enabled: !!user,
+  });
+
+  const deleteReview = useMutation({
+    mutationFn: (id: number) => api.delete(`/reviews/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['my-reviews'] }),
+  });
+
   const toggleActive = useMutation({
     mutationFn: (id: number) => api.patch(`/listings/${id}/toggle-active`),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['my-listings'] }),
@@ -208,6 +219,55 @@ export function ProfileView({ locale }: Props) {
           )}
         </div>
       )}
+
+      {/* ── My reviews ─────────────────────────────── */}
+      <div className={styles.section}>
+        <h2 className={styles.section__title}>{t('myReviews')}</h2>
+        {!myReviews?.length ? (
+          <p className={styles.empty}>{t('noReviews')}</p>
+        ) : (
+          <div className={styles.listings}>
+            {myReviews.map((r: any) => (
+              <div key={r.id} className={styles.listing}>
+                <div className={styles.listing__thumb}>
+                  {r.listing?.media?.[0] ? (
+                    <img src={r.listing.media[0].thumbUrl || r.listing.media[0].url} alt={r.listing.title} />
+                  ) : (
+                    <span>{r.listing ? '🏠' : '👤'}</span>
+                  )}
+                </div>
+
+                <div className={styles.listing__info}>
+                  <p className={styles.listing__title}>
+                    {r.listing?.title ?? r.provider?.name ?? '—'}
+                  </p>
+                  <div className={styles.review__stars}>
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <span key={i} style={{ color: i < r.rating ? '#F59E0B' : '#E2E8F0' }}>★</span>
+                    ))}
+                    {r.comment && (
+                      <span className={styles.review__comment}>{r.comment}</span>
+                    )}
+                  </div>
+                </div>
+
+                <span className={styles.listing__sub} style={{ flexShrink: 0, whiteSpace: 'nowrap' }}>
+                  {new Date(r.createdAt).toLocaleDateString(locale)}
+                </span>
+
+                <button
+                  className={`${styles.listing__btn} ${styles['listing__btn--delete']}`}
+                  onClick={() => deleteReview.mutate(r.id)}
+                  disabled={deleteReview.isPending}
+                  title="Delete"
+                >
+                  🗑
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* ── Delete confirmation dialog ──────────────── */}
       {confirmDelete !== null && (

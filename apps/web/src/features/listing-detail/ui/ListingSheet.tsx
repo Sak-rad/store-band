@@ -4,11 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
+import { MapPin, Star, MessageCircle, BadgeCheck } from 'lucide-react';
 import { useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
 import { CreateBookingForm } from '../../create-booking/ui/CreateBookingForm';
 import { PhotoSlider } from './PhotoSlider';
+import { ReviewsSection } from './ReviewsSection';
 import styles from './ListingSheet.module.scss';
 
 interface Props {
@@ -19,7 +21,6 @@ interface Props {
 export function ListingSheet({ id, locale }: Props) {
   const router = useRouter();
   const t = useTranslations('listings');
-  const tCommon = useTranslations('common');
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -78,7 +79,7 @@ export function ListingSheet({ id, locale }: Props) {
           {/* ─── Photo (sticky on mobile, normal on desktop) ─── */}
           {hasPhotos && (
             <div className={styles.panel__photos}>
-              <PhotoSlider photos={listing!.media} priority />
+              <PhotoSlider photos={listing!.media} priority overlapped />
             </div>
           )}
 
@@ -106,15 +107,14 @@ export function ListingSheet({ id, locale }: Props) {
                 <div className={styles.content__meta}>
                   {locationStr && (
                     <span className={styles.content__location}>
-                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" /><circle cx="12" cy="10" r="3" />
-                      </svg>
+                      <MapPin size={13} />
                       {locationStr}
                     </span>
                   )}
                   {listing.rating > 0 && (
                     <span className={styles.content__rating}>
-                      ★ {Number(listing.rating).toFixed(1)}
+                      <Star size={12} fill="currentColor" />
+                      {Number(listing.rating).toFixed(1)}
                       {listing.reviewCount > 0 && <em>({listing.reviewCount})</em>}
                     </span>
                   )}
@@ -136,23 +136,35 @@ export function ListingSheet({ id, locale }: Props) {
                         : <span>{listing.provider.name?.[0]?.toUpperCase()}</span>}
                     </div>
                     <div className={styles['content__prov-info']}>
-                      <p className={styles['content__prov-name']}>{listing.provider.name}</p>
-                      {listing.provider.isVerified && (
-                        <p className={styles['content__prov-verified']}>✓ {tCommon('verified')}</p>
+                      <a href={`/${locale}/providers/${listing.provider.id}`} className={styles['content__prov-name']}>
+                        {listing.provider.name}
+                        {listing.provider.isVerified && <BadgeCheck size={14} className={styles['content__prov-badge']} />}
+                      </a>
+                      {listing.provider.rating > 0 && (
+                        <p className={styles['content__prov-verified']}>
+                          <Star size={11} fill="currentColor" /> {Number(listing.provider.rating).toFixed(1)}
+                        </p>
                       )}
                     </div>
-                    <button className={styles['content__prov-btn']} onClick={handleContact}>
-                      {t('contactProvider')}
+                    <button className={styles['content__prov-btn']} onClick={handleContact} title={t('contactProvider')}>
+                      <MessageCircle size={18} />
                     </button>
                   </div>
                 )}
+
+                {/* Reviews */}
+                <ReviewsSection
+                  listingId={listing.id}
+                  reviewCount={listing.reviewCount}
+                  locale={locale}
+                />
 
                 {/* Booking */}
                 <div className={styles.content__booking}>
                   <CreateBookingForm listing={listing} />
                 </div>
 
-                <a href={`/${locale}/listings/${listing.id}`} className={styles.content__fullpage}>
+                <a href={`/${locale}/listing/${listing.id}`} className={styles.content__fullpage}>
                   {t('viewFullPage')} →
                 </a>
               </>

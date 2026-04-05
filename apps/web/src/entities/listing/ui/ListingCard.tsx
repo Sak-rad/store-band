@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { Link } from '../../../navigation';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
 import styles from './ListingCard.module.scss';
@@ -9,7 +10,10 @@ interface Listing {
   id: string;
   title: string;
   priceMin: number;
+  priceOnRequest?: boolean;
   currency: string;
+  listingType?: string;
+  isShortTermAvailable?: boolean;
   category?: { name: string };
   city?: { name: string };
   country?: { name: string };
@@ -18,21 +22,24 @@ interface Listing {
   reviewCount: number;
 }
 
-interface Props { listing: Listing; locale: string; }
+interface Props { listing: Listing; locale: string; priority?: boolean; }
 
-export function ListingCard({ listing }: Props) {
+export function ListingCard({ listing, priority }: Props) {
+  const t = useTranslations('listings');
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const thumb = listing.media?.[0]?.thumbUrl || listing.media?.[0]?.url;
   const location = [listing.city?.name, listing.country?.name].filter(Boolean).join(', ');
+  const showPerMonth = !listing.priceOnRequest && listing.listingType !== 'buy';
 
   return (
-    <Link href={`/listings/${listing.id}`} scroll={false} className={styles.card}>
+    <Link href={`/listing/${listing.id}`} scroll={false} className={styles.card}>
       <div className={styles.card__img}>
         {thumb ? (
           <Image
             src={thumb}
             alt={listing.title}
             fill
+            priority={priority}
             style={{ objectFit: 'cover' }}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
@@ -48,6 +55,11 @@ export function ListingCard({ listing }: Props) {
         {listing.category && (
           <span className={styles.card__badge}>{listing.category.name}</span>
         )}
+        {listing.isShortTermAvailable && (
+          <span className={`${styles.card__badge} ${styles['card__badge--short']}`}>
+            {t('alsoShortTerm')}
+          </span>
+        )}
       </div>
 
       <div className={styles.card__body}>
@@ -56,7 +68,7 @@ export function ListingCard({ listing }: Props) {
         <div className={styles.card__footer}>
           <p className={styles.card__price}>
             <strong>{formatPrice(listing.priceMin)}</strong>
-            <span> / mo</span>
+            {showPerMonth && <span> / {t('perMonth')}</span>}
           </p>
           {listing.reviewCount > 0 && (
             <span className={styles.card__rating}>

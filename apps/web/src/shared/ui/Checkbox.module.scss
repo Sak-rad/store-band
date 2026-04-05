@@ -1,0 +1,79 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: $spacing-3;
+  cursor: pointer;
+  user-select: none;
+
+  // ─── Hidden native input ──────────────────────────────────────────────────────
+  &__input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+
+  // ─── Custom box ───────────────────────────────────────────────────────────────
+  &__box {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-sm;
+    background: $color-surface;
+    transition: border-color $transition-fast, background $transition-fast;
+    @include flex-center;
+
+    svg {
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity $transition-fast, transform $transition-fast;
+      color: #fff;
+    }
+
+    &--checked {
+      border-color: $color-primary;
+      background: $color-primary;
+
+      svg {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+  }
+
+  // ─── Text area ────────────────────────────────────────────────────────────────
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+    line-height: 1.4;
+  }
+
+  &__hint {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    line-height: 1.5;
+  }
+
+  // ─── States ───────────────────────────────────────────────────────────────────
+  &:hover &__box:not(&__box--checked) {
+    border-color: $color-primary;
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}

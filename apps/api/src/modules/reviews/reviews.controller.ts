@@ -36,6 +36,11 @@ export class ReviewsController {
     });
   }
 
+  @Get('my')
+  findMy(@CurrentUser('id') userId: number) {
+    return this.reviewsService.findMy(userId);
+  }
+
   @Post()
   create(@Body() dto: CreateReviewDto, @CurrentUser('id') userId: number) {
     return this.reviewsService.create(dto, userId);

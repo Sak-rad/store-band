@@ -49,6 +49,13 @@
     font-size: $font-size-xs;
     font-weight: 600;
     color: $color-text-primary;
+
+    &--short {
+      top: auto;
+      bottom: $spacing-3;
+      background: rgba(99, 102, 241, 0.88); // indigo tint
+      color: #fff;
+    }
   }
 
   // ─── Body ────────────────────────────────────────────────────────────

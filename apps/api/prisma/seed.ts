@@ -7,22 +7,23 @@ async function main() {
   // ─── Countries ────────────────────────────────────────────────────────
 
   await Promise.all([
-    prisma.country.upsert({ where: { code: 'AM' }, update: {}, create: { name: 'Armenia', code: 'AM', nameI18n: { en: 'Armenia', ru: 'Армения' } } }),
-    prisma.country.upsert({ where: { code: 'RS' }, update: {}, create: { name: 'Serbia',  code: 'RS', nameI18n: { en: 'Serbia',  ru: 'Сербия'  } } }),
+    prisma.country.upsert({ where: { code: 'AM' }, update: {}, create: { name: 'Armenia', code: 'AM', slug: 'armenia', nameI18n: { en: 'Armenia', ru: 'Армения' } } }),
+    prisma.country.upsert({ where: { code: 'RS' }, update: {}, create: { name: 'Serbia',  code: 'RS', slug: 'serbia',  nameI18n: { en: 'Serbia',  ru: 'Сербия'  } } }),
   ]);
 
   const [thailand, uae, georgia, vietnam] = await Promise.all([
-    prisma.country.upsert({ where: { code: 'TH' }, update: {}, create: { name: 'Thailand', code: 'TH', nameI18n: { en: 'Thailand', ru: 'Таиланд' } } }),
-    prisma.country.upsert({ where: { code: 'AE' }, update: {}, create: { name: 'UAE',      code: 'AE', nameI18n: { en: 'UAE',      ru: 'ОАЭ'    } } }),
-    prisma.country.upsert({ where: { code: 'GE' }, update: {}, create: { name: 'Georgia',  code: 'GE', nameI18n: { en: 'Georgia',  ru: 'Грузия'  } } }),
-    prisma.country.upsert({ where: { code: 'VN' }, update: {}, create: { name: 'Vietnam',  code: 'VN', nameI18n: { en: 'Vietnam',  ru: 'Вьетнам' } } }),
+    prisma.country.upsert({ where: { code: 'TH' }, update: {}, create: { name: 'Thailand', code: 'TH', slug: 'thailand', nameI18n: { en: 'Thailand', ru: 'Таиланд' } } }),
+    prisma.country.upsert({ where: { code: 'AE' }, update: {}, create: { name: 'UAE',      code: 'AE', slug: 'uae',      nameI18n: { en: 'UAE',      ru: 'ОАЭ'    } } }),
+    prisma.country.upsert({ where: { code: 'GE' }, update: {}, create: { name: 'Georgia',  code: 'GE', slug: 'georgia',  nameI18n: { en: 'Georgia',  ru: 'Грузия'  } } }),
+    prisma.country.upsert({ where: { code: 'VN' }, update: {}, create: { name: 'Vietnam',  code: 'VN', slug: 'vietnam',  nameI18n: { en: 'Vietnam',  ru: 'Вьетнам' } } }),
   ]);
 
   // ─── Cities ───────────────────────────────────────────────────────────
 
+  const toSlug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const findOrCreateCity = async (name: string, countryId: number, nameRu: string) => {
     const existing = await prisma.city.findFirst({ where: { name, countryId } });
-    return existing ?? await prisma.city.create({ data: { name, countryId, nameI18n: { en: name, ru: nameRu } } });
+    return existing ?? await prisma.city.create({ data: { name, countryId, slug: toSlug(name), nameI18n: { en: name, ru: nameRu } } });
   };
 
   const [phuket, pattaya, dubai] = await Promise.all([
@@ -310,12 +311,96 @@ async function main() {
     },
   ] as const;
 
+  const createdListings: { id: number }[] = [];
   for (const { photos, ...listing } of listings) {
-    await prisma.listing.create({
+    const created = await prisma.listing.create({
       data: {
         ...listing,
         providerId: provider.id,
         media: { createMany: { data: mediaSet(photos as unknown as string[]) } },
+      },
+    });
+    createdListings.push(created);
+  }
+
+  // ─── Seed Reviewer Users ───────────────────────────────────────────────
+
+  const reviewerData = [
+    { email: 'anna@relocate.dev',    name: 'Anna K.',     locale: 'ru' },
+    { email: 'mikhail@relocate.dev', name: 'Михаил С.',   locale: 'ru' },
+    { email: 'james@relocate.dev',   name: 'James T.',    locale: 'en' },
+    { email: 'sarah@relocate.dev',   name: 'Sarah M.',    locale: 'en' },
+    { email: 'dmitry@relocate.dev',  name: 'Дмитрий В.', locale: 'ru' },
+    { email: 'elena@relocate.dev',   name: 'Елена П.',    locale: 'ru' },
+    { email: 'oliver@relocate.dev',  name: 'Oliver B.',   locale: 'en' },
+  ];
+
+  const reviewers = await Promise.all(
+    reviewerData.map(({ email, name, locale }) =>
+      prisma.user.upsert({
+        where: { email },
+        update: {},
+        create: { email, name, passwordHash, role: UserRole.USER, preferredLocale: locale },
+      })
+    )
+  );
+
+  // ─── Reviews ──────────────────────────────────────────────────────────
+  // Per listing: 2-4 reviews from different users, varied ratings & comments.
+  // Delete old seeded reviews first to avoid unique constraint errors.
+
+  await prisma.review.deleteMany({
+    where: { userId: { in: reviewers.map(r => r.id) } },
+  });
+
+  const reviewPool = [
+    // [ userId_index, rating, comment ]
+    [0, 5, 'Отличное место! Всё соответствует описанию, хозяин очень отзывчивый. Рекомендую всем.'],
+    [1, 4, 'Хорошее расположение, чистая квартира. Немного шумновато по ночам, но в целом отлично.'],
+    [2, 5, 'Amazing place! Exactly as described, great location and super clean. Will definitely come back.'],
+    [3, 4, 'Very comfortable stay. The host was responsive and helpful. Minor issue with hot water but quickly resolved.'],
+    [4, 5, 'Превосходно! Вид потрясающий, инфраструктура на высоте. Однозначно буду снимать снова.'],
+    [5, 3, 'Неплохо, но есть что улучшить — шторы пропускают свет и кондиционер немного шумит. В целом жить можно.'],
+    [6, 5, 'Fantastic apartment! Great value for money, clean, modern, and the host was incredibly helpful with local tips.'],
+    [0, 4, 'Хорошее жильё за свои деньги. Район тихий, рядом все удобства. Хозяин оперативно отвечал на вопросы.'],
+    [1, 5, 'Идеально для долгосрочного проживания. Всё что нужно есть, интернет быстрый, соседи приятные.'],
+    [2, 4, 'Great spot! Loved the neighborhood and proximity to everything. Would recommend to friends.'],
+    [3, 5, 'Superb! The photos do not do it justice — even better in person. Highly recommend.'],
+    [4, 4, 'Очень понравилось. Чуть далеко от метро, но зато тихо и уютно. Бассейн просто класс!'],
+    [5, 5, 'Лучшее жильё из всех что я снимала за рубежом. Всё продумано до мелочей.'],
+    [6, 3, 'Decent place overall. Location is good but the apartment needs some renovation. Not bad for the price though.'],
+  ] as [number, number, string][];
+
+  // Assign 3-5 reviews per listing, cycling through pool
+  let poolIdx = 0;
+  for (const listing of createdListings) {
+    const count = 3 + (listing.id % 3); // 3, 4, or 5 reviews per listing
+    const usedUsers = new Set<number>();
+
+    for (let i = 0; i < count; i++) {
+      const [userIdx, rating, comment] = reviewPool[poolIdx % reviewPool.length];
+      const reviewer = reviewers[userIdx];
+
+      if (!usedUsers.has(reviewer.id)) {
+        usedUsers.add(reviewer.id);
+        await prisma.review.create({
+          data: { listingId: listing.id, userId: reviewer.id, rating, comment },
+        });
+      }
+      poolIdx++;
+    }
+
+    // Recalculate real rating from seeded reviews
+    const agg = await prisma.review.aggregate({
+      where: { listingId: listing.id },
+      _avg: { rating: true },
+      _count: { id: true },
+    });
+    await prisma.listing.update({
+      where: { id: listing.id },
+      data: {
+        rating:      agg._avg.rating ?? 0,
+        reviewCount: agg._count.id,
       },
     });
   }
