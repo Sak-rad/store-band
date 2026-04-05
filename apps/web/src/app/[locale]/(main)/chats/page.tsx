@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ChatList } from '../../../../features/chat/ui/ChatList';
+import { ChatList } from '@/widgets/chat';
 
 export const metadata: Metadata = { title: 'Messages' };
 

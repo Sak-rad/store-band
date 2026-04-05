@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { EditListingForm } from '../../../../../../../features/create-listing/ui/EditListingForm';
+import { EditListingForm } from '@/features/create-listing';
 
 interface Props { params: Promise<{ locale: string; id: string }> }
 

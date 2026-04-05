@@ -8,9 +8,9 @@ import { MapPin, Star, MessageCircle, BadgeCheck } from 'lucide-react';
 import { useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
-import { CreateBookingForm } from '../../create-booking/ui/CreateBookingForm';
-import { PhotoSlider } from './PhotoSlider';
-import { ReviewsSection } from './ReviewsSection';
+import { CreateBookingForm } from '@/features/create-booking/ui/CreateBookingForm';
+import { PhotoSlider } from '@/entities/photo/ui/PhotoSlider';
+import { ReviewsSection } from '@/entities/review/ui/ReviewsSection';
 import styles from './ListingSheet.module.scss';
 
 interface Props {

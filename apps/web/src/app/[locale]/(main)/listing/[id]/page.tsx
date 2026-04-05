@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
-import { ListingDetail } from '../../../../../features/listing-detail/ui/ListingDetail';
+import { ListingDetail } from '@/widgets/listing-detail';
 import { apiServer } from '../../../../../shared/lib/api-server';
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';

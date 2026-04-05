@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { AdminListingsPanel } from '../../../../../features/admin/ui/AdminListingsPanel';
+import { AdminListingsPanel } from '@/features/admin';
 
 export const metadata: Metadata = { title: 'Admin — Pending Listings' };
 

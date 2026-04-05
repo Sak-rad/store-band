@@ -1,4 +1,4 @@
-import { ChatWindow } from '../../../../../features/chat/ui/ChatWindow';
+import { ChatWindow } from '@/widgets/chat';
 
 interface Props {
   params: Promise<{ locale: string; id: string }>;

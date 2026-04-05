@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
-import { CreateListingForm } from '../../../../../../features/create-listing/ui/CreateListingForm';
+import { CreateListingForm } from '@/features/create-listing';
 
 interface Props { params: Promise<{ locale: string }> }
 
