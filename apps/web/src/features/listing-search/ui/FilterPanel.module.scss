@@ -163,6 +163,12 @@
       color: $color-text-primary;
       margin-bottom: $spacing-3;
     }
+
+    &__selects {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
   }
 
   // ─── Chips ─────────────────────────────────────────────────────────────
@@ -213,6 +219,22 @@
 
   // ─── Price ─────────────────────────────────────────────────────────────
 
+  &__apply {
+    padding: $spacing-4 0 $spacing-2;
+
+    &__btn {
+      width: 100%;
+      height: 44px;
+      background: $color-primary;
+      color: #fff;
+      border: none;
+      border-radius: $radius-xl;
+      font-size: $font-size-base;
+      font-weight: 600;
+      cursor: pointer;
+    }
+  }
+
   &__price {
     display: flex;
     align-items: center;
@@ -232,3 +254,4 @@
     }
   }
 }
+

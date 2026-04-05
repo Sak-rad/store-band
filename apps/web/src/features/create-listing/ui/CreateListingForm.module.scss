@@ -57,6 +57,8 @@
     border-radius: $radius-xl;
     padding: $spacing-6;
 
+    @include below(sm) { padding: $spacing-4; }
+
     &__title {
       font-size: $font-size-base;
       font-weight: 700;
@@ -75,6 +77,8 @@
     @include below(sm) { grid-template-columns: 1fr; }
   }
 
+  // ─── Field wrapper ────────────────────────────────────────────────────────────
+
   &__field {
     display: flex;
     flex-direction: column;
@@ -87,17 +91,65 @@
       font-size: $font-size-sm;
       font-weight: 600;
       color: $color-text-secondary;
+      display: flex;
+      align-items: center;
+      gap: $spacing-1;
     }
 
-    input, textarea, select {
-      @include input-base;
+    // All single-line inputs — same height + radius as Select trigger (38px / $radius-lg)
+    input:not([type='checkbox']):not([type='radio']):not([type='file']) {
       width: 100%;
+      height: 38px;
+      padding: 0 $spacing-3;
+      border: 1.5px solid $color-border;
+      border-radius: $radius-lg;
+      font-size: $font-size-base;
+      font-family: inherit;
+      color: $color-text-primary;
+      background: $color-surface;
+      transition: border-color $transition-fast, box-shadow $transition-fast;
+      -webkit-appearance: none;
+
+      &::placeholder { color: $color-text-muted; }
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+      }
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        background: $color-background-secondary;
+      }
     }
 
-    textarea { resize: vertical; min-height: 100px; }
+    textarea {
+      width: 100%;
+      padding: $spacing-2 $spacing-3;
+      border: 1.5px solid $color-border;
+      border-radius: $radius-lg;
+      font-size: $font-size-base;
+      font-family: inherit;
+      color: $color-text-primary;
+      background: $color-surface;
+      resize: vertical;
+      min-height: 100px;
+      transition: border-color $transition-fast, box-shadow $transition-fast;
+      -webkit-appearance: none;
 
-    select option[disabled] { color: $color-text-muted; }
+      &::placeholder { color: $color-text-muted; }
+
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+      }
+    }
   }
+
+  // ─── Error + hints ────────────────────────────────────────────────────────────
 
   &__error {
     font-size: $font-size-xs;
@@ -112,35 +164,125 @@
     font-size: $font-size-sm;
   }
 
-  &__checkbox {
+  // ─── Info callout (short-term disclaimer) ─────────────────────────────────────
+
+  &__callout {
+    display: flex;
+    gap: $spacing-2;
+    align-items: flex-start;
+    padding: $spacing-3;
+    background: rgba(99, 102, 241, 0.07);
+    border-left: 3px solid rgba(99, 102, 241, 0.45);
+    border-radius: 0 $radius-md $radius-md 0;
+    font-size: $font-size-xs;
+    line-height: 1.6;
+    color: $color-text-secondary;
+    margin-top: $spacing-2;
+
+    &::before {
+      content: 'ℹ';
+      font-size: $font-size-sm;
+      color: rgba(99, 102, 241, 0.8);
+      flex-shrink: 0;
+    }
+  }
+
+  // ─── Tooltip ? badge ──────────────────────────────────────────────────────────
+
+  &__tip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: $radius-full;
+    background: rgba(99, 102, 241, 0.12);
+    color: rgba(99, 102, 241, 0.85);
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    flex-shrink: 0;
+
+    &:hover &-body,
+    &:focus-within &-body {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    &-body {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      width: 260px;
+      padding: $spacing-3;
+      background: #1e293b;
+      color: #fff;
+      font-size: $font-size-xs;
+      font-weight: 400;
+      line-height: 1.65;
+      border-radius: $radius-lg;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+      z-index: 200;
+      pointer-events: none;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #1e293b;
+      }
+    }
+  }
+
+  // ─── Footer (back + submit) ───────────────────────────────────────────────────
+
+  &__footer {
     display: flex;
     align-items: center;
-    gap: $spacing-2;
-    cursor: pointer;
-    font-size: $font-size-sm;
-    font-weight: 600;
-    color: $color-text-primary;
+    justify-content: flex-end;
+    gap: $spacing-3;
+    padding-top: $spacing-2;
+  }
 
-    input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: $color-primary;
-      cursor: pointer;
+  &__back {
+    padding: $spacing-2 $spacing-6;
+    height: 44px;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-xl;
+    background: none;
+    font-size: $font-size-base;
+    font-family: inherit;
+    font-weight: 500;
+    color: $color-text-secondary;
+    cursor: pointer;
+    transition: background $transition-fast, border-color $transition-fast;
+
+    &:hover {
+      background: $color-background-secondary;
+      border-color: $color-border-secondary;
     }
+  }
+
+  &__submit {
+    @include btn-primary;
+    height: 44px;
+    padding: 0 $spacing-8;
+    font-size: $font-size-base;
+    font-weight: 600;
+    border-radius: $radius-xl;
   }
 
   &__input--disabled {
     opacity: 0.45;
     cursor: not-allowed;
-  }
-
-  &__submit {
-    @include btn-primary;
-    width: 100%;
-    padding: $spacing-4;
-    font-size: $font-size-md;
-    font-weight: 600;
-    border-radius: $radius-xl;
   }
 }
 
@@ -202,7 +344,7 @@
     background: rgba(0, 0, 0, 0.55);
     color: #fff;
     border: none;
-    border-radius: 50%;
+    border-radius: $radius-full;
     font-size: 11px;
     cursor: pointer;
     display: flex;
@@ -212,22 +354,4 @@
 
     &:hover { background: rgba(0, 0, 0, 0.8); }
   }
-}
-
-.form__footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: $spacing-3;
-}
-
-.form__back {
-  padding: $spacing-3 $spacing-6;
-  border: 1.5px solid $color-border;
-  border-radius: $radius-full;
-  background: none;
-  font-size: $font-size-base;
-  color: $color-text-secondary;
-  cursor: pointer;
-  &:hover { background: $color-background-secondary; }
 }

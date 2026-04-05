@@ -3,11 +3,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
+import { MapPin, Star, MessageCircle, BadgeCheck } from 'lucide-react';
 import { Link, useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
 import { CreateBookingForm } from '../../create-booking/ui/CreateBookingForm';
 import { PhotoSlider } from './PhotoSlider';
+import { ReviewsSection } from './ReviewsSection';
 import styles from './ListingDetail.module.scss';
 
 interface Props {
@@ -49,9 +51,16 @@ export function ListingDetail({ id, locale }: Props) {
         <div className={styles.detail__info}>
           {/* Breadcrumb */}
           <nav className={styles.detail__breadcrumb}>
-            <Link href="/listings">{t('allListings')}</Link>
-            <span>›</span>
-            {listing.category?.name && <span>{listing.category.name}</span>}
+            <button
+              onClick={() => window.history.length > 1 ? router.back() : router.push('/listings')}
+              className={styles.detail__breadcrumb__back}
+            >{t('allListings')}</button>
+            {listing.category?.slug && (
+              <>
+                <span>›</span>
+                <Link href={`/listings/${listing.category.slug}`}>{listing.category.name}</Link>
+              </>
+            )}
           </nav>
 
           {/* Category pill */}
@@ -65,16 +74,14 @@ export function ListingDetail({ id, locale }: Props) {
           <div className={styles.detail__meta}>
             {locationStr && (
               <div className={styles.detail__location}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                  <circle cx="12" cy="10" r="3" />
-                </svg>
+                <MapPin size={15} />
                 {locationStr}
               </div>
             )}
             {listing.rating > 0 && (
               <div className={styles.detail__rating}>
-                ★ {Number(listing.rating).toFixed(1)}
+                <Star size={14} fill="currentColor" />
+                {Number(listing.rating).toFixed(1)}
                 {listing.reviewCount > 0 && (
                   <span>({listing.reviewCount} {t('reviews')})</span>
                 )}
@@ -96,6 +103,13 @@ export function ListingDetail({ id, locale }: Props) {
             <p className={styles.detail__description}>{listing.description}</p>
           </div>
 
+          {/* Reviews */}
+          <ReviewsSection
+            listingId={listing.id}
+            reviewCount={listing.reviewCount}
+            locale={locale}
+          />
+
           {/* Provider card */}
           {listing.provider && (
             <div className={styles.detail__provider}>
@@ -113,13 +127,18 @@ export function ListingDetail({ id, locale }: Props) {
                 )}
               </div>
               <div className={styles.detail__provider__info}>
-                <p className={styles.detail__provider__name}>{listing.provider.name}</p>
+                <Link href={`/providers/${listing.provider.id}`} className={styles.detail__provider__name}>
+                  {listing.provider.name}
+                  {listing.provider.isVerified && <BadgeCheck size={15} className={styles.detail__provider__verified} />}
+                </Link>
                 {listing.provider.rating > 0 && (
-                  <p className={styles.detail__provider__rating}>★ {Number(listing.provider.rating).toFixed(1)}</p>
+                  <p className={styles.detail__provider__rating}>
+                    <Star size={12} fill="currentColor" /> {Number(listing.provider.rating).toFixed(1)}
+                  </p>
                 )}
               </div>
-              <button className={styles.detail__provider__btn} onClick={handleContactProvider}>
-                {t('contactProvider')}
+              <button className={styles.detail__provider__btn} onClick={handleContactProvider} title={t('contactProvider')}>
+                <MessageCircle size={18} />
               </button>
             </div>
           )}

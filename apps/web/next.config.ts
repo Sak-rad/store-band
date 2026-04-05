@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.unsplash.com' },
       { protocol: 'https', hostname: '*.unsplash.com' },
       { protocol: 'http', hostname: 'localhost' },
+      // Allow any HTTP host in staging/dev (set ALLOW_ANY_HTTP_HOST=true as build arg)
+      ...(process.env.ALLOW_ANY_HTTP_HOST === 'true'
+        ? [{ protocol: 'http' as const, hostname: '**' }]
+        : []),
     ],
   },
 };

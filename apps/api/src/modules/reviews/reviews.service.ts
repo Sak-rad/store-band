@@ -19,6 +19,22 @@ export class ReviewsService {
     });
   }
 
+  async findMy(userId: number) {
+    return this.prisma.review.findMany({
+      where: { userId },
+      include: {
+        listing: {
+          select: {
+            id: true, title: true,
+            media: { take: 1, orderBy: { order: 'asc' }, select: { thumbUrl: true, url: true } },
+          },
+        },
+        provider: { select: { id: true, name: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
   async create(dto: CreateReviewDto, userId: number) {
     const review = await this.prisma.review.create({
       data: {

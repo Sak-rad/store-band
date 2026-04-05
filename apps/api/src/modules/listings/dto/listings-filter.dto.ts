@@ -3,10 +3,10 @@ import { Transform, Type } from 'class-transformer';
 
 export class ListingsFilterDto {
   @IsOptional() @IsString() q?: string;
-  @IsOptional() @Type(() => Number) @IsInt() countryId?: number;
-  @IsOptional() @Type(() => Number) @IsInt() cityId?: number;
+  @IsOptional() @IsString() country?: string;   // country slug
+  @IsOptional() @IsString() city?: string;       // city slug
   @IsOptional() @Type(() => Number) @IsInt() categoryId?: number;
-  @IsOptional() @IsString() category?: string; // slug alias → resolved to id in search service
+  @IsOptional() @IsString() category?: string;   // category slug → resolved to id in search service
   @IsOptional() @IsString() currency?: string;
   @IsOptional() @Type(() => Number) @IsNumber() priceMin?: number;
   @IsOptional() @Type(() => Number) @IsNumber() priceMax?: number;

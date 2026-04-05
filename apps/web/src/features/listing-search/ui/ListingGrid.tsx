@@ -3,13 +3,40 @@
 import { useEffect, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
+import { useRouter, usePathname } from '../../../navigation';
+import { useSearchParams } from 'next/navigation';
 import { api } from '../../../shared/lib/api';
 import { ListingCard } from '../../../entities/listing/ui/ListingCard';
 import styles from './ListingGrid.module.scss';
 
+const SORT_OPTIONS = ['newest', 'price_asc', 'price_desc', 'rating_desc'] as const;
+type SortOption = typeof SORT_OPTIONS[number];
+
 interface Props {
-  searchParams: Record<string, string | undefined>;
+  filters: Record<string, string | undefined>;
   locale: string;
+}
+
+function SortSelect({ current, onChange, label, t }: {
+  current: SortOption;
+  onChange: (s: SortOption) => void;
+  label: string;
+  t: (key: string) => string;
+}) {
+  return (
+    <div className={styles.sort}>
+      <span className={styles.sort__label}>{label}:</span>
+      <select
+        className={styles.sort__select}
+        value={current}
+        onChange={e => onChange(e.target.value as SortOption)}
+      >
+        {SORT_OPTIONS.map(opt => (
+          <option key={opt} value={opt}>{t(`sort.${opt}`)}</option>
+        ))}
+      </select>
+    </div>
+  );
 }
 
 function SkeletonCard() {
@@ -25,9 +52,20 @@ function SkeletonCard() {
   );
 }
 
-export function ListingGrid({ searchParams, locale }: Props) {
-  const t = useTranslations('listings');
-  const sentinelRef = useRef<HTMLDivElement>(null);
+export function ListingGrid({ filters, locale }: Props) {
+  const t          = useTranslations('listings');
+  const router     = useRouter();
+  const pathname   = usePathname();
+  const searchParams = useSearchParams();
+  const sentinelRef  = useRef<HTMLDivElement>(null);
+
+  const currentSort = (filters.sort ?? searchParams.get('sort') ?? 'newest') as SortOption;
+
+  const changeSort = (sort: SortOption) => {
+    const qs = new URLSearchParams(searchParams.toString());
+    qs.set('sort', sort);
+    router.push(`${pathname}?${qs.toString()}`);
+  };
 
   const {
     data,
@@ -37,12 +75,13 @@ export function ListingGrid({ searchParams, locale }: Props) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['listings', searchParams, locale],
+    queryKey: ['listings', filters, locale, currentSort],
     queryFn: ({ pageParam }) =>
       api
         .get('/listings', {
           params: {
-            ...searchParams,
+            ...filters,
+            sort: currentSort,
             lang: locale,
             limit: 15,
             ...(pageParam ? { cursor: pageParam } : {}),
@@ -81,16 +120,25 @@ export function ListingGrid({ searchParams, locale }: Props) {
   const listings = data?.pages.flatMap((p) => p.data) ?? [];
   const total = data?.pages[0]?.total ?? 0;
 
-  if (!listings.length) return <p className={styles.empty}>{t('noListings')}</p>;
+  if (!listings.length) return (
+    <>
+      <div className={styles.toolbar}>
+        <span />
+        <SortSelect current={currentSort} onChange={changeSort} label={t('sort.label')} t={t} />
+      </div>
+      <p className={styles.empty}>{t('noListings')}</p>
+    </>
+  );
 
   return (
     <>
-      {total > 0 && (
+      <div className={styles.toolbar}>
         <p className={styles.count}>{total} {t('allListings')}</p>
-      )}
+        <SortSelect current={currentSort} onChange={changeSort} label={t('sort.label')} t={t} />
+      </div>
       <div className={styles.grid}>
-        {listings.map((listing: any) => (
-          <ListingCard key={listing.id} listing={listing} locale={locale} />
+        {listings.map((listing: any, i: number) => (
+          <ListingCard key={listing.id} listing={listing} locale={locale} priority={i < 3} />
         ))}
       </div>
 

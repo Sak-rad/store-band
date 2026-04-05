@@ -1,0 +1,311 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+// ─── Section wrapper ──────────────────────────────────────────────────────────
+
+.section {
+  margin-top: $spacing-10;
+  padding-top: $spacing-8;
+  border-top: 1px solid $color-border-light;
+
+  &__head {
+    @include flex-between;
+    margin-bottom: $spacing-6;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 $spacing-2;
+    background: $color-primary-light;
+    color: $color-primary;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-weight: 600;
+  }
+
+  &__btn {
+    padding: $spacing-2 $spacing-4;
+    border: 1.5px solid $color-primary;
+    border-radius: $radius-full;
+    background: transparent;
+    color: $color-primary;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background $transition-fast, color $transition-fast;
+
+    &:hover {
+      background: $color-primary;
+      color: #fff;
+    }
+  }
+}
+
+// ─── Reviews scroll row ───────────────────────────────────────────────────────
+
+.scroll {
+  display: flex;
+  gap: $spacing-4;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: $spacing-2; // space for scrollbar
+
+  // Hide scrollbar visually but keep functionality
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+// ─── Single review card ───────────────────────────────────────────────────────
+
+.review {
+  flex: 0 0 300px;
+  scroll-snap-align: start;
+  padding: $spacing-5;
+  background: $color-background-secondary;
+  border-radius: $radius-xl;
+  border: 1px solid $color-border-light;
+  transition: border-color $transition-fast;
+
+  @include below(sm) { flex: 0 0 260px; }
+
+  &--own {
+    border-color: $color-primary;
+    background: $color-primary-light;
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    margin-bottom: $spacing-3;
+  }
+
+  &__avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: $color-primary;
+    color: #fff;
+    @include flex-center;
+    font-size: $font-size-base;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+
+  &__meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__name {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    flex-wrap: wrap;
+  }
+
+  &__own {
+    font-size: $font-size-xs;
+    font-weight: 500;
+    color: $color-primary;
+    background: rgba($color-primary, 0.1);
+    padding: 1px $spacing-2;
+    border-radius: $radius-full;
+  }
+
+  &__date {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-top: 2px;
+  }
+
+  &__stars {
+    display: flex;
+    gap: 2px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  &__star {
+    &--on  { color: $color-star; font-size: 1rem; }
+    &--off { color: $color-border; font-size: 1rem; }
+  }
+
+  &__comment {
+    font-size: $font-size-base;
+    color: $color-text-secondary;
+    line-height: 1.7;
+    white-space: pre-line;
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-3;
+    margin-top: $spacing-3;
+    padding-top: $spacing-3;
+    border-top: 1px solid rgba($color-primary, 0.15);
+  }
+
+  &__edit {
+    font-size: $font-size-sm;
+    color: $color-primary;
+    font-weight: 500;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    &:hover { text-decoration: underline; }
+  }
+
+  &__delete {
+    font-size: $font-size-sm;
+    color: $color-error;
+    font-weight: 500;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-family: inherit;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+// ─── Star picker ──────────────────────────────────────────────────────────────
+
+.starPicker {
+  display: flex;
+  gap: $spacing-1;
+  margin-bottom: $spacing-3;
+
+  &__star {
+    font-size: 2rem;
+    line-height: 1;
+    color: $color-border-secondary;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: color $transition-fast, transform $transition-fast;
+
+    &:hover,
+    &--on {
+      color: $color-star;
+    }
+
+    &:hover {
+      transform: scale(1.15);
+    }
+  }
+}
+
+// ─── Review form ──────────────────────────────────────────────────────────────
+
+.form {
+  padding: $spacing-5;
+  background: $color-background-secondary;
+  border: 1.5px solid $color-primary;
+  border-radius: $radius-xl;
+  margin-bottom: $spacing-5;
+
+  &__label {
+    font-size: $font-size-sm;
+    font-weight: 600;
+    color: $color-text-primary;
+    margin-bottom: $spacing-2;
+  }
+
+  &__textarea {
+    @include input-base;
+    width: 100%;
+    resize: vertical;
+    min-height: 80px;
+    font-size: $font-size-base;
+    margin-bottom: $spacing-4;
+    font-family: inherit;
+    line-height: 1.6;
+  }
+
+  &__row {
+    display: flex;
+    gap: $spacing-3;
+  }
+
+  &__submit {
+    padding: $spacing-2 $spacing-6;
+    background: $color-primary;
+    color: #fff;
+    border: none;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity $transition-fast;
+
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+    &:hover:not(:disabled) { opacity: 0.88; }
+  }
+
+  &__cancel {
+    padding: $spacing-2 $spacing-4;
+    background: none;
+    border: 1.5px solid $color-border;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text-secondary;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color $transition-fast;
+
+    &:hover { border-color: $color-text-secondary; }
+  }
+}
+
+// ─── Misc ─────────────────────────────────────────────────────────────────────
+
+.loginPrompt {
+  font-size: $font-size-sm;
+  color: $color-text-muted;
+  margin-bottom: $spacing-5;
+
+  &__link {
+    color: $color-primary;
+    font-weight: 600;
+    &:hover { text-decoration: underline; }
+  }
+}
+
+.empty {
+  color: $color-text-muted;
+  font-size: $font-size-base;
+  padding: $spacing-6 0;
+}
+
+.loading {
+  color: $color-text-muted;
+  font-size: $font-size-sm;
+  padding: $spacing-4 0;
+}
+

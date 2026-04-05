@@ -6,15 +6,35 @@ import { ListingsFilterDto } from './dto/listings-filter.dto';
 export class ListingsSearchService {
   constructor(private prisma: PrismaService) {}
 
-  async search(filter: ListingsFilterDto, locale: string) {
-    const { q, countryId, cityId, priceMin, priceMax, currency,
+  async search(filter: ListingsFilterDto, _locale: string) {
+    const { q, country, city, priceMin, priceMax, currency,
       isFeatured, cursor, limit = 20, sort = 'newest' } = filter;
 
-    // Resolve category slug → id if needed
+    // Resolve slugs → ids (same pattern as category)
+    // 'real-estate' is a virtual slug that maps to both apartments + villas
     let resolvedCategoryId = filter.categoryId;
+    let resolvedCategoryIds: number[] | undefined;
     if (!resolvedCategoryId && filter.category) {
-      const cat = await this.prisma.category.findUnique({ where: { slug: filter.category } });
-      resolvedCategoryId = cat?.id;
+      if (filter.category === 'real-estate') {
+        const cats = await this.prisma.category.findMany({
+          where: { slug: { in: ['apartments', 'villas'] } },
+        });
+        resolvedCategoryIds = cats.map(c => c.id);
+      } else {
+        const cat = await this.prisma.category.findUnique({ where: { slug: filter.category } });
+        resolvedCategoryId = cat?.id;
+      }
+    }
+
+    let resolvedCountryId: number | undefined;
+    let resolvedCityId: number | undefined;
+    if (country) {
+      const countryRecord = await this.prisma.country.findUnique({ where: { slug: country } });
+      resolvedCountryId = countryRecord?.id;
+    }
+    if (city && resolvedCountryId) {
+      const cityRecord = await this.prisma.city.findFirst({ where: { slug: city, countryId: resolvedCountryId } });
+      resolvedCityId = cityRecord?.id;
     }
 
     const take = Math.min(limit, 50);
@@ -25,21 +45,60 @@ export class ListingsSearchService {
       deletedAt: null,
     };
 
-    if (countryId) where.countryId = countryId;
-    if (cityId) where.cityId = cityId;
-    if (resolvedCategoryId) where.categoryId = resolvedCategoryId;
+    if (resolvedCountryId) where.countryId = resolvedCountryId;
+    if (resolvedCityId) where.cityId = resolvedCityId;
+    if (resolvedCategoryIds?.length) where.categoryId = { in: resolvedCategoryIds };
+    else if (resolvedCategoryId) where.categoryId = resolvedCategoryId;
     if (isFeatured !== undefined) where.isFeatured = isFeatured;
+    // Filter by priceMin of the listing (always non-null) so we don't lose
+    // listings that have priceMax = null (price on request / open range).
     if (priceMin !== undefined) where.priceMin = { gte: priceMin };
-    if (priceMax !== undefined) where.priceMax = { lte: priceMax };
+    if (priceMax !== undefined) where.priceMin = { ...where.priceMin, lte: priceMax };
     if (currency) where.currency = currency;
-    if (filter.listingType) where.listingType = filter.listingType;
+    if (filter.listingType) {
+      // Listings explicitly marked as also available short-term appear in both searches
+      if (filter.listingType === 'short-term') {
+        where.OR = [
+          ...(where.OR ?? []),
+          { listingType: 'short-term' },
+          { isShortTermAvailable: true },
+        ];
+      } else {
+        where.listingType = filter.listingType;
+      }
+    }
 
-    // Full-text search via Prisma insensitive contains
+    // Full-text search: both i18n languages + address + city/country name.
+    // string_contains on JSON paths is case-sensitive in Prisma, so we
+    // generate 3 variants: original, lowercase, Capitalised-first.
     if (q) {
+      const variants = [...new Set([
+        q,
+        q.toLowerCase(),
+        q.charAt(0).toUpperCase() + q.slice(1).toLowerCase(),
+      ])];
+
+      const jsonOr = (field: string, lang: string) =>
+        variants.map(v => ({ [field]: { path: [lang], string_contains: v } }));
+
       where.OR = [
-        { title: { contains: q, mode: 'insensitive' } },
+        { title:       { contains: q, mode: 'insensitive' } },
         { description: { contains: q, mode: 'insensitive' } },
-        { address: { contains: q, mode: 'insensitive' } },
+        { address:     { contains: q, mode: 'insensitive' } },
+        ...jsonOr('titleI18n', 'en'),
+        ...jsonOr('titleI18n', 'ru'),
+        ...jsonOr('descriptionI18n', 'en'),
+        ...jsonOr('descriptionI18n', 'ru'),
+        { city: { OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          ...jsonOr('nameI18n', 'ru'),
+          ...jsonOr('nameI18n', 'en'),
+        ]}},
+        { country: { OR: [
+          { name: { contains: q, mode: 'insensitive' } },
+          ...jsonOr('nameI18n', 'ru'),
+          ...jsonOr('nameI18n', 'en'),
+        ]}},
       ];
     }
 

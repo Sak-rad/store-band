@@ -53,6 +53,16 @@
       color: $color-primary;
       &:hover { text-decoration: underline; }
     }
+
+    &__back {
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      color: $color-primary;
+      font-size: $font-size-sm;
+      &:hover { text-decoration: underline; }
+    }
   }
 
   &__category {
@@ -187,9 +197,25 @@
       font-weight: 600;
       color: $color-text-primary;
       @include truncate(1);
+      text-decoration: none;
+      &:hover { color: $color-primary; text-decoration: underline; }
+    }
+
+    &__name {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    &__verified {
+      color: $color-primary;
+      flex-shrink: 0;
     }
 
     &__rating {
+      display: flex;
+      align-items: center;
+      gap: 3px;
       font-size: $font-size-sm;
       color: $color-star;
       font-weight: 500;
@@ -198,10 +224,12 @@
 
     &__btn {
       @include btn-primary;
-      padding: $spacing-2 $spacing-5;
-      font-size: $font-size-sm;
+      width: 40px;
+      height: 40px;
+      padding: 0;
       border-radius: $radius-full;
       flex-shrink: 0;
+      @include flex-center;
     }
   }
 

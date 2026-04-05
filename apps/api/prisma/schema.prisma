@@ -134,27 +134,32 @@ model Provider {
 // ─── Location ─────────────────────────────────────────────────────────────────
 
 model Country {
-  id       Int    @id @default(autoincrement())
+  id       Int     @id @default(autoincrement())
   nameI18n Json
   name     String
-  code     String @unique
+  code     String  @unique
+  slug     String @unique
 
   cities   City[]
   listings Listing[]
 
   @@index([code])
+  @@index([slug])
 }
 
 model City {
-  id        Int    @id @default(autoincrement())
+  id        Int     @id @default(autoincrement())
   nameI18n  Json
   name      String
   countryId Int
+  slug      String
 
   country  Country   @relation(fields: [countryId], references: [id])
   listings Listing[]
 
+  @@unique([countryId, slug])
   @@index([countryId])
+  @@index([slug])
 }
 
 // ─── Category ─────────────────────────────────────────────────────────────────
@@ -194,9 +199,10 @@ model Listing {
   cityId          Int
   countryId       Int
   providerId      Int
-  listingType     String    @default("rent")
-  isPublished     Boolean   @default(false)
-  isActive        Boolean   @default(true)
+  listingType          String    @default("rent")
+  isShortTermAvailable Boolean   @default(false)
+  isPublished          Boolean   @default(false)
+  isActive             Boolean   @default(true)
   isFeatured      Boolean   @default(false)
   rating          Float     @default(0)
   reviewCount     Int       @default(0)

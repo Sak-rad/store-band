@@ -15,9 +15,12 @@ interface AuthState {
   accessToken: string | null;
   setAuth: (user: User, token: string) => void;
   setUser: (user: User) => void;
+  setToken: (token: string) => void;
   logout: () => void;
 }
 
+// user persisted for instant UI render — re-validated from API on mount (Providers.tsx)
+// accessToken is memory-only: never written to localStorage (XSS risk)
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -25,8 +28,13 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       setAuth: (user, accessToken) => set({ user, accessToken }),
       setUser: (user) => set({ user }),
+      setToken: (token) => set({ accessToken: token }),
       logout: () => set({ user: null, accessToken: null }),
     }),
-    { name: 'auth-storage' },
+    {
+      name: 'auth-storage',
+      // only persist user info, never the token
+      partialize: (state) => ({ user: state.user }),
+    },
   ),
 );

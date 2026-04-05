@@ -18,10 +18,12 @@ export class CitiesService {
   }
 
   async create(countryId: number, nameEn: string, nameRu: string) {
+    const slug = nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     return this.prisma.city.create({
       data: {
         name: nameEn,
         countryId,
+        slug,
         nameI18n: { en: nameEn, ru: nameRu },
       },
     });

@@ -1,0 +1,338 @@
+@import '../../../../styles/variables';
+@import '../../../../styles/mixins';
+
+.page {
+  max-width: $container-max-width;
+  margin: 0 auto;
+  padding: $spacing-8 $spacing-6;
+
+  @include below(sm) { padding: $spacing-4; }
+}
+
+// ─── Hero card ────────────────────────────────────────────────────────────────
+
+.hero {
+  display: flex;
+  align-items: center;
+  gap: $spacing-6;
+  padding: $spacing-8;
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-2xl;
+  margin-bottom: $spacing-8;
+  box-shadow: $shadow-sm;
+
+  @include below(md) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: $spacing-6;
+    gap: $spacing-4;
+  }
+
+  &__avatar {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-dark 100%);
+    color: #fff;
+    @include flex-center;
+    font-size: 2.5rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba($color-primary, 0.3);
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__nameRow {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    flex-wrap: wrap;
+    margin-bottom: $spacing-2;
+  }
+
+  &__name {
+    font-size: clamp($font-size-xl, 3vw, $font-size-3xl);
+    font-weight: 800;
+    color: $color-text-primary;
+    letter-spacing: -0.02em;
+  }
+
+  &__verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px $spacing-3;
+    background: $color-success-bg;
+    color: $color-success-text;
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    font-weight: 600;
+  }
+
+  &__rating {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    margin-bottom: $spacing-2;
+  }
+
+  &__stars { display: flex; gap: 2px; }
+
+  &__star {
+    &--on  { color: $color-star; font-size: 1.1rem; }
+    &--off { color: $color-border-secondary; font-size: 1.1rem; }
+  }
+
+  &__ratingVal {
+    font-size: $font-size-lg;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__ratingCount {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+
+  &__since {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+
+    strong { color: $color-text-secondary; }
+  }
+
+  &__contactBtn {
+    @include btn-primary;
+    padding: $spacing-3 $spacing-8;
+    border-radius: $radius-full;
+    font-size: $font-size-base;
+    flex-shrink: 0;
+    box-shadow: 0 4px 14px rgba($color-primary, 0.3);
+
+    @include below(md) { width: 100%; }
+  }
+}
+
+// ─── Two-column layout ────────────────────────────────────────────────────────
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  gap: $spacing-8;
+  align-items: start;
+
+  @include below(lg) {
+    grid-template-columns: 1fr;
+  }
+
+  &__main { min-width: 0; }
+}
+
+// ─── Sections ─────────────────────────────────────────────────────────────────
+
+.section {
+  margin-bottom: $spacing-10;
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: 700;
+    color: $color-text-primary;
+    margin-bottom: $spacing-5;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 $spacing-2;
+    background: $color-primary-light;
+    color: $color-primary;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-weight: 600;
+  }
+}
+
+.bio {
+  font-size: $font-size-base;
+  line-height: 1.8;
+  color: $color-text-secondary;
+  white-space: pre-line;
+}
+
+// ─── Listings grid ────────────────────────────────────────────────────────────
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-5;
+
+  @include below(xl) { grid-template-columns: repeat(2, 1fr); }
+  @include below(sm) { grid-template-columns: 1fr; }
+}
+
+.empty {
+  color: $color-text-muted;
+  font-size: $font-size-base;
+  padding: $spacing-6 0;
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+.sidebar {
+  position: sticky;
+  top: calc($header-height + $spacing-6);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+
+  @include below(lg) {
+    position: static;
+    order: -1;
+  }
+}
+
+// ─── Contacts card ────────────────────────────────────────────────────────────
+
+.contacts {
+  background: $color-surface;
+  border: 1.5px solid $color-border;
+  border-radius: $radius-xl;
+  padding: $spacing-5;
+
+  &__title {
+    font-size: $font-size-base;
+    font-weight: 700;
+    color: $color-text-primary;
+    margin-bottom: $spacing-4;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    padding: $spacing-3 0;
+    border-top: 1px solid $color-border-light;
+    text-decoration: none;
+    transition: color $transition-fast;
+
+    &:hover { color: $color-primary; }
+    &:hover .contacts__value { color: $color-primary; }
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+  }
+
+  &__label {
+    font-size: $font-size-xs;
+    color: $color-text-muted;
+    margin-bottom: 2px;
+  }
+
+  &__value {
+    font-size: $font-size-sm;
+    font-weight: 500;
+    color: $color-text-primary;
+    word-break: break-all;
+    transition: color $transition-fast;
+  }
+
+  &__empty {
+    color: $color-text-muted;
+    font-size: $font-size-sm;
+    padding: $spacing-3 0;
+    border-top: 1px solid $color-border-light;
+  }
+
+  &__btn {
+    @include btn-primary;
+    width: 100%;
+    margin-top: $spacing-4;
+    border-radius: $radius-xl;
+    font-size: $font-size-sm;
+  }
+}
+
+// ─── Stats card ───────────────────────────────────────────────────────────────
+
+.stats {
+  background: $color-background-secondary;
+  border: 1px solid $color-border-light;
+  border-radius: $radius-xl;
+  padding: $spacing-4 $spacing-5;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-1;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $spacing-2 0;
+
+    & + & { border-top: 1px solid $color-border-light; }
+  }
+
+  &__val {
+    font-size: $font-size-base;
+    font-weight: 700;
+    color: $color-text-primary;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+    color: $color-text-muted;
+  }
+}
+
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
+.skeleton {
+  animation: pulse 1.6s ease-in-out infinite;
+
+  &__hero {
+    height: 160px;
+    background: $color-background-tertiary;
+    border-radius: $radius-2xl;
+    margin-bottom: $spacing-8;
+  }
+
+  &__body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-5;
+  }
+
+  &__card {
+    height: 280px;
+    background: $color-background-tertiary;
+    border-radius: $radius-xl;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.error {
+  text-align: center;
+  padding: $spacing-16;
+  color: $color-text-muted;
+}

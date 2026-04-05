@@ -98,7 +98,7 @@ export function AdminListingsPanel({ locale }: Props) {
 
             {/* Actions */}
             <div className={styles.card__actions}>
-              <Link href={`/listings/${listing.id}`} className={styles.btn__view} target="_blank">
+              <Link href={`/listing/${listing.id}`} className={styles.btn__view} target="_blank">
                 View
               </Link>
               <button

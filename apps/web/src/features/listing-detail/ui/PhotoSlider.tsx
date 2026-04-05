@@ -8,9 +8,10 @@ interface Props {
   photos: Array<{ url: string; thumbUrl?: string }>;
   className?: string;
   priority?: boolean;
+  overlapped?: boolean;
 }
 
-export function PhotoSlider({ photos, className, priority }: Props) {
+export function PhotoSlider({ photos, className, priority, overlapped }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [current, setCurrent] = useState(0);
 
@@ -36,7 +37,7 @@ export function PhotoSlider({ photos, className, priority }: Props) {
   if (!photos.length) return null;
 
   return (
-    <div className={`${styles.slider} ${className ?? ''}`}>
+    <div className={[styles.slider, overlapped && styles['slider--overlapped'], className].filter(Boolean).join(' ')}>
       <div ref={trackRef} className={styles.slider__track}>
         {photos.map((p, i) => (
           <div key={i} className={styles.slider__slide}>
