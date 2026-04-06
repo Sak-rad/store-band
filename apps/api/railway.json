@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd ../.. && pnpm install && pnpm --filter @relocation/api run build && pnpm --filter @relocation/api exec prisma generate"
+    "buildCommand": "pnpm install --frozen-lockfile --filter @relocation/api && pnpm --filter @relocation/api exec prisma generate && pnpm --filter @relocation/api run build"
   },
   "deploy": {
     "startCommand": "node apps/api/dist/main",
