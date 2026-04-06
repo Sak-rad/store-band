@@ -35,7 +35,7 @@ import { CurrencyModule } from './modules/currency/currency.module';
       useFactory: (config: ConfigService) => ({
         fallbackLanguage: config.get('DEFAULT_LOCALE', 'en'),
         loaderOptions: {
-          path: path.join(process.cwd(), 'i18n'),
+          path: path.join(__dirname, '..', '..', 'i18n'),
           watch: true,
         },
         resolvers: [
