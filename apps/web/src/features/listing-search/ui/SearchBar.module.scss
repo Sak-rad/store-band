@@ -10,10 +10,9 @@
 .bar {
   display: flex;
   align-items: center;
-  gap: $spacing-3;
   max-width: $container-max-width;
   margin: 0 auto;
-  @include below(sm) { gap: $spacing-2; }
+
 
   &__field {
     position: relative;
@@ -34,7 +33,7 @@
     width: 100%;
     padding: $spacing-3 $spacing-10 $spacing-3 $spacing-10;
     border: 1.5px solid $color-border;
-    border-radius: $radius-lg;
+    border-radius: 12px 0 0 12px;
     font-size: $font-size-base;
     color: $color-text-primary;
     background: $color-surface;
@@ -66,9 +65,10 @@
   &__btn {
     @include btn-primary;
     padding: $spacing-3 $spacing-6;
-    border-radius: $radius-lg;
+    border-radius: 0 12px 12px 0;
     white-space: nowrap;
     flex-shrink: 0;
+    height: 51px;
     @include below(sm) { padding: $spacing-3 $spacing-4; font-size: $font-size-sm; }
   }
 }

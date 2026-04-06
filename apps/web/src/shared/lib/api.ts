@@ -10,10 +10,12 @@ export const api = axios.create({
 
 api.interceptors.request.use((config) => {
   if (typeof window !== 'undefined') {
-    const locale = document.cookie
+    const SUPPORTED_LOCALES = ['en', 'ru'];
+    const raw = document.cookie
       .split('; ')
       .find((row) => row.startsWith('NEXT_LOCALE='))
-      ?.split('=')[1] || 'en';
+      ?.split('=')[1];
+    const locale = raw && SUPPORTED_LOCALES.includes(raw) ? raw : 'en';
     config.headers['Accept-Language'] = locale;
 
     // accessToken lives in memory only (not localStorage)

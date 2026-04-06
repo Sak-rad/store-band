@@ -30,7 +30,11 @@ export function LoginForm() {
       setAuth(res.data.user, res.data.accessToken);
       router.push('/listings');
     } catch (err: any) {
-      setError('root', { message: err.response?.data?.message || t('errors.invalidCredentials') });
+      const status = err.response?.status;
+      const message = status === 429
+        ? t('errors.tooManyRequests')
+        : t('errors.invalidCredentials');
+      setError('root', { message });
     }
   };
 
