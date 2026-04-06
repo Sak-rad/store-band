@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
-import { ProfileView } from '../../../../features/profile/ui/ProfileView';
+import { ProfileView } from '@/widgets/profile';
 
 interface Props {
   params: Promise<{ locale: string }>;

@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { apiServer } from '../../../../../shared/lib/api-server';
-import { ProviderDetail } from '../../../../../features/provider-detail/ui/ProviderDetail';
+import { ProviderDetail } from '@/widgets/provider-detail';
 
 interface Props {
   params: Promise<{ locale: string; id: string }>;

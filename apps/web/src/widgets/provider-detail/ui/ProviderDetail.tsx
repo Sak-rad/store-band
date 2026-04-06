@@ -3,9 +3,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { api } from '../../../shared/lib/api';
-import { ListingCard } from '../../../entities/listing/ui/ListingCard';
-import { ReviewsSection } from '../../listing-detail/ui/ReviewsSection';
+import { api } from '@/shared/lib/api';
+import { ListingCard } from '@/entities/listing/ui/ListingCard';
+import { ReviewsSection } from '@/entities/review/ui/ReviewsSection';
 import styles from './ProviderDetail.module.scss';
 
 interface Props {

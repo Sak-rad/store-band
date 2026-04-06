@@ -1,4 +1,4 @@
-import { ListingSheet } from '../../../../../../features/listing-detail/ui/ListingSheet';
+import { ListingSheet } from '@/widgets/listing-detail';
 
 interface Props {
   params: Promise<{ locale: string; id: string }>;
