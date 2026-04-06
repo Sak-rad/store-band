@@ -5,7 +5,7 @@
     "buildCommand": "pnpm install --frozen-lockfile --filter @relocation/api && pnpm --filter @relocation/api exec prisma generate && pnpm --filter @relocation/api run build"
   },
   "deploy": {
-    "startCommand": "node apps/api/dist/main",
+    "startCommand": "node apps/api/dist/src/main.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
