@@ -12,7 +12,10 @@ import styles from './AuthForm.module.scss';
 const schema = z.object({
   name: z.string().min(1),
   email: z.string().email(),
-  password: z.string().min(8),
+  password: z.string()
+    .min(8)
+    .regex(/[A-Z]/, 'Нужна заглавная буква')
+    .regex(/[0-9]/, 'Нужна цифра'),
 });
 type FormData = z.infer<typeof schema>;
 
@@ -31,7 +34,13 @@ export function RegisterForm() {
       setAuth(res.data.user, res.data.accessToken);
       router.push('/listings');
     } catch (err: any) {
-      setError('root', { message: err.response?.data?.message || t('errors.emailTaken') });
+      const status = err.response?.status;
+      const message = status === 409
+        ? t('errors.emailTaken')
+        : status === 429
+          ? t('errors.tooManyRequests')
+          : t('errors.generic');
+      setError('root', { message });
     }
   };
 

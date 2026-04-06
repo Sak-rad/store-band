@@ -37,15 +37,33 @@
     },
     "steps": {
       "title": "Plan your stay in three steps",
-      "step1": { "title": "Choose your destination", "desc": "Browse listings across 40+ cities in 8 countries" },
-      "step2": { "title": "Find what you need", "desc": "Housing, tours, services, food — filter by category, price and location" },
-      "step3": { "title": "Book with confidence", "desc": "Connect directly with verified providers — no middlemen" }
+      "step1": {
+        "title": "Choose your destination",
+        "desc": "Browse listings across 40+ cities in 8 countries"
+      },
+      "step2": {
+        "title": "Find what you need",
+        "desc": "Housing, tours, services, food — filter by category, price and location"
+      },
+      "step3": {
+        "title": "Book with confidence",
+        "desc": "Connect directly with verified providers — no middlemen"
+      }
     },
     "usp": {
       "title": "For travellers and expats alike",
-      "verified": { "title": "Verified providers", "desc": "Every provider is manually reviewed for reliability and quality" },
-      "reviews": { "title": "Honest reviews", "desc": "Real feedback from people who've been there — tourists and locals" },
-      "prices": { "title": "Zero commissions", "desc": "Contact providers directly — no hidden fees, ever" }
+      "verified": {
+        "title": "Verified providers",
+        "desc": "Every provider is manually reviewed for reliability and quality"
+      },
+      "reviews": {
+        "title": "Honest reviews",
+        "desc": "Real feedback from people who've been there — tourists and locals"
+      },
+      "prices": {
+        "title": "Zero commissions",
+        "desc": "Contact providers directly — no hidden fees, ever"
+      }
     },
     "cta": {
       "title": "Your next adventure starts here",
@@ -69,7 +87,9 @@
     "errors": {
       "invalidCredentials": "Invalid email or password",
       "emailTaken": "This email is already registered",
-      "weakPassword": "Password must be at least 8 characters"
+      "weakPassword": "Password must be at least 8 characters",
+      "tooManyRequests": "Too many attempts. Please wait a minute.",
+      "generic": "Something went wrong. Please try again."
     }
   },
   "listings": {
@@ -112,38 +132,38 @@
     "alsoShortTerm": "Also short-term",
     "sort": {
       "label": "Sort",
-      "newest":     "Newest",
-      "price_asc":  "Price: low to high",
+      "newest": "Newest",
+      "price_asc": "Price: low to high",
       "price_desc": "Price: high to low",
       "rating_desc": "Top rated"
     },
     "pageTitleInCountry": "{title} in {country}",
-    "pageTitleInCity":    "{title} in {city}, {country}",
-    "pageDescSuffix":     "Find options in {location}.",
+    "pageTitleInCity": "{title} in {city}, {country}",
+    "pageDescSuffix": "Find options in {location}.",
     "pageTitle": {
-      "default":    "Housing, services & local life abroad",
+      "default": "Housing, services & local life abroad",
       "apartments": "Apartments for rent abroad",
-      "villas":     "Villas for rent abroad",
-      "services":   "Services & local help abroad",
+      "villas": "Villas for rent abroad",
+      "services": "Services & local help abroad",
       "excursions": "Excursions & tours abroad",
-      "transport":  "Transport & car rental abroad",
-      "food":       "Restaurants & cafes abroad",
+      "transport": "Transport & car rental abroad",
+      "food": "Restaurants & cafes abroad",
       "healthcare": "Doctors & clinics abroad",
-      "education":  "Schools & courses abroad",
-      "rent":       "Long-term rentals abroad",
-      "buy":        "Property for sale abroad",
+      "education": "Schools & courses abroad",
+      "rent": "Long-term rentals abroad",
+      "buy": "Property for sale abroad",
       "short-term": "Short-term rentals abroad"
     },
     "pageDesc": {
-      "default":    "Apartments, restaurants, doctors, schools and transport — everything you need abroad in one place. Verified providers, real reviews.",
+      "default": "Apartments, restaurants, doctors, schools and transport — everything you need abroad in one place. Verified providers, real reviews.",
       "apartments": "Apartments for rent abroad — long-term and short-stay. Real photos, tenant reviews, direct contact with landlords.",
-      "villas":     "Villas for rent abroad. Pools, sea views, for families and groups. Verified owners.",
-      "services":   "Useful services for life abroad: legal help, delivery, language courses, medical care and more.",
+      "villas": "Villas for rent abroad. Pools, sea views, for families and groups. Verified owners.",
+      "services": "Useful services for life abroad: legal help, delivery, language courses, medical care and more.",
       "excursions": "Excursions and tours abroad from local guides. Easy to find and book directly.",
-      "transport":  "Car rental, transfers and transport services abroad. No middlemen.",
-      "food":       "Restaurants, cafes and food delivery abroad. Places recommended by expats who live there.",
+      "transport": "Car rental, transfers and transport services abroad. No middlemen.",
+      "food": "Restaurants, cafes and food delivery abroad. Places recommended by expats who live there.",
       "healthcare": "Doctors, dentists and clinics abroad. Find a specialist near you.",
-      "education":  "Language schools, kindergartens and courses abroad. For children and adults."
+      "education": "Language schools, kindergartens and courses abroad. For children and adults."
     }
   },
   "chat": {
