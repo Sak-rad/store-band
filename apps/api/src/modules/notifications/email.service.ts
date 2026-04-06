@@ -7,10 +7,13 @@ import * as Handlebars from 'handlebars';
 
 @Injectable()
 export class EmailService {
-  private resend: Resend;
+  private resend: Resend | null = null;
 
   constructor(private config: ConfigService) {
-    this.resend = new Resend(config.get('RESEND_API_KEY', 're_dev'));
+    const apiKey = config.get<string>('RESEND_API_KEY');
+    if (apiKey) {
+      this.resend = new Resend(apiKey);
+    }
   }
 
   async send(to: string, template: string, locale: string, params: Record<string, any>) {
@@ -46,6 +49,11 @@ export class EmailService {
       const fallbackPath = path.join(__dirname, 'templates', `${template}.en.hbs`);
       const source = fs.readFileSync(fallbackPath, 'utf8');
       html = Handlebars.compile(source)(params);
+    }
+
+    if (!this.resend) {
+      console.warn(`[EmailService] RESEND_API_KEY not set, skipping email to ${to}`);
+      return;
     }
 
     await this.resend.emails.send({
