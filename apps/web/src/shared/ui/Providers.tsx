@@ -16,7 +16,7 @@ export function Providers({ children, locale }: Props) {
   const setDisplayCurrency = useCurrencyStore((s) => s.setDisplayCurrency);
   const setRate = useCurrencyStore((s) => s.setRate);
   const userSet = useCurrencyStore((s) => s.userSet);
-  const { user, accessToken, setUser, setToken, logout } = useAuthStore();
+  const { user, accessToken, setUser, setToken, setRestoring, logout } = useAuthStore();
 
   useEffect(() => {
     // Default to RUB for Russian locale (only if user hasn't changed it manually)
@@ -32,7 +32,10 @@ export function Providers({ children, locale }: Props) {
   // On every app load: if user is persisted but accessToken is gone (page reload),
   // restore session via refresh cookie, then verify identity.
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setRestoring(false);
+      return;
+    }
 
     const restore = async () => {
       try {
@@ -50,6 +53,8 @@ export function Providers({ children, locale }: Props) {
         }
       } catch {
         logout();
+      } finally {
+        setRestoring(false);
       }
     };
 

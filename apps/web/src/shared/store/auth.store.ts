@@ -13,9 +13,11 @@ interface User {
 interface AuthState {
   user: User | null;
   accessToken: string | null;
+  isRestoring: boolean;
   setAuth: (user: User, token: string) => void;
   setUser: (user: User) => void;
   setToken: (token: string) => void;
+  setRestoring: (v: boolean) => void;
   logout: () => void;
 }
 
@@ -26,14 +28,15 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       accessToken: null,
+      isRestoring: true,
       setAuth: (user, accessToken) => set({ user, accessToken }),
       setUser: (user) => set({ user }),
       setToken: (token) => set({ accessToken: token }),
-      logout: () => set({ user: null, accessToken: null }),
+      setRestoring: (v) => set({ isRestoring: v }),
+      logout: () => set({ user: null, accessToken: null, isRestoring: false }),
     }),
     {
       name: 'auth-storage',
-      // only persist user info, never the token
       partialize: (state) => ({ user: state.user }),
     },
   ),

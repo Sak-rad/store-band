@@ -26,7 +26,7 @@ const STATUS_LABEL: Record<string, string> = {
 export function ProfileView({ locale }: Props) {
   const t = useTranslations('profile');
   const tCommon = useTranslations('common');
-  const { user } = useAuthStore();
+  const { user, isRestoring } = useAuthStore();
   const { displayCurrency, toggle } = useCurrencyStore();
   const qc = useQueryClient();
 
@@ -35,19 +35,19 @@ export function ProfileView({ locale }: Props) {
   const { data: myListings } = useQuery({
     queryKey: ['my-listings'],
     queryFn: () => api.get('/listings/my').then(r => r.data),
-    enabled: user?.role === 'PROVIDER' || user?.role === 'ADMIN',
+    enabled: !isRestoring && (user?.role === 'PROVIDER' || user?.role === 'ADMIN'),
   });
 
   const { data: bookings } = useQuery({
     queryKey: ['bookings'],
     queryFn: () => api.get('/bookings').then(r => r.data),
-    enabled: !!user,
+    enabled: !isRestoring && !!user,
   });
 
   const { data: myReviews } = useQuery({
     queryKey: ['my-reviews'],
     queryFn: () => api.get('/reviews/my').then(r => r.data),
-    enabled: !!user,
+    enabled: !isRestoring && !!user,
   });
 
   const deleteReview = useMutation({
@@ -67,6 +67,10 @@ export function ProfileView({ locale }: Props) {
       qc.invalidateQueries({ queryKey: ['my-listings'] });
     },
   });
+
+  if (isRestoring) {
+    return <div className={styles.page} />;
+  }
 
   if (!user) {
     return (
