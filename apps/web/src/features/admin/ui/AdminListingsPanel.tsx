@@ -7,6 +7,7 @@ import { useAuthStore } from '../../../shared/store/auth.store';
 import { api } from '../../../shared/lib/api';
 import { useCurrencyStore } from '../../../shared/store/currency.store';
 import { Link } from '../../../navigation';
+import { revalidatePWA } from '@/app/actions';
 import styles from './AdminListingsPanel.module.scss';
 
 interface Props { locale: string }
@@ -26,12 +27,20 @@ export function AdminListingsPanel({ locale }: Props) {
 
   const approve = useMutation({
     mutationFn: (id: number) => api.patch(`/listings/${id}/approve`),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin-pending'] }); setActionId(null); },
+    onSuccess: (_, id) => {
+      qc.invalidateQueries({ queryKey: ['admin-pending'] });
+      setActionId(null);
+      revalidatePWA(['/ru/listings', '/en/listings', `/ru/listing/${id}`, `/en/listing/${id}`]);
+    },
   });
 
   const reject = useMutation({
     mutationFn: (id: number) => api.patch(`/listings/${id}/reject`),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin-pending'] }); setActionId(null); },
+    onSuccess: (_, id) => {
+      qc.invalidateQueries({ queryKey: ['admin-pending'] });
+      setActionId(null);
+      revalidatePWA(['/ru/listings', '/en/listings', `/ru/listing/${id}`, `/en/listing/${id}`]);
+    },
   });
 
   if (!user || user.role !== 'ADMIN') {

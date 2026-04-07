@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Link } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
@@ -155,14 +155,17 @@ function ReviewForm({ target, existing, onDone, t, tC }: {
 // ── Main component ────────────────────────────────────────────────────────────
 
 type Props =
-  | { listingId: number; providerId?: never; reviewCount: number; locale: string }
-  | { providerId: number; listingId?: never; reviewCount: number; locale: string };
+  | { listingId: number; providerId?: never; reviewCount: number; locale: string; sectionRef?: React.RefObject<HTMLElement | null>; containerRef?: React.RefObject<HTMLDivElement | null> }
+  | { providerId: number; listingId?: never; reviewCount: number; locale: string; sectionRef?: React.RefObject<HTMLElement | null>; containerRef?: React.RefObject<HTMLDivElement | null> };
 
-export function ReviewsSection({ reviewCount, locale, ...ids }: Props) {
+const TAKE = 5;
+
+export function ReviewsSection({ reviewCount, locale, sectionRef, containerRef, ...ids }: Props) {
   const t    = useTranslations('reviews');
   const tC   = useTranslations('common');
   const user = useAuthStore(s => s.user);
   const qc   = useQueryClient();
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   const [showForm, setShowForm]     = useState(false);
   const [editReview, setEditReview] = useState<Review | null>(null);
@@ -172,16 +175,45 @@ export function ReviewsSection({ reviewCount, locale, ...ids }: Props) {
     ? ['reviews', 'listing', ids.listingId]
     : ['reviews', 'provider', ids.providerId];
 
-  const queryParams = isListing
-    ? { listingId: ids.listingId, lang: locale }
-    : { providerId: ids.providerId, lang: locale };
+  const baseParams = isListing
+    ? { listingId: ids.listingId, lang: locale, take: TAKE }
+    : { providerId: ids.providerId, lang: locale, take: TAKE };
 
-  const { data: reviews = [], isLoading } = useQuery<Review[]>({
+  const {
+    data,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
     queryKey: cacheKey,
-    queryFn: () => api.get('/reviews', { params: queryParams }).then(r => r.data),
+    queryFn: ({ pageParam }) =>
+      api.get('/reviews', {
+        params: { ...baseParams, ...(pageParam ? { cursor: pageParam } : {}) },
+      }).then(r => r.data),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
   });
 
+  const reviews = data?.pages.flatMap(p => p.data) ?? [];
+  const total   = data?.pages[0]?.total ?? reviewCount;
   const ownReview = user ? reviews.find(r => r.user.id === user.id) : undefined;
+
+  // IntersectionObserver — root is the sheet scroll container (or viewport)
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { root: containerRef?.current ?? null, rootMargin: '150px' },
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage, containerRef]);
 
   const remove = useMutation({
     mutationFn: (id: number) => api.delete(`/reviews/${id}`),
@@ -201,11 +233,11 @@ export function ReviewsSection({ reviewCount, locale, ...ids }: Props) {
     : { providerId: ids.providerId as number };
 
   return (
-    <section className={styles.section}>
+    <section className={styles.section} ref={sectionRef}>
       <div className={styles.section__head}>
         <h2 className={styles.section__title}>
           {t('title')}
-          {reviewCount > 0 && <span className={styles.section__count}>{reviewCount}</span>}
+          {total > 0 && <span className={styles.section__count}>{total}</span>}
         </h2>
 
         {user && !ownReview && !showForm && (
@@ -241,6 +273,10 @@ export function ReviewsSection({ reviewCount, locale, ...ids }: Props) {
           />
         ))}
       </div>
+
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} style={{ height: 1 }} />
+      {isFetchingNextPage && <p className={styles.loading}>{tC('loading')}</p>}
     </section>
   );
 }

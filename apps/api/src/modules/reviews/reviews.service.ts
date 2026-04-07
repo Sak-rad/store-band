@@ -6,17 +6,31 @@ import { CreateReviewDto } from './dto/create-review.dto';
 export class ReviewsService {
   constructor(private prisma: PrismaService) {}
 
-  async findAll(query: { listingId?: number; providerId?: number }) {
-    return this.prisma.review.findMany({
-      where: {
-        ...(query.listingId ? { listingId: query.listingId } : {}),
-        ...(query.providerId ? { providerId: query.providerId } : {}),
-      },
-      include: {
-        user: { select: { id: true, name: true, avatarUrl: true } },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(query: { listingId?: number; providerId?: number; cursor?: number; take?: number }) {
+    const take = Math.min(query.take ?? 5, 50);
+    const where = {
+      ...(query.listingId  ? { listingId:  query.listingId  } : {}),
+      ...(query.providerId ? { providerId: query.providerId } : {}),
+    };
+
+    const [total, items] = await Promise.all([
+      this.prisma.review.count({ where }),
+      this.prisma.review.findMany({
+        where,
+        include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: take + 1,
+        ...(query.cursor ? { cursor: { id: query.cursor }, skip: 1 } : {}),
+      }),
+    ]);
+
+    let nextCursor: number | null = null;
+    if (items.length > take) {
+      const next = items.pop();
+      nextCursor = next!.id;
+    }
+
+    return { data: items, nextCursor, total };
   }
 
   async findMy(userId: number) {

@@ -9,19 +9,17 @@ const intlMiddleware = createMiddleware({
 });
 
 // ── Basic Auth (staging protection) ───────────────────────────────────────────
-// Включается только если задана переменная BASIC_AUTH_PASSWORD
 function basicAuth(req: NextRequest): NextResponse | null {
   const password = process.env.BASIC_AUTH_PASSWORD;
-  if (!password) return null; // защита выключена — пропускаем
+  if (!password) return null;
 
   const authHeader = req.headers.get('authorization');
-
   if (authHeader) {
     const [scheme, encoded] = authHeader.split(' ');
     if (scheme === 'Basic' && encoded) {
       const decoded = Buffer.from(encoded, 'base64').toString('utf-8');
       const [, pass] = decoded.split(':');
-      if (pass === password) return null; // верный пароль — пропускаем
+      if (pass === password) return null;
     }
   }
 
@@ -34,10 +32,9 @@ function basicAuth(req: NextRequest): NextResponse | null {
 export default function middleware(req: NextRequest) {
   const authResponse = basicAuth(req);
   if (authResponse) return authResponse;
-
   return intlMiddleware(req);
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)'],
+  matcher: ['/((?!_next|_vercel|api|.*\\..*).*)'],
 };

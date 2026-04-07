@@ -1,0 +1,100 @@
+@import '../../../styles/variables';
+@import '../../../styles/mixins';
+
+.banner {
+  position: fixed;
+  bottom: $spacing-5;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - #{$spacing-8});
+  max-width: 640px;
+  background: $color-text-primary;
+  color: #fff;
+  border-radius: $radius-2xl;
+  box-shadow: $shadow-xl;
+  z-index: $z-modal;
+  padding: $spacing-4 $spacing-5;
+  animation: slideUp 0.3s ease;
+
+  @include below(sm) {
+    bottom: $spacing-3;
+    width: calc(100% - #{$spacing-6});
+    padding: $spacing-3 $spacing-4;
+  }
+
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    flex-wrap: wrap;
+
+    @include below(sm) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-3;
+    }
+  }
+
+  &__text {
+    flex: 1;
+    font-size: $font-size-sm;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.9);
+    min-width: 0;
+  }
+
+  &__link {
+    color: #fff;
+    text-decoration: underline;
+    opacity: 0.8;
+
+    &:hover { opacity: 1; }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-2;
+    flex-shrink: 0;
+
+    @include below(sm) { width: 100%; }
+  }
+
+  &__decline {
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-full;
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: $font-size-sm;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.6);
+      color: #fff;
+    }
+
+    @include below(sm) { flex: 1; }
+  }
+
+  &__accept {
+    padding: $spacing-2 $spacing-5;
+    border-radius: $radius-full;
+    border: none;
+    background: $color-primary;
+    color: #fff;
+    font-size: $font-size-sm;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity $transition-fast;
+
+    &:hover { opacity: 0.88; }
+
+    @include below(sm) { flex: 1; }
+  }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(16px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

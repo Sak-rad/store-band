@@ -8,7 +8,7 @@ export class ListingsSearchService {
 
   async search(filter: ListingsFilterDto, _locale: string) {
     const { q, country, city, priceMin, priceMax, currency,
-      isFeatured, cursor, limit = 20, sort = 'newest' } = filter;
+      isFeatured, cursor, limit = 20, sort = 'newest', preferCountry } = filter;
 
     // Resolve slugs → ids (same pattern as category)
     // 'real-estate' is a virtual slug that maps to both apartments + villas
@@ -103,6 +103,63 @@ export class ListingsSearchService {
     }
 
     const orderBy = this.buildOrderBy(sort);
+    const include = {
+      category: true,
+      city: true,
+      country: true,
+      provider: { select: { id: true, name: true, nameI18n: true, avatarUrl: true, rating: true } },
+      media: { orderBy: { order: 'asc' as const }, take: 5 },
+    };
+
+    // ── Boosted mode: preferred country always comes first, across all pages ──
+    if (preferCountry && !resolvedCountryId) {
+      const preferredCountryRecord = await this.prisma.country.findUnique({ where: { slug: preferCountry } });
+      const preferredCountryId = preferredCountryRecord?.id;
+
+      if (preferredCountryId) {
+        const { oCursor, preferDone } = filter;
+
+        const [total, boostedRaw, othersRaw] = await Promise.all([
+          this.prisma.listing.count({ where }),
+          // Skip preferred query once exhausted to avoid re-fetching from start
+          preferDone
+            ? Promise.resolve([])
+            : this.prisma.listing.findMany({
+                where: { ...where, countryId: preferredCountryId },
+                take: take + 1,
+                ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
+                orderBy,
+                include,
+              }),
+          // other countries — uses oCursor
+          this.prisma.listing.findMany({
+            where: { ...where, countryId: { not: preferredCountryId } },
+            take: take + 1,
+            ...(oCursor ? { cursor: { id: oCursor }, skip: 1 } : {}),
+            orderBy,
+            include,
+          }),
+        ]);
+
+        const boostedHasMore = boostedRaw.length > take;
+        if (boostedHasMore) boostedRaw.pop();
+
+        const othersHasMore = othersRaw.length > take;
+        if (othersHasMore) othersRaw.pop();
+
+        const preferred = boostedRaw.slice(0, take);
+        const remaining = take - preferred.length;
+        const others = othersRaw.slice(0, remaining);
+
+        return {
+          data: [...preferred, ...others],
+          nextCursor: boostedHasMore ? (preferred[preferred.length - 1]?.id ?? null) : null,
+          nextOCursor: othersHasMore ? (others[others.length - 1]?.id ?? null) : null,
+          total,
+        };
+      }
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     const [total, items] = await Promise.all([
       this.prisma.listing.count({ where }),
@@ -111,13 +168,7 @@ export class ListingsSearchService {
         take: take + 1,
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
         orderBy,
-        include: {
-          category: true,
-          city: true,
-          country: true,
-          provider: { select: { id: true, name: true, nameI18n: true, avatarUrl: true, rating: true } },
-          media: { orderBy: { order: 'asc' }, take: 5 },
-        },
+        include,
       }),
     ]);
 

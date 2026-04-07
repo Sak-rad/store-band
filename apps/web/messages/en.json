@@ -331,5 +331,22 @@
     "uploading": "Uploading...",
     "maxSize": "Max file size: {size}",
     "formats": "Supported: JPG, PNG, WebP, GIF"
+  },
+  "cookies": {
+    "text": "We use cookies to improve your experience.",
+    "policy": "Privacy Policy",
+    "accept": "Accept",
+    "decline": "Decline"
+  },
+  "location": {
+    "detected": "Looking for housing in {country}?",
+    "detectedSub": "We will show you the best listings for this destination.",
+    "yes": "Yes, show",
+    "change": "Change country",
+    "noDetect": "Where are you planning to go?",
+    "noDetectSub": "Choose a destination and we will show you relevant listings.",
+    "choose": "Choose country",
+    "skip": "Skip",
+    "pickerTitle": "Select destination"
   }
 }

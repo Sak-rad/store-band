@@ -27,12 +27,16 @@ export class ReviewsController {
   @Public()
   @Get()
   findAll(
-    @Query('listingId') listingId?: string,
+    @Query('listingId')  listingId?:  string,
     @Query('providerId') providerId?: string,
+    @Query('cursor')     cursor?:     string,
+    @Query('take')       take?:       string,
   ) {
     return this.reviewsService.findAll({
-      listingId: listingId ? parseInt(listingId, 10) : undefined,
+      listingId:  listingId  ? parseInt(listingId,  10) : undefined,
       providerId: providerId ? parseInt(providerId, 10) : undefined,
+      cursor:     cursor     ? parseInt(cursor,     10) : undefined,
+      take:       take       ? parseInt(take,       10) : undefined,
     });
   }
 

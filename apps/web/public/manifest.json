@@ -1,0 +1,21 @@
+{
+  "name": "Relocate — Find Housing Abroad",
+  "short_name": "Relocate",
+  "description": "Find apartments, villas and services for relocation and travel",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#6366F1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "/",
+  "prefer_related_applications": false
+}

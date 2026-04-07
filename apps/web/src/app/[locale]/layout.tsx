@@ -3,6 +3,8 @@ import { getMessages, getTranslations } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { Providers } from '../../shared/ui/Providers';
+import { CookieBanner } from '../../shared/ui/CookieBanner';
+import { LocationBanner } from '../../shared/ui/LocationBanner';
 import '../../../styles/globals.scss';
 
 const locales = ['en', 'ru'];
@@ -19,6 +21,12 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   return {
     title: { default: t('homeTitle'), template: `%s | Relocation Platform` },
     description: t('homeDescription'),
+    manifest: '/manifest.json',
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'default',
+      title: 'Relocate',
+    },
     alternates: {
       languages: {
         en: `${BASE_URL}/en`,
@@ -36,10 +44,16 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} data-scroll-behavior="smooth">
+      <head>
+        <meta name="theme-color" content="#6366F1" />
+        <link rel="apple-touch-icon" href="/icons/icon.svg" />
+      </head>
       <body>
         <NextIntlClientProvider messages={messages}>
           <Providers locale={locale}>
             {children}
+            <CookieBanner />
+            <LocationBanner locale={locale} />
           </Providers>
         </NextIntlClientProvider>
       </body>

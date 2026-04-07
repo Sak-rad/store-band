@@ -22,7 +22,12 @@ export function ListingSheet({ id, locale }: Props) {
   const router = useRouter();
   const t = useTranslations('listings');
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef   = useRef<HTMLDivElement>(null);
+  const reviewsRef  = useRef<HTMLElement>(null);
+
+  const scrollToReviews = () => {
+    reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id, locale],
@@ -112,7 +117,12 @@ export function ListingSheet({ id, locale }: Props) {
                     </span>
                   )}
                   {listing.rating > 0 && (
-                    <span className={styles.content__rating}>
+                    <span
+                      className={styles.content__rating}
+                      onClick={scrollToReviews}
+                      style={{ cursor: 'pointer' }}
+                      title="View reviews"
+                    >
                       <Star size={12} fill="currentColor" />
                       {Number(listing.rating).toFixed(1)}
                       {listing.reviewCount > 0 && <em>({listing.reviewCount})</em>}
@@ -157,6 +167,8 @@ export function ListingSheet({ id, locale }: Props) {
                   listingId={listing.id}
                   reviewCount={listing.reviewCount}
                   locale={locale}
+                  sectionRef={reviewsRef}
+                  containerRef={scrollRef}
                 />
 
                 {/* Booking */}

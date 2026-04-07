@@ -97,8 +97,6 @@ async function main() {
       bioI18n: { en: 'Professional relocation services across Asia', ru: 'Профессиональные услуги по переезду в Азии' },
       bio: 'Professional relocation services across Asia',
       isVerified: true,
-      rating: 4.8,
-      reviewCount: 120,
     },
   });
 
@@ -134,7 +132,7 @@ async function main() {
       priceMin: 420, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.7769, lng: 106.7009, address: '12 Lê Lợi, District 1, Ho Chi Minh City',
-      isPublished: true, isFeatured: true, rating: 4.8, reviewCount: 24,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_city,
     },
     {
@@ -144,7 +142,7 @@ async function main() {
       priceMin: 750, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.8029, lng: 106.7348, address: 'Thao Dien, District 2, Ho Chi Minh City',
-      isPublished: true, isFeatured: false, rating: 4.6, reviewCount: 18,
+      isPublished: true, isFeatured: false,
       photos: PHOTOS.apt_modern,
     },
     {
@@ -154,7 +152,7 @@ async function main() {
       priceMin: 1400, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.7970, lng: 106.7220, address: 'Vinhomes Central Park, Bình Thạnh, Ho Chi Minh City',
-      isPublished: true, isFeatured: true, rating: 4.9, reviewCount: 41,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_luxury,
     },
     {
@@ -164,7 +162,7 @@ async function main() {
       priceMin: 320, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: hcmc.id, countryId: vietnam.id,
       lat: 10.7686, lng: 106.6953, address: 'Phạm Ngũ Lão, District 1, Ho Chi Minh City',
-      isPublished: true, isFeatured: false, rating: 4.4, reviewCount: 9,
+      isPublished: true, isFeatured: false,
       photos: PHOTOS.apt_cozy,
     },
 
@@ -176,7 +174,7 @@ async function main() {
       priceMin: 480, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: hanoi.id, countryId: vietnam.id,
       lat: 21.0278, lng: 105.8342, address: 'Hoan Kiem District, Hanoi',
-      isPublished: true, isFeatured: true, rating: 4.7, reviewCount: 33,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_city,
     },
 
@@ -188,7 +186,7 @@ async function main() {
       priceMin: 550, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: danang.id, countryId: vietnam.id,
       lat: 16.0544, lng: 108.2472, address: 'My Khe Beach, Son Tra District, Da Nang',
-      isPublished: true, isFeatured: true, rating: 4.9, reviewCount: 52,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_beach,
     },
     {
@@ -198,7 +196,7 @@ async function main() {
       priceMin: 1200, currency: 'USD', listingType: 'rent',
       categoryId: villas.id, cityId: danang.id, countryId: vietnam.id,
       lat: 16.0200, lng: 108.2490, address: 'Ngu Hanh Son District, Da Nang',
-      isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 17,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.villa_pool,
     },
     {
@@ -208,7 +206,7 @@ async function main() {
       priceMin: 2200, currency: 'USD', listingType: 'rent',
       categoryId: villas.id, cityId: danang.id, countryId: vietnam.id,
       lat: 16.1108, lng: 108.2768, address: 'Son Tra Peninsula, Da Nang',
-      isPublished: true, isFeatured: false, rating: 4.8, reviewCount: 8,
+      isPublished: true, isFeatured: false,
       photos: PHOTOS.villa_sea,
     },
     {
@@ -218,7 +216,7 @@ async function main() {
       priceMin: 900, currency: 'USD', listingType: 'rent',
       categoryId: villas.id, cityId: danang.id, countryId: vietnam.id,
       lat: 15.8801, lng: 108.3380, address: 'Cam Chau, Hoi An',
-      isPublished: true, isFeatured: false, rating: 4.7, reviewCount: 29,
+      isPublished: true, isFeatured: false,
       photos: PHOTOS.villa_garden,
     },
 
@@ -230,7 +228,7 @@ async function main() {
       priceMin: 380, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: nhaTrang.id, countryId: vietnam.id,
       lat: 12.2388, lng: 109.1967, address: 'Trần Phú Street, Nha Trang',
-      isPublished: true, isFeatured: true, rating: 4.7, reviewCount: 38,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_beach,
     },
     {
@@ -240,7 +238,7 @@ async function main() {
       priceMin: 1100, currency: 'USD', listingType: 'rent',
       categoryId: villas.id, cityId: nhaTrang.id, countryId: vietnam.id,
       lat: 12.0060, lng: 109.1420, address: 'Cam Lam District, Nha Trang',
-      isPublished: true, isFeatured: false, rating: 4.6, reviewCount: 14,
+      isPublished: true, isFeatured: false,
       photos: PHOTOS.villa_pool,
     },
 
@@ -252,7 +250,7 @@ async function main() {
       priceMin: 650, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: phuket.id, countryId: thailand.id,
       lat: 7.8960, lng: 98.2973, address: 'Patong, Kathu District, Phuket',
-      isPublished: true, isFeatured: true, rating: 4.8, reviewCount: 61,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_beach,
     },
     {
@@ -262,7 +260,7 @@ async function main() {
       priceMin: 3200, currency: 'USD', listingType: 'rent',
       categoryId: villas.id, cityId: phuket.id, countryId: thailand.id,
       lat: 7.9508, lng: 98.2738, address: 'Kamala, Kathu District, Phuket',
-      isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 23,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.villa_pool,
     },
 
@@ -274,7 +272,7 @@ async function main() {
       priceMin: 290, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: pattaya.id, countryId: thailand.id,
       lat: 12.9236, lng: 100.8825, address: 'Central Pattaya Road, Pattaya',
-      isPublished: true, isFeatured: true, rating: 4.5, reviewCount: 47,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.apt_modern,
     },
 
@@ -286,7 +284,7 @@ async function main() {
       priceMin: 2100, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: dubai.id, countryId: uae.id,
       lat: 25.0772, lng: 55.1341, address: 'Dubai Marina, Dubai',
-      isPublished: true, isFeatured: true, rating: 4.9, reviewCount: 87,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.dubai,
     },
     {
@@ -296,7 +294,7 @@ async function main() {
       priceMin: 8500, currency: 'USD', listingType: 'rent',
       categoryId: apartments.id, cityId: dubai.id, countryId: uae.id,
       lat: 25.1972, lng: 55.2744, address: 'Downtown Dubai, Dubai',
-      isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 12,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.dubai,
     },
     {
@@ -306,7 +304,7 @@ async function main() {
       priceMin: 2500000, currency: 'USD', listingType: 'buy',
       categoryId: villas.id, cityId: dubai.id, countryId: uae.id,
       lat: 25.1124, lng: 55.1390, address: 'Palm Jumeirah, Dubai',
-      isPublished: true, isFeatured: true, rating: 5.0, reviewCount: 3,
+      isPublished: true, isFeatured: true,
       photos: PHOTOS.villa_sea,
     },
   ] as const;

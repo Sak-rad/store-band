@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
@@ -22,6 +23,10 @@ export function ListingDetail({ id, locale }: Props) {
   const tCommon = useTranslations('common');
   const router = useRouter();
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const reviewsRef = useRef<HTMLElement>(null);
+
+  const scrollToReviews = () =>
+    reviewsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   const { data: listing, isLoading } = useQuery({
     queryKey: ['listing', id, locale],
@@ -79,7 +84,12 @@ export function ListingDetail({ id, locale }: Props) {
               </div>
             )}
             {listing.rating > 0 && (
-              <div className={styles.detail__rating}>
+              <div
+                className={styles.detail__rating}
+                onClick={scrollToReviews}
+                style={{ cursor: 'pointer' }}
+                title="View reviews"
+              >
                 <Star size={14} fill="currentColor" />
                 {Number(listing.rating).toFixed(1)}
                 {listing.reviewCount > 0 && (
@@ -108,6 +118,7 @@ export function ListingDetail({ id, locale }: Props) {
             listingId={listing.id}
             reviewCount={listing.reviewCount}
             locale={locale}
+            sectionRef={reviewsRef}
           />
 
           {/* Provider card */}

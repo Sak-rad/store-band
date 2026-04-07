@@ -18,4 +18,7 @@ export class ListingsFilterDto {
   @IsOptional() @Type(() => Number) @IsNumber() limit?: number;
   @IsOptional() @IsString() listingType?: string;
   @IsOptional() @IsString() sort?: string;
+  @IsOptional() @IsString() preferCountry?: string;  // soft boost: show this country first
+  @IsOptional() @Type(() => Number) @IsInt() oCursor?: number; // cursor for "others" in boosted mode
+  @IsOptional() @Transform(({ value }) => value === 'true') @IsBoolean() preferDone?: boolean; // preferred exhausted
 }

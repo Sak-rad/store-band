@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '../../../navigation';
 import { useSearchParams } from 'next/navigation';
 import { api } from '../../../shared/lib/api';
+import { useLocationStore } from '../../../shared/store/location.store';
 import { ListingCard } from '../../../entities/listing/ui/ListingCard';
 import styles from './ListingGrid.module.scss';
 
@@ -58,6 +59,7 @@ export function ListingGrid({ filters, locale }: Props) {
   const pathname   = usePathname();
   const searchParams = useSearchParams();
   const sentinelRef  = useRef<HTMLDivElement>(null);
+  const preferCountry = useLocationStore(s => s.country?.slug);
 
   const currentSort = (filters.sort ?? searchParams.get('sort') ?? 'newest') as SortOption;
 
@@ -75,21 +77,35 @@ export function ListingGrid({ filters, locale }: Props) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['listings', filters, locale, currentSort],
-    queryFn: ({ pageParam }) =>
-      api
+    queryKey: ['listings', filters, locale, currentSort, preferCountry],
+    queryFn: ({ pageParam }) => {
+      const boosted = !filters.country && preferCountry;
+      const p = pageParam as { cursor?: number; oCursor?: number } | undefined;
+      return api
         .get('/listings', {
           params: {
             ...filters,
             sort: currentSort,
             lang: locale,
             limit: 15,
-            ...(pageParam ? { cursor: pageParam } : {}),
+            ...(p?.cursor     ? { cursor:     p.cursor     } : {}),
+            ...(p?.oCursor    ? { oCursor:    p.oCursor    } : {}),
+            ...(p?.preferDone ? { preferDone: true         } : {}),
+            ...(boosted ? { preferCountry } : {}),
           },
         })
-        .then((r) => r.data),
-    initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+        .then((r) => r.data);
+    },
+    initialPageParam: undefined as { cursor?: number; oCursor?: number; preferDone?: boolean } | undefined,
+    getNextPageParam: (lastPage) => {
+      const { nextCursor, nextOCursor } = lastPage;
+      if (!nextCursor && !nextOCursor) return undefined;
+      return {
+        cursor: nextCursor ?? undefined,
+        oCursor: nextOCursor ?? undefined,
+        preferDone: !nextCursor, // preferred exhausted — skip on next page
+      };
+    },
   });
 
   useEffect(() => {
