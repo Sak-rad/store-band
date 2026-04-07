@@ -33,6 +33,7 @@
   @include below(sm) {
     gap: $spacing-3;
     padding: $spacing-4;
+    flex-wrap: wrap;
   }
 
   &__avatar {
@@ -133,6 +134,12 @@
   font-size: $font-size-sm;
   border-radius: $radius-full;
   text-decoration: none;
+  white-space: nowrap;
+
+  @include below(sm) {
+    padding: $spacing-1 $spacing-3;
+    font-size: $font-size-xs;
+  }
 }
 
 .empty {
