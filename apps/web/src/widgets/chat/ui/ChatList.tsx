@@ -29,7 +29,7 @@ export function ChatList({ locale }: Props) {
     }).then(r => {
       router.replace(`/chats/${r.data.id}`);
     }).catch(() => {});
-  }, [user, providerId]);
+}, [user, providerId, listingId, router]);
 
   const { data: chats = [], isLoading } = useQuery({
     queryKey: ['chats'],

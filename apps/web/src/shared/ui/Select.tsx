@@ -106,6 +106,7 @@ export function Select({
             {value && placeholder && (
               <li
                 role="option"
+                aria-selected={false}
                 className={`${styles.select__option} ${styles['select__option--clear']}`}
                 onClick={() => { onChange(''); setOpen(false); }}
               >

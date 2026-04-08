@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useLocationStore } from '../store/location.store';
 import styles from './CookieBanner.module.scss';
+import Link from 'next/link';
 
 export function CookieBanner() {
   const { cookieConsent, setCookieConsent } = useLocationStore();
@@ -34,7 +35,7 @@ export function CookieBanner() {
       <div className={styles.banner__content}>
         <p className={styles.banner__text}>
           🍪 {t('text')}{' '}
-          <a href="/privacy" className={styles.banner__link}>{t('policy')}</a>.
+          <Link href="/privacy" className={styles.banner__link}>{t('policy')}</Link>
         </p>
         <div className={styles.banner__actions}>
           <button className={styles.banner__decline} onClick={decline}>

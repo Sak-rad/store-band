@@ -136,14 +136,16 @@ export function ChatWindow({ chatId }: Props) {
     });
 
     return () => { socket.emit('chat:leave', chatIdNum); socket.disconnect(); };
-  }, [chatIdNum, accessToken]);
+}, [chatIdNum, accessToken, queryClient]);
 
   // Scroll to bottom on first load
-  useEffect(() => {
-    if (messagesData?.data?.length) {
-      bottomRef.current?.scrollIntoView();
-    }
-  }, [messagesData?.data?.length > 0]);
+const hasMessages = (messagesData?.data?.length ?? 0) > 0;
+
+useEffect(() => {
+  if (hasMessages) {
+    bottomRef.current?.scrollIntoView();
+  }
+}, [hasMessages]);
 
   const sendText = (text: string, replyToId?: number) => {
     socketRef.current?.emit('message:send', {

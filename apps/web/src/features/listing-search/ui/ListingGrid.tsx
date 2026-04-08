@@ -80,7 +80,7 @@ export function ListingGrid({ filters, locale }: Props) {
     queryKey: ['listings', filters, locale, currentSort, preferCountry],
     queryFn: ({ pageParam }) => {
       const boosted = !filters.country && preferCountry;
-      const p = pageParam as { cursor?: number; oCursor?: number } | undefined;
+      const p = pageParam as { cursor?: number; oCursor?: number; preferDone?: boolean } | undefined;
       return api
         .get('/listings', {
           params: {
