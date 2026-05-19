@@ -38,7 +38,7 @@ export function Header() {
             <path d="M8 14.5C8 11.5 10.5 8 14 8C17.5 8 20 11.5 20 14.5C20 17 17 21 14 22C11 21 8 17 8 14.5Z" fill="white" opacity="0.9"/>
             <circle cx="14" cy="14" r="3" fill="#0EA5E9"/>
           </svg>
-          <span>Relocate</span>
+          <span>Roamly</span>
         </Link>
 
         {/* Desktop Nav */}

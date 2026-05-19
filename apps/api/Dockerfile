@@ -7,11 +7,11 @@ WORKDIR /app
 
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/
-RUN pnpm install --frozen-lockfile --filter @relocation/api
+RUN pnpm install --frozen-lockfile --filter @roamly/api
 
 COPY apps/api ./apps/api
-RUN pnpm --filter @relocation/api run build
-RUN pnpm --filter @relocation/api exec prisma generate
+RUN pnpm --filter @roamly/api run build
+RUN pnpm --filter @roamly/api exec prisma generate
 
 # Stage 2: Production
 FROM node:20-alpine AS runner
@@ -23,7 +23,7 @@ WORKDIR /app
 
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/api/package.json ./apps/api/
-RUN pnpm install --frozen-lockfile --filter @relocation/api --prod
+RUN pnpm install --frozen-lockfile --filter @roamly/api --prod
 
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma

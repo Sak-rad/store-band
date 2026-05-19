@@ -76,12 +76,12 @@ async function main() {
   const passwordHash = await argon2.hash('Admin1234!');
 
   const seedUser = await prisma.user.upsert({
-    where: { email: 'provider@relocate.dev' },
+    where: { email: 'provider@roamly.dev' },
     update: { passwordHash },
     create: {
-      email: 'provider@relocate.dev',
+      email: 'provider@roamly.dev',
       passwordHash,
-      name: 'Relocate Agency',
+      name: 'Roamly Agency',
       role: UserRole.PROVIDER,
       preferredLocale: 'en',
     },
@@ -92,10 +92,10 @@ async function main() {
     update: {},
     create: {
       userId: seedUser.id,
-      name: 'Relocate Agency',
-      nameI18n: { en: 'Relocate Agency', ru: 'Агентство Relocate' },
-      bioI18n: { en: 'Professional relocation services across Asia', ru: 'Профессиональные услуги по переезду в Азии' },
-      bio: 'Professional relocation services across Asia',
+      name: 'Roamly Agency',
+      nameI18n: { en: 'Roamly Agency', ru: 'Агентство Relocate' },
+      bioI18n: { en: 'Professional travel & relocation services across Asia', ru: 'Профессиональные услуги по переезду в Азии' },
+      bio: 'Professional travel & relocation services across Asia',
       isVerified: true,
     },
   });
@@ -324,13 +324,13 @@ async function main() {
   // ─── Seed Reviewer Users ───────────────────────────────────────────────
 
   const reviewerData = [
-    { email: 'anna@relocate.dev',    name: 'Anna K.',     locale: 'ru' },
-    { email: 'mikhail@relocate.dev', name: 'Михаил С.',   locale: 'ru' },
-    { email: 'james@relocate.dev',   name: 'James T.',    locale: 'en' },
-    { email: 'sarah@relocate.dev',   name: 'Sarah M.',    locale: 'en' },
-    { email: 'dmitry@relocate.dev',  name: 'Дмитрий В.', locale: 'ru' },
-    { email: 'elena@relocate.dev',   name: 'Елена П.',    locale: 'ru' },
-    { email: 'oliver@relocate.dev',  name: 'Oliver B.',   locale: 'en' },
+    { email: 'anna@roamly.dev',    name: 'Anna K.',     locale: 'ru' },
+    { email: 'mikhail@roamly.dev', name: 'Михаил С.',   locale: 'ru' },
+    { email: 'james@roamly.dev',   name: 'James T.',    locale: 'en' },
+    { email: 'sarah@roamly.dev',   name: 'Sarah M.',    locale: 'en' },
+    { email: 'dmitry@roamly.dev',  name: 'Дмитрий В.', locale: 'ru' },
+    { email: 'elena@roamly.dev',   name: 'Елена П.',    locale: 'ru' },
+    { email: 'oliver@roamly.dev',  name: 'Oliver B.',   locale: 'en' },
   ];
 
   const reviewers = await Promise.all(
@@ -404,7 +404,7 @@ async function main() {
   }
 
   console.log(`✅ Seed complete — ${listings.length} listings created`);
-  console.log(`   Provider login: provider@relocate.dev / Admin1234!`);
+  console.log(`   Provider login: provider@roamly.dev / Admin1234!`);
   console.log(`   New cities: Nha Trang (VN), Phuket (TH), Pattaya (TH), Dubai (AE)`);
   console.log(`   Categories: real-estate (parent) → apartments, villas`);
 }
