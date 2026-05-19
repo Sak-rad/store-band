@@ -1,10 +1,24 @@
 node_modules
-.env
-.env.local
-.env.*.local
 dist
 .next
 .turbo
-*.log
 coverage
-prisma/migrations/*.sql
+*.log
+.DS_Store
+.idea
+
+# Env files — никогда не коммитить секреты
+.env
+.env.local
+.env.*.local
+.env.staging
+.env.production
+apps/api/.env
+apps/web/.env.local
+
+# Prisma — игнорируем сгенерированные SQL миграций, но НЕ ручные SQL файлы
+# add_search_vector.sql должен быть в репо — применяется вручную после migrate
+
+# IDE
+.vscode
+.claude/worktrees/

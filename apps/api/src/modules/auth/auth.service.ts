@@ -31,8 +31,10 @@ export class AuthService {
     }
 
     const passwordHash = await argon2.hash(dto.password, {
+      type: argon2.argon2id,
       memoryCost: 19456,
       timeCost: 2,
+      parallelism: 1,
     });
 
     const preferredLocale = ['en', 'ru'].includes(lang) ? lang : 'en';
@@ -68,8 +70,9 @@ export class AuthService {
   }
 
   async refresh(refreshToken: string, ip: string, userAgent: string) {
+    const hashedToken = this.hashToken(refreshToken);
     const session = await this.prisma.session.findUnique({
-      where: { refreshToken },
+      where: { refreshToken: hashedToken },
       include: { user: true },
     });
 
@@ -86,7 +89,8 @@ export class AuthService {
   }
 
   async logout(refreshToken: string) {
-    await this.prisma.session.deleteMany({ where: { refreshToken } });
+    const hashedToken = this.hashToken(refreshToken);
+    await this.prisma.session.deleteMany({ where: { refreshToken: hashedToken } });
   }
 
   private async generateTokens(userId: number) {
@@ -104,9 +108,17 @@ export class AuthService {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
+    // Store SHA-256 hash of the token — plain token stays only in the httpOnly cookie
+    const hashedToken = this.hashToken(refreshToken);
     await this.prisma.session.create({
-      data: { userId, refreshToken, ip, userAgent, expiresAt },
+      data: { userId, refreshToken: hashedToken, ip, userAgent, expiresAt },
     });
+  }
+
+  // SHA-256 is appropriate here: the token is already high-entropy random data,
+  // so a fast hash is safe and avoids unnecessary argon2 overhead.
+  private hashToken(token: string): string {
+    return crypto.createHash('sha256').update(token).digest('hex');
   }
 
   private sanitizeUser(user: any) {

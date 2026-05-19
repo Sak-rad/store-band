@@ -14,6 +14,7 @@ async function bootstrap() {
   const config = app.get(ConfigService);
   const clientUrl = config.get<string>('CLIENT_URL', 'http://localhost:3000');
 
+  app.set('trust proxy', 1);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cookieParser());
 

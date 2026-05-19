@@ -30,7 +30,7 @@ export class AuthController {
     const { accessToken, refreshToken, user } = await this.authService.register(
       dto,
       req.ip,
-      req.headers['user-agent'],
+      req.headers['user-agent'] ?? 'unknown',
       lang,
     );
     this.setRefreshCookie(res, refreshToken);
@@ -46,7 +46,7 @@ export class AuthController {
     const { accessToken, refreshToken, user } = await this.authService.login(
       dto,
       req.ip,
-      req.headers['user-agent'],
+      req.headers['user-agent'] ?? 'unknown',
       lang,
     );
     this.setRefreshCookie(res, refreshToken);
@@ -54,6 +54,7 @@ export class AuthController {
   }
 
   @Public()
+  @Throttle({ default: { limit: 20, ttl: 60000 } })
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -61,12 +62,13 @@ export class AuthController {
     const { accessToken, refreshToken: newRefresh, user } = await this.authService.refresh(
       refreshToken,
       req.ip,
-      req.headers['user-agent'],
+      req.headers['user-agent'] ?? 'unknown',
     );
     this.setRefreshCookie(res, newRefresh);
     return { accessToken, user };
   }
 
+  @Public()
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -82,10 +84,11 @@ export class AuthController {
   }
 
   private setRefreshCookie(res: Response, token: string) {
+    const isProd = process.env.NODE_ENV === 'production';
     res.cookie('refresh_token', token, {
       httpOnly: true,
-      secure: true,
-      sameSite: 'none',
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
       path: '/',
     });
