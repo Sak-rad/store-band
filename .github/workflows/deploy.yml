@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_API: ${{ github.repository }}/api
-  IMAGE_WEB: ${{ github.repository }}/web
+  IMAGE_API: sak-rad/store-band/api
+  IMAGE_WEB: sak-rad/store-band/web
 
 jobs:
   # ── Lint & Type-check ──────────────────────────────────────
