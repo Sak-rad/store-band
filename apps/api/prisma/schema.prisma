@@ -7,8 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── Enums ───────────────────────────────────────────────────────────────────
-
 enum UserRole {
   USER
   PROVIDER
@@ -49,18 +47,16 @@ enum NotificationType {
   REVIEW_RECEIVED
 }
 
-// ─── User & Auth ──────────────────────────────────────────────────────────────
-
 model User {
-  id              Int       @id @default(autoincrement())
-  email           String    @unique
+  id              Int      @id @default(autoincrement())
+  email           String   @unique
   passwordHash    String?
   name            String?
   avatarUrl       String?
-  role            UserRole  @default(USER)
-  preferredLocale String    @default("en")
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  role            UserRole @default(USER)
+  preferredLocale String   @default("en")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   sessions      Session[]
   accounts      Account[]
@@ -69,8 +65,8 @@ model User {
   reviews       Review[]
   favorites     Favorite[]
   notifications Notification[]
-  chatsAsUser  Chat[]     @relation("ChatUser")
-  sentMessages Message[]
+  chatsAsUser   Chat[]         @relation("ChatUser")
+  sentMessages  Message[]
 
   @@index([email])
 }
@@ -105,8 +101,6 @@ model Account {
   @@index([userId])
 }
 
-// ─── Provider ─────────────────────────────────────────────────────────────────
-
 model Provider {
   id          Int      @id @default(autoincrement())
   userId      Int      @unique
@@ -131,13 +125,11 @@ model Provider {
   @@index([userId])
 }
 
-// ─── Location ─────────────────────────────────────────────────────────────────
-
 model Country {
-  id       Int     @id @default(autoincrement())
+  id       Int    @id @default(autoincrement())
   nameI18n Json
   name     String
-  code     String  @unique
+  code     String @unique
   slug     String @unique
 
   cities   City[]
@@ -148,7 +140,7 @@ model Country {
 }
 
 model City {
-  id        Int     @id @default(autoincrement())
+  id        Int    @id @default(autoincrement())
   nameI18n  Json
   name      String
   countryId Int
@@ -161,8 +153,6 @@ model City {
   @@index([countryId])
   @@index([slug])
 }
-
-// ─── Category ─────────────────────────────────────────────────────────────────
 
 model Category {
   id       Int     @id @default(autoincrement())
@@ -180,35 +170,33 @@ model Category {
   @@index([parentId])
 }
 
-// ─── Listing ──────────────────────────────────────────────────────────────────
-
 model Listing {
-  id              Int       @id @default(autoincrement())
-  titleI18n       Json
-  descriptionI18n Json
-  title           String
-  description     String
-  priceMin        Decimal   @db.Decimal(12, 2)
-  priceMax        Decimal?  @db.Decimal(12, 2)
-  priceOnRequest  Boolean   @default(false)
-  currency        String    @default("USD")
-  lat             Float?
-  lng             Float?
-  address         String?
-  categoryId      Int
-  cityId          Int
-  countryId       Int
-  providerId      Int
+  id                   Int       @id @default(autoincrement())
+  titleI18n            Json
+  descriptionI18n      Json
+  title                String
+  description          String
+  priceMin             Decimal   @db.Decimal(12, 2)
+  priceMax             Decimal?  @db.Decimal(12, 2)
+  priceOnRequest       Boolean   @default(false)
+  currency             String    @default("USD")
+  lat                  Float?
+  lng                  Float?
+  address              String?
+  categoryId           Int
+  cityId               Int
+  countryId            Int
+  providerId           Int
   listingType          String    @default("rent")
   isShortTermAvailable Boolean   @default(false)
   isPublished          Boolean   @default(false)
   isActive             Boolean   @default(true)
-  isFeatured      Boolean   @default(false)
-  rating          Float     @default(0)
-  reviewCount     Int       @default(0)
-  deletedAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  isFeatured           Boolean   @default(false)
+  rating               Float     @default(0)
+  reviewCount          Int       @default(0)
+  deletedAt            DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 
   category  Category       @relation(fields: [categoryId], references: [id])
   city      City           @relation(fields: [cityId], references: [id])
@@ -239,8 +227,6 @@ model ListingMedia {
 
   @@index([listingId])
 }
-
-// ─── Chat ─────────────────────────────────────────────────────────────────────
 
 model Chat {
   id          Int          @id @default(autoincrement())
@@ -273,16 +259,14 @@ model Message {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  chat    Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
-  sender  User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
-  replyTo Message? @relation("MessageReply", fields: [replyToMessageId], references: [id])
+  chat    Chat      @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender  User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo Message?  @relation("MessageReply", fields: [replyToMessageId], references: [id])
   replies Message[] @relation("MessageReply")
 
   @@index([chatId, createdAt])
   @@index([senderId])
 }
-
-// ─── Booking ──────────────────────────────────────────────────────────────────
 
 model Booking {
   id                 Int           @id @default(autoincrement())
@@ -309,8 +293,6 @@ model Booking {
   @@index([status])
 }
 
-// ─── Review ───────────────────────────────────────────────────────────────────
-
 model Review {
   id         Int      @id @default(autoincrement())
   userId     Int
@@ -331,8 +313,6 @@ model Review {
   @@index([userId])
 }
 
-// ─── Favorite ─────────────────────────────────────────────────────────────────
-
 model Favorite {
   id        Int      @id @default(autoincrement())
   userId    Int
@@ -345,8 +325,6 @@ model Favorite {
   @@unique([userId, listingId])
   @@index([userId])
 }
-
-// ─── Notification ─────────────────────────────────────────────────────────────
 
 model Notification {
   id        Int              @id @default(autoincrement())
