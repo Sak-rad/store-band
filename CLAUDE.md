@@ -61,6 +61,32 @@ Monorepo: `pnpm` workspaces + Turborepo.
 
 ---
 
+## Workflow rules (AI assistant must follow)
+
+### After every feature — run tests
+After implementing any feature or fix, always run the relevant test suite before committing:
+```bash
+# API unit/e2e tests
+cd apps/api && pnpm test
+
+# Web type check
+cd apps/web && pnpm tsc --noEmit
+
+# Lint both
+pnpm lint   # from repo root
+```
+If tests don't exist yet for the new code — write them first, then implement.
+
+### Commit style — human, not AI
+Commits must read like a developer wrote them. Rules:
+- **No** "Co-Authored-By: Claude" or any AI attribution in commit messages
+- Short imperative subject line (50 chars max): `fix login redirect on 401`, `add geo filter to listings`
+- No bullet-point body unless there's a real reason to explain non-obvious decisions
+- No generated summaries, no "this commit..." phrasing
+- Match the tone of existing commits in the repo (`git log --oneline` is the reference)
+
+---
+
 ## Key file locations
 
 ```
