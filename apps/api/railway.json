@@ -5,7 +5,7 @@
     "buildCommand": "pnpm install --frozen-lockfile --filter @roamly/api && pnpm --filter @roamly/api exec prisma generate && pnpm --filter @roamly/api run build"
   },
   "deploy": {
-    "startCommand": "node apps/api/dist/src/main.js",
+    "startCommand": "npx prisma migrate deploy && node apps/api/dist/main.js",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }
