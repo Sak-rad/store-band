@@ -1,7 +1,7 @@
 {
-  "name": "Relocate — Find Housing Abroad",
-  "short_name": "Relocate",
-  "description": "Find apartments, villas and services for relocation and travel",
+  "name": "Roamly — Housing, Services & More Abroad",
+  "short_name": "Roamly",
+  "description": "Find apartments, cafes, services and more for expats and travelers in Asia & UAE",
   "start_url": "/",
   "id": "/",
   "display": "standalone",
