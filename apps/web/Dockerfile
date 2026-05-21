@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/web/package.json ./apps/web/
-RUN pnpm install --frozen-lockfile --filter @roamly/web
+RUN pnpm install --frozen-lockfile --filter @meriloz/web
 
 # Stage 2: Build
 FROM node:20-alpine AS builder
@@ -23,7 +23,7 @@ COPY styles ./styles
 COPY package.json pnpm-workspace.yaml ./
 
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm --filter @roamly/web run build
+RUN pnpm --filter @meriloz/web run build
 
 # Stage 3: Production
 FROM node:20-alpine AS runner
