@@ -13,9 +13,9 @@ export function Footer() {
             <path d="M8 14.5C8 11.5 10.5 8 14 8C17.5 8 20 11.5 20 14.5C20 17 17 21 14 22C11 21 8 17 8 14.5Z" fill="white" opacity="0.9"/>
             <circle cx="14" cy="14" r="3" fill="#0EA5E9"/>
           </svg>
-          <span>Roamly</span>
+          <span>Meriloz</span>
         </div>
-        <p className={styles.footer__copy}>© {year} Roamly</p>
+        <p className={styles.footer__copy}>© {year} Meriloz</p>
         <nav className={styles.footer__nav}>
           <Link href="/listings">Listings</Link>
           <Link href="/en/register">Join as provider</Link>

@@ -2,7 +2,7 @@
   "$schema": "https://railway.com/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "pnpm install --frozen-lockfile --filter @roamly/web && pnpm --filter @roamly/web run build"
+    "buildCommand": "pnpm install --frozen-lockfile --filter @meriloz/web && pnpm --filter @meriloz/web run build"
   },
   "deploy": {
     "startCommand": "node apps/web/.next/standalone/server.js",

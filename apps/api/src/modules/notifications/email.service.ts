@@ -32,7 +32,7 @@ export class EmailService {
       },
     };
 
-    const subject = subjects[locale]?.[template] ?? subjects['en'][template] ?? 'Roamly';
+    const subject = subjects[locale]?.[template] ?? subjects['en'][template] ?? 'Meriloz';
 
     // В dev режиме просто логируем, не отправляем
     if (this.config.get('NODE_ENV') !== 'production') {

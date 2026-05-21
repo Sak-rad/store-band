@@ -19,13 +19,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: 'meta' });
   return {
-    title: { default: t('homeTitle'), template: `%s | Roamly` },
+    title: { default: t('homeTitle'), template: `%s | Meriloz` },
     description: t('homeDescription'),
     manifest: '/manifest.json',
     appleWebApp: {
       capable: true,
       statusBarStyle: 'default',
-      title: 'Roamly',
+      title: 'Meriloz',
     },
     alternates: {
       languages: {

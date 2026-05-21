@@ -7,7 +7,7 @@
 
 ## What is this project
 
-**Relocation Platform** — marketplace for expats relocating to Southeast Asia and UAE.
+**Meriloz** (meriloz.com) — marketplace for expats relocating to Southeast Asia and UAE.
 Users browse listings (apartments, villas, services), book, chat with providers, leave reviews.
 Two locales: **en** and **ru**. Two roles: `USER` and `PROVIDER`.
 
