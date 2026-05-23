@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useTranslations } from 'next-intl';
-import { Link } from '../../../navigation';
-import { useCurrencyStore } from '../../../shared/store/currency.store';
-import styles from './ListingCard.module.scss';
+import Image from "next/image";
+import { useTranslations } from "next-intl";
+import { Link } from "../../../navigation";
+import { useCurrencyStore } from "../../../shared/store/currency.store";
+import styles from "./ListingCard.module.scss";
 
 interface Listing {
   id: string;
@@ -22,17 +22,27 @@ interface Listing {
   reviewCount: number;
 }
 
-interface Props { listing: Listing; locale: string; priority?: boolean; }
+interface Props {
+  listing: Listing;
+  locale: string;
+  priority?: boolean;
+}
 
 export function ListingCard({ listing, priority }: Props) {
-  const t = useTranslations('listings');
+  const t = useTranslations("listings");
   const formatPrice = useCurrencyStore((s) => s.formatPrice);
   const thumb = listing.media?.[0]?.thumbUrl || listing.media?.[0]?.url;
-  const location = [listing.city?.name, listing.country?.name].filter(Boolean).join(', ');
-  const showPerMonth = !listing.priceOnRequest && listing.listingType !== 'buy';
+  const location = [listing.city?.name, listing.country?.name]
+    .filter(Boolean)
+    .join(", ");
+  const showPerMonth = !listing.priceOnRequest && listing.listingType !== "buy";
 
   return (
-    <Link href={`/listing/${listing.id}`} scroll={false} className={styles.card}>
+    <Link
+      href={`/listing/${listing.id}`}
+      scroll={false}
+      className={styles.card}
+    >
       <div className={styles.card__img}>
         {thumb ? (
           <Image
@@ -40,15 +50,34 @@ export function ListingCard({ listing, priority }: Props) {
             alt={listing.title}
             fill
             priority={priority}
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: "cover" }}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
           <div className={styles.card__img__placeholder}>
             <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-              <rect x="3" y="3" width="18" height="18" rx="2" stroke="#CBD5E1" strokeWidth="1.5"/>
-              <circle cx="8.5" cy="8.5" r="1.5" stroke="#CBD5E1" strokeWidth="1.5"/>
-              <path d="M3 16L8 11L12 15L15 12L21 18" stroke="#CBD5E1" strokeWidth="1.5" strokeLinejoin="round"/>
+              <rect
+                x="3"
+                y="3"
+                width="18"
+                height="18"
+                rx="2"
+                stroke="#CBD5E1"
+                strokeWidth="1.5"
+              />
+              <circle
+                cx="8.5"
+                cy="8.5"
+                r="1.5"
+                stroke="#CBD5E1"
+                strokeWidth="1.5"
+              />
+              <path
+                d="M3 16L8 11L12 15L15 12L21 18"
+                stroke="#CBD5E1"
+                strokeWidth="1.5"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
         )}
@@ -56,8 +85,10 @@ export function ListingCard({ listing, priority }: Props) {
           <span className={styles.card__badge}>{listing.category.name}</span>
         )}
         {listing.isShortTermAvailable && (
-          <span className={`${styles.card__badge} ${styles['card__badge--short']}`}>
-            {t('alsoShortTerm')}
+          <span
+            className={`${styles.card__badge} ${styles["card__badge--short"]}`}
+          >
+            {t("alsoShortTerm")}
           </span>
         )}
       </div>
@@ -67,13 +98,16 @@ export function ListingCard({ listing, priority }: Props) {
         <h3 className={styles.card__title}>{listing.title}</h3>
         <div className={styles.card__footer}>
           <p className={styles.card__price}>
-            <strong>{formatPrice(listing.priceMin)}</strong>
-            {showPerMonth && <span> / {t('perMonth')}</span>}
+            <strong suppressHydrationWarning>{formatPrice(listing.priceMin)}</strong>
+            {showPerMonth && <span> / {t("perMonth")}</span>}
           </p>
           {listing.reviewCount > 0 && (
             <span className={styles.card__rating}>
               ★ {listing.rating.toFixed(1)}
-              <span className={styles.card__rating__count}> ({listing.reviewCount})</span>
+              <span className={styles.card__rating__count}>
+                {" "}
+                ({listing.reviewCount})
+              </span>
             </span>
           )}
         </div>

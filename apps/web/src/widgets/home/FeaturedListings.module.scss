@@ -1,0 +1,20 @@
+// Отступы под стрелки на десктопе
+.root {
+  @include above(lg) {
+    padding: 0 $spacing-6;
+    margin: 0 (-$spacing-6);
+  }
+}
+
+// Ширина одного слайда (3 колонки → 2 → 1)
+.slide {
+  width: calc((100% - 1.25rem * 2) / 3);
+
+  @include below(lg) {
+    width: calc((100% - 1.25rem) / 2);
+  }
+
+  @include below(sm) {
+    width: 82%;
+  }
+}

@@ -69,6 +69,20 @@
       "title": "Your next adventure starts here",
       "desc": "Whether you're relocating or just visiting — find everything you need in one place",
       "btn": "Browse all listings"
+    },
+    "featured": "Top picks",
+    "featuredSub": "Handpicked listings loved by expats and travellers",
+    "destTitle": "Popular destinations",
+    "destSub": "Start exploring the most searched cities",
+    "catsTitle": "Browse by category",
+    "catsSub": "From apartments to local experiences — find exactly what you need",
+    "provider": {
+      "title": "List your property or service",
+      "desc": "Reach thousands of travellers and expats actively looking for what you offer.",
+      "cta": "Get started — it's free",
+      "benefit1": "Verified badge builds trust and drives bookings",
+      "benefit2": "Direct contact — zero commission on every deal",
+      "benefit3": "Built-in chat with every potential client"
     }
   },
   "auth": {

@@ -1,69 +1,69 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '../lib/query-client';
-import { useCurrencyStore } from '../store/currency.store';
-import { useAuthStore } from '../store/auth.store';
-import { api } from '../lib/api';
+import { useEffect, lazy, Suspense } from "react";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { queryClient } from "../lib/query-client";
+import { useCurrencyStore } from "../store/currency.store";
+import { useAuthModalStore } from "../store/auth-modal.store";
+import { api } from "../lib/api";
+
+const AuthModal = lazy(() =>
+  import("./AuthModal").then((m) => ({ default: m.AuthModal })),
+);
+
+const MobileNav = lazy(() =>
+  import("./MobileNav").then((m) => ({ default: m.MobileNav })),
+);
 
 interface Props {
   children: React.ReactNode;
   locale: string;
 }
 
-export function Providers({ children, locale }: Props) {
+function LazyAuthModal() {
+  const open = useAuthModalStore((s) => s.open);
+  if (!open) return null;
+  return (
+    <Suspense fallback={null}>
+      <AuthModal />
+    </Suspense>
+  );
+}
+
+function AppInit({ locale }: { locale: string }) {
   const setDisplayCurrency = useCurrencyStore((s) => s.setDisplayCurrency);
   const setRate = useCurrencyStore((s) => s.setRate);
   const userSet = useCurrencyStore((s) => s.userSet);
-  const { user, accessToken, setUser, setToken, setRestoring, logout } = useAuthStore();
+
+  useQuery({
+    queryKey: ["currency-rates"],
+    queryFn: () =>
+      api.get("/currency/rates").then((r) => {
+        if (r.data?.RUB) setRate(r.data.RUB);
+        return r.data;
+      }),
+    staleTime: 5 * 60 * 1000,
+    retry: false,
+  });
 
   useEffect(() => {
-    // Default to RUB for Russian locale (only if user hasn't changed it manually)
-    if (!userSet && locale === 'ru') {
-      setDisplayCurrency('RUB');
+    if (!userSet && locale === "ru") {
+      setDisplayCurrency("RUB");
     }
-    // Fetch real-time exchange rate
-    api.get('/currency/rates').then((r) => {
-      if (r.data?.RUB) setRate(r.data.RUB);
-    }).catch(() => {});
-  }, [locale]);
+  }, [locale, userSet, setDisplayCurrency]);
 
-  // On every app load: if user is persisted but accessToken is gone (page reload),
-  // restore session via refresh cookie, then verify identity.
-  useEffect(() => {
-    if (!user) {
-      setRestoring(false);
-      return;
-    }
+  return null;
+}
 
-    const restore = async () => {
-      try {
-        let token = accessToken;
-        if (!token) {
-          // accessToken lives in memory — lost on reload, restore via httpOnly cookie
-          const { data } = await api.post('/auth/refresh');
-          token = data.accessToken;
-          setToken(token);
-          if (data.user) setUser(data.user);
-        } else {
-          // Token already in memory — just sync user data
-          const { data } = await api.get('/users/me');
-          setUser(data);
-        }
-      } catch {
-        logout();
-      } finally {
-        setRestoring(false);
-      }
-    };
-
-    restore();
-  }, []);
-
+export function Providers({ children, locale }: Props) {
   return (
     <QueryClientProvider client={queryClient}>
+      <AppInit locale={locale} />
       {children}
+      <LazyAuthModal />
+      <Suspense fallback={null}>
+        <MobileNav />
+      </Suspense>
     </QueryClientProvider>
   );
 }

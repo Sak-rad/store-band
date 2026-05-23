@@ -1,21 +1,18 @@
-@import 'variables';
-@import 'mixins';
-
-// ─── Reset ───────────────────────────────────────────────────────────────────
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-// ─── Base ────────────────────────────────────────────────────────────────────
-
 html {
   font-size: 16px;
   -webkit-text-size-adjust: 100%;
 
-  &[data-scroll-behavior="smooth"] { scroll-behavior: smooth; }
+  &[data-scroll-behavior="smooth"] {
+    scroll-behavior: smooth;
+  }
 }
 
 body {
@@ -26,6 +23,13 @@ body {
   background-color: $color-background;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+
+  @media (max-width: 767px) {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
 }
 
 a {
@@ -41,27 +45,37 @@ button {
   padding: 0;
 }
 
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
 }
 
-img, video, svg {
+img,
+video,
+svg {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-ul, ol { list-style: none; }
+ul,
+ol {
+  list-style: none;
+}
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   line-height: 1.25;
   font-weight: 700;
   color: $color-text-primary;
 }
-
-// ─── Layout utilities ────────────────────────────────────────────────────────
 
 .container {
   width: 100%;
@@ -74,12 +88,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-.sr-only { @include visually-hidden; }
+.sr-only {
+  @include visually-hidden;
+}
 
-// ─── Page chrome ─────────────────────────────────────────────────────────────
-
-#__next, body > div:first-child {
-//  min-height: 100vh;
+#__next,
+body > div:first-child {
   display: flex;
   flex-direction: column;
 }

@@ -12,28 +12,18 @@ interface User {
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
-  isRestoring: boolean;
-  setAuth: (user: User, token: string) => void;
   setUser: (user: User) => void;
-  setToken: (token: string) => void;
-  setRestoring: (v: boolean) => void;
   logout: () => void;
 }
 
-// user persisted for instant UI render — re-validated from API on mount (Providers.tsx)
-// accessToken is memory-only: never written to localStorage (XSS risk)
+// user persisted for instant UI render on reload
+// access_token lives in httpOnly cookie — invisible to JS
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
       user: null,
-      accessToken: null,
-      isRestoring: true,
-      setAuth: (user, accessToken) => set({ user, accessToken }),
       setUser: (user) => set({ user }),
-      setToken: (token) => set({ accessToken: token }),
-      setRestoring: (v) => set({ isRestoring: v }),
-      logout: () => set({ user: null, accessToken: null, isRestoring: false }),
+      logout: () => set({ user: null }),
     }),
     {
       name: 'auth-storage',

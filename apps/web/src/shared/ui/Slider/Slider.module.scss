@@ -1,0 +1,105 @@
+.root {
+  position: relative;
+}
+
+// ─── Track ─────────────────────────────────────────────────────────────────────
+
+.track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: $spacing-2;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// ─── Slide ─────────────────────────────────────────────────────────────────────
+
+.slide {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  min-width: 0;
+}
+
+// ─── Arrows ────────────────────────────────────────────────────────────────────
+
+.arrow {
+  display: none;
+
+  @include above(lg) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: calc(50% - 20px);
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: $color-surface;
+    border: 1.5px solid $color-border;
+    color: $color-text-primary;
+    cursor: pointer;
+    transition:
+      background $transition-fast,
+      border-color $transition-fast,
+      box-shadow $transition-fast,
+      opacity $transition-fast;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+
+    &:hover:not(:disabled) {
+      background: $color-primary;
+      border-color: $color-primary;
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(28, 69, 50, 0.25);
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    &--prev {
+      left: -22px;
+    }
+
+    &--next {
+      right: -22px;
+    }
+  }
+}
+
+// ─── Dots ──────────────────────────────────────────────────────────────────────
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: $spacing-2;
+  margin-top: $spacing-6;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: $color-border-secondary;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transform-origin: left center;
+  transition:
+    background $transition-fast,
+    transform $transition-fast,
+    border-radius $transition-fast;
+
+  &--active {
+    background: $color-primary;
+    transform: scaleX(3);
+    border-radius: 4px;
+  }
+}

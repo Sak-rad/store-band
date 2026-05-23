@@ -5,7 +5,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001/api";
 
 export const api = axios.create({
   baseURL: API_URL,
-  withCredentials: true,
+  withCredentials: true, // sends httpOnly cookies automatically
 });
 
 api.interceptors.request.use((config) => {
@@ -17,17 +17,12 @@ api.interceptors.request.use((config) => {
       ?.split("=")[1];
     const locale = raw && SUPPORTED_LOCALES.includes(raw) ? raw : "en";
     config.headers["Accept-Language"] = locale;
-
-    const token = useAuthStore.getState().accessToken;
-    if (token) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
   }
   return config;
 });
 
 let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+let refreshQueue: Array<() => void> = [];
 
 api.interceptors.response.use(
   (res) => res,
@@ -45,27 +40,18 @@ api.interceptors.response.use(
     original._retry = true;
 
     if (isRefreshing) {
-      return new Promise((resolve) => {
-        refreshQueue.push((token) => {
-          original.headers["Authorization"] = `Bearer ${token}`;
-          resolve(api.request(original));
-        });
+      return new Promise<void>((resolve) => {
+        refreshQueue.push(() => resolve(api.request(original)));
       });
     }
 
     isRefreshing = true;
 
     try {
-      const { data } = await api.post("/auth/refresh");
-      const newToken: string = data.accessToken;
-
-      useAuthStore.getState().setToken(newToken);
-      if (data.user) useAuthStore.getState().setUser(data.user);
-
-      refreshQueue.forEach((cb) => cb(newToken));
+      await api.post("/auth/refresh");
+      // New access_token cookie is set by server — just retry
+      refreshQueue.forEach((cb) => cb());
       refreshQueue = [];
-
-      original.headers["Authorization"] = `Bearer ${newToken}`;
       return api.request(original);
     } catch {
       useAuthStore.getState().logout();

@@ -79,6 +79,88 @@
 
 ---
 
+## 2026-05-23 — Rebrand + Railway deploy fixes + Homepage redesign + Auth modal
+
+### Rebrand: Relocate → Meriloz (через Roamly)
+
+Переименование прошло в два этапа: сначала → Roamly, потом пользователь сменил на Meriloz.
+
+**Затронутые файлы:**
+- `package.json`, `apps/api/package.json`, `apps/web/package.json` — имена пакетов → `@meriloz/*`
+- `apps/web/src/shared/ui/Header.tsx`, `Footer.tsx` — логотип и название
+- `apps/web/src/app/[locale]/layout.tsx` — title template
+- `apps/web/public/manifest.json` — PWA manifest
+- `apps/web/messages/en.json`, `ru.json` — `listingsSiteName`
+- `apps/api/src/modules/notifications/email.service.ts` — email subject
+- `apps/api/prisma/seed.ts` — email-домены провайдеров
+
+### Railway production deploy
+
+**Исправленные ошибки:**
+- `invalid tag ... must be lowercase` — в deploy.yml захардкожено `sak-rad/store-band/api` (lowercase)
+- `ERR_PNPM_NO_LOCKFILE` — добавлен `pnpm-lock.yaml` в COPY в обоих Dockerfile
+- `node_modules/.prisma not found` — pnpm workspace кладёт prisma client в `apps/api/node_modules/.prisma`, не в root; исправлен COPY путь в Dockerfile
+- `Cannot find module dist/src/main.js` — Railway dashboard использовал старое имя пакета `@relocation/api`, pnpm молча пропускал → dist не создавался; обновлено вручную
+- `i18n path cannot be found` — i18n файлы лежат в `apps/api/i18n/`, `__dirname` = `dist/src` → путь `../..` корректный; откатили ошибочный фикс
+- `Cannot find .next/standalone/server.js` — Next.js без `output: standalone`; стартовая команда изменена на `pnpm --filter @meriloz/web run start`
+
+**Финальные команды Railway:**
+- API build: `pnpm install --frozen-lockfile --filter @meriloz/api && pnpm --filter @meriloz/api exec prisma generate && pnpm --filter @meriloz/api run build`
+- API start: `apps/api/node_modules/.bin/prisma migrate deploy --schema apps/api/prisma/schema.prisma && node apps/api/dist/src/main.js`
+- Web build: `pnpm install --frozen-lockfile --filter @meriloz/web && pnpm --filter @meriloz/web run build`
+- Web start: `pnpm --filter @meriloz/web run start`
+
+### Правила разработки (добавлены в CLAUDE.md)
+
+- После каждой фичи — запуск тестов (`pnpm test`, `tsc --noEmit`, `pnpm lint`)
+- Коммиты — человекоподобные, без AI-атрибуции, короткий imperative subject
+- Никогда не упоминать CLAUDE.md, Claude или AI в коде, коммитах, комментариях
+
+### Цветовая палитра — полная смена
+
+Заменена "AI SaaS template" палитра (`#0EA5E9` sky blue + тёмный hero с orbs) на редакционную/тревел тему:
+
+- `$color-primary`: `#1C4532` (тёмный лесной зелёный)
+- `$color-accent`: `#E8603A` (тёплый коралловый — CTA кнопки)
+- `$color-background`: `#FAF8F5` (тёплый кремовый вместо холодного белого)
+- `$color-border`: `#DDD8D0` (тёплый серый)
+- Обновлены: `variables.scss`, `mixins.scss` (`btn-primary`, `input-base`, `focus-ring`)
+- Логотип в Header и Footer — зелёный круг с коралловой точкой
+
+### Главная страница — полный редизайн (`page.tsx` + `page.module.scss`)
+
+**Новая структура:**
+1. **Hero** — split layout (текст слева, мозаика направлений справа); тёплый кремовый фон, никаких тёмных gradient orbs; поиск с коралловой кнопкой; чипсы категорий
+2. **Featured listings** — реальные данные из API (`GET /listings?limit=6&sort=rating_desc`), server-side fetch с `revalidate: 300`
+3. **Popular destinations** — 4 карточки с CSS градиентами (Nha Trang, Phuket, Pattaya, Dubai)
+4. **Categories** — Lucide иконки вместо emoji, 8 категорий
+5. **Provider CTA** — тёмно-зелёная секция с преимуществами и коралловой CTA кнопкой
+
+**SEO:**
+- JSON-LD: `WebSite` schema + `SearchAction` + `Organization`
+- `generateMetadata` с `alternates.languages` (hreflang en/ru), OpenGraph, Twitter card
+- Правильная иерархия h1/h2, aria-label на всех секциях
+- Семантический `<nav>` для категорий
+
+**Мобильная адаптация:**
+- Hero мозаика скрыта на планшете/мобилке
+- Поиск стакается в колонку на мобилке (кнопка на всю ширину)
+- `overflow-x: hidden` на `.home` и hero для предотвращения горизонтального скролла
+
+### Auth Modal
+
+**Новые файлы:**
+- `src/shared/store/auth-modal.store.ts` — Zustand стор: `openLogin()`, `openRegister()`, `setTab()`, `close()`
+- `src/shared/ui/AuthModal.tsx` — модал с переключением login/register вкладок
+- `src/shared/ui/AuthModal.module.scss` — десктоп: центрированный модал + backdrop; мобилка: full-screen sheet снизу вверх с `safe-area-inset-bottom`
+
+**Изменённые файлы:**
+- `LoginForm.tsx`, `RegisterForm.tsx` — добавлен опциональный `onSuccess?: () => void` (в модале — закрывает, на странице — редирект как раньше)
+- `Header.tsx` — кнопки `<button onClick={openLogin}>` вместо `<Link href="/login">`
+- `Providers.tsx` — `lazy()` + `Suspense` для модала: чанк грузится только при первом открытии
+
+---
+
 ## Следующие сессии — план
 
 ### Приоритет 1: Production deploy
@@ -98,6 +180,27 @@
 - [ ] Admin panel (listing moderation: approve/reject)
 - [ ] Email notifications (Resend) для бронирований
 - [ ] OAuth (Google) через существующую Account модель в схеме
+
+---
+
+## 2026-05-23 — Home page RSC fixes
+
+### Проблема: `Cannot read properties of undefined (reading 'call')`
+- Корень: `FeaturedListings.tsx` лежал в `app/[locale]/` — Next.js 15 по-особому бандлит файлы в app-директории, из-за чего `ListingCard` не попадал в `page_client-reference-manifest.js`
+- Фикс: перенесён в `src/widgets/home/FeaturedListings.tsx` с собственным `FeaturedListings.module.scss`
+- `page.tsx` загружает его через `next/dynamic` (lazy, вне RSC manifest)
+
+### Правило зафиксировано
+- `app/` — только серверные роут-файлы (`page.tsx`, `layout.tsx`, etc.)
+- Все клиентские компоненты (`"use client"`) — в `src/widgets/`, `src/features/`, `src/entities/`, `src/shared/`
+
+### Hydration mismatch (цена в карточке листинга)
+- Сервер рендерил `$2,200` (USD), клиент читал из Zustand persist (RUB) → несоответствие
+- `suppressHydrationWarning` стоял на `<p>`, но React проверяет только тот элемент — перенесён на `<strong>` где реально живёт текст цены
+
+### CORS
+- Web работал на порту 3002, API разрешал только `localhost:3000`
+- `apps/api/src/main.ts`: в dev-режиме origin-функция пропускает любой `http://localhost:*`, в проде — строго `CLIENT_URL`
 
 ### Известные технические долги
 - Migration history не синхронизирована с реальной схемой (использовали `db push`)

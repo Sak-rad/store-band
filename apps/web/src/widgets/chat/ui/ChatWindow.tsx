@@ -89,7 +89,6 @@ export function ChatWindow({ chatId }: Props) {
   const chatIdNum = parseInt(chatId, 10);
   const t = useTranslations('chat');
   const user = useAuthStore((s) => s.user);
-  const accessToken = useAuthStore((s) => s.accessToken);
   const queryClient = useQueryClient();
 
   const [message, setMessage]       = useState('');
@@ -115,7 +114,7 @@ export function ChatWindow({ chatId }: Props) {
 
   useEffect(() => {
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL || 'http://localhost:3001';
-    const socket = io(`${wsUrl}/chat`, { auth: { token: accessToken } });
+    const socket = io(`${wsUrl}/chat`, { withCredentials: true });
     socketRef.current = socket;
     socket.emit('chat:join', chatIdNum);
 
@@ -136,7 +135,7 @@ export function ChatWindow({ chatId }: Props) {
     });
 
     return () => { socket.emit('chat:leave', chatIdNum); socket.disconnect(); };
-}, [chatIdNum, accessToken, queryClient]);
+}, [chatIdNum, queryClient]);
 
   // Scroll to bottom on first load
 const hasMessages = (messagesData?.data?.length ?? 0) > 0;

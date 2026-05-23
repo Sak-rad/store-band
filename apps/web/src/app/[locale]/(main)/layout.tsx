@@ -10,9 +10,9 @@ export default function MainLayout({ children, modal }: Props) {
   return (
     <>
       <Header />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <main style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         {children}
-      </div>
+      </main>
       {modal}
       <Footer />
     </>

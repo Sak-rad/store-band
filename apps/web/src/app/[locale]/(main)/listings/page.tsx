@@ -1,11 +1,30 @@
-import { getTranslations } from 'next-intl/server';
-import type { Metadata } from 'next';
-import { SearchBar } from '../../../../features/listing-search/ui/SearchBar';
-import { FilterPanel } from '../../../../features/listing-search/ui/FilterPanel';
-import { ListingGrid } from '../../../../features/listing-search/ui/ListingGrid';
-import styles from './listings.module.scss';
+import { getTranslations } from "next-intl/server";
+import type { Metadata } from "next";
+import { SearchBar } from "../../../../features/listing-search/ui/SearchBar";
+import { FilterPanel } from "../../../../features/listing-search/ui/FilterPanel";
+import {
+  ListingGrid,
+  type ListingsPage,
+} from "../../../../features/listing-search/ui/ListingGrid";
+import { apiServer } from "../../../../shared/lib/api-server";
+import type { InfiniteData } from "@tanstack/react-query";
+import styles from "./listings.module.scss";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
+const LISTINGS_PAGE_SIZE = 15;
+
+async function fetchInitialListings(
+  params: Record<string, string | undefined>,
+): Promise<InfiniteData<ListingsPage, unknown> | undefined> {
+  try {
+    const res = await apiServer.get("/listings", {
+      params: { ...params, limit: LISTINGS_PAGE_SIZE, sort: "newest" },
+    });
+    return { pages: [res.data], pageParams: [undefined] };
+  } catch {
+    return undefined;
+  }
+}
 
 interface SearchParams {
   q?: string;
@@ -21,33 +40,33 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t     = await getTranslations({ locale, namespace: 'listings' });
-  const tMeta = await getTranslations({ locale, namespace: 'meta' });
+  const t = await getTranslations({ locale, namespace: "listings" });
+  const tMeta = await getTranslations({ locale, namespace: "meta" });
   const pageUrl = `${BASE_URL}/${locale}/listings`;
 
   return {
-    title:       t('pageTitle.default' as any),
-    description: t('pageDesc.default' as any),
+    title: t("pageTitle.default" as any),
+    description: t("pageDesc.default" as any),
     alternates: {
       canonical: pageUrl,
       languages: {
         en: `${BASE_URL}/en/listings`,
         ru: `${BASE_URL}/ru/listings`,
-        'x-default': `${BASE_URL}/en/listings`,
+        "x-default": `${BASE_URL}/en/listings`,
       },
     },
     openGraph: {
-      title:       t('pageTitle.default' as any),
-      description: t('pageDesc.default' as any),
-      url:         pageUrl,
-      siteName:    tMeta('listingsSiteName'),
-      type:        'website',
-      locale:      locale === 'ru' ? 'ru_RU' : 'en_US',
+      title: t("pageTitle.default" as any),
+      description: t("pageDesc.default" as any),
+      url: pageUrl,
+      siteName: tMeta("listingsSiteName"),
+      type: "website",
+      locale: locale === "ru" ? "ru_RU" : "en_US",
     },
     twitter: {
-      card:        'summary_large_image',
-      title:       t('pageTitle.default' as any),
-      description: t('pageDesc.default' as any),
+      card: "summary_large_image",
+      title: t("pageTitle.default" as any),
+      description: t("pageDesc.default" as any),
     },
   };
 }
@@ -55,17 +74,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ListingsPage({ params, searchParams }: Props) {
   const { locale } = await params;
   const sp = await searchParams;
-  const t     = await getTranslations({ locale, namespace: 'listings' });
-  const tMeta = await getTranslations({ locale, namespace: 'meta' });
+  const t = await getTranslations({ locale, namespace: "listings" });
+  const tMeta = await getTranslations({ locale, namespace: "meta" });
 
-  const h1 = t('pageTitle.default' as any);
+  const h1 = t("pageTitle.default" as any);
+
+  const initialData = await fetchInitialListings({
+    lang: locale,
+    q: sp.q,
+    priceMin: sp.priceMin,
+    priceMax: sp.priceMax,
+  });
 
   const breadcrumbJsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: tMeta('listingsSiteName'), item: `${BASE_URL}/${locale}` },
-      { '@type': 'ListItem', position: 2, name: h1, item: `${BASE_URL}/${locale}/listings` },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: tMeta("listingsSiteName"),
+        item: `${BASE_URL}/${locale}`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: h1,
+        item: `${BASE_URL}/${locale}/listings`,
+      },
     ],
   };
 
@@ -92,7 +128,11 @@ export default async function ListingsPage({ params, searchParams }: Props) {
             <FilterPanel />
           </div>
 
-          <ListingGrid filters={{ q: sp.q, priceMin: sp.priceMin, priceMax: sp.priceMax }} locale={locale} />
+          <ListingGrid
+            filters={{ q: sp.q, priceMin: sp.priceMin, priceMax: sp.priceMax }}
+            locale={locale}
+            initialData={initialData}
+          />
         </main>
       </div>
     </div>
