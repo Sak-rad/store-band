@@ -1,14 +1,23 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, type InfiniteData } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '../../../navigation';
 import { useSearchParams } from 'next/navigation';
 import { api } from '../../../shared/lib/api';
+
+const LISTINGS_PAGE_SIZE = 15;
 import { useLocationStore } from '../../../shared/store/location.store';
 import { ListingCard } from '../../../entities/listing/ui/ListingCard';
 import styles from './ListingGrid.module.scss';
+
+export type ListingsPage = {
+  data: any[];
+  total: number;
+  nextCursor?: number;
+  nextOCursor?: number;
+};
 
 const SORT_OPTIONS = ['newest', 'price_asc', 'price_desc', 'rating_desc'] as const;
 type SortOption = typeof SORT_OPTIONS[number];
@@ -16,6 +25,7 @@ type SortOption = typeof SORT_OPTIONS[number];
 interface Props {
   filters: Record<string, string | undefined>;
   locale: string;
+  initialData?: InfiniteData<ListingsPage, unknown>;
 }
 
 function SortSelect({ current, onChange, label, t }: {
@@ -26,8 +36,9 @@ function SortSelect({ current, onChange, label, t }: {
 }) {
   return (
     <div className={styles.sort}>
-      <span className={styles.sort__label}>{label}:</span>
+      <label htmlFor="sort-select" className={styles.sort__label}>{label}:</label>
       <select
+        id="sort-select"
         className={styles.sort__select}
         value={current}
         onChange={e => onChange(e.target.value as SortOption)}
@@ -53,7 +64,7 @@ function SkeletonCard() {
   );
 }
 
-export function ListingGrid({ filters, locale }: Props) {
+export function ListingGrid({ filters, locale, initialData }: Props) {
   const t          = useTranslations('listings');
   const router     = useRouter();
   const pathname   = usePathname();
@@ -77,7 +88,7 @@ export function ListingGrid({ filters, locale }: Props) {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ['listings', filters, locale, currentSort, preferCountry],
+    queryKey: ['listings', filters, locale, currentSort],
     queryFn: ({ pageParam }) => {
       const boosted = !filters.country && preferCountry;
       const p = pageParam as { cursor?: number; oCursor?: number; preferDone?: boolean } | undefined;
@@ -87,7 +98,7 @@ export function ListingGrid({ filters, locale }: Props) {
             ...filters,
             sort: currentSort,
             lang: locale,
-            limit: 15,
+            limit: LISTINGS_PAGE_SIZE,
             ...(p?.cursor     ? { cursor:     p.cursor     } : {}),
             ...(p?.oCursor    ? { oCursor:    p.oCursor    } : {}),
             ...(p?.preferDone ? { preferDone: true         } : {}),
@@ -103,9 +114,12 @@ export function ListingGrid({ filters, locale }: Props) {
       return {
         cursor: nextCursor ?? undefined,
         oCursor: nextOCursor ?? undefined,
-        preferDone: !nextCursor, // preferred exhausted — skip on next page
+        preferDone: !nextCursor,
       };
     },
+    initialData,
+    initialDataUpdatedAt: initialData ? Date.now() : undefined,
+    staleTime: 30_000,
   });
 
   useEffect(() => {

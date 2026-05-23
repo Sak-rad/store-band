@@ -8,6 +8,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { Request, Response } from 'express';
@@ -23,7 +24,7 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 попыток в минуту
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('register')
   async register(@Body() dto: RegisterDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const lang = (req as any).locale || 'en';
@@ -33,12 +34,13 @@ export class AuthController {
       req.headers['user-agent'] ?? 'unknown',
       lang,
     );
+    this.setAccessCookie(res, accessToken);
     this.setRefreshCookie(res, refreshToken);
-    return { accessToken, user };
+    return { user };
   }
 
   @Public()
-  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 попыток в минуту
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('login')
   @HttpCode(HttpStatus.OK)
   async login(@Body() dto: LoginDto, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
@@ -49,8 +51,9 @@ export class AuthController {
       req.headers['user-agent'] ?? 'unknown',
       lang,
     );
+    this.setAccessCookie(res, accessToken);
     this.setRefreshCookie(res, refreshToken);
-    return { accessToken, user };
+    return { user };
   }
 
   @Public()
@@ -59,13 +62,15 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async refresh(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.['refresh_token'];
+    if (!refreshToken) throw new UnauthorizedException('No refresh token');
     const { accessToken, refreshToken: newRefresh, user } = await this.authService.refresh(
       refreshToken,
       req.ip,
       req.headers['user-agent'] ?? 'unknown',
     );
+    this.setAccessCookie(res, accessToken);
     this.setRefreshCookie(res, newRefresh);
-    return { accessToken, user };
+    return { user };
   }
 
   @Public()
@@ -74,13 +79,25 @@ export class AuthController {
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     const refreshToken = req.cookies?.['refresh_token'];
     if (refreshToken) await this.authService.logout(refreshToken);
-    res.clearCookie('refresh_token');
+    res.clearCookie('access_token', { path: '/' });
+    res.clearCookie('refresh_token', { path: '/' });
   }
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
   me(@CurrentUser() user: any) {
     return user;
+  }
+
+  private setAccessCookie(res: Response, token: string) {
+    const isProd = process.env.NODE_ENV === 'production';
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000,
+      path: '/',
+    });
   }
 
   private setRefreshCookie(res: Response, token: string) {

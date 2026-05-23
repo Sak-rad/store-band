@@ -1,6 +1,3 @@
-@import '../../../styles/variables';
-@import '../../../styles/mixins';
-
 .select {
   position: relative;
   width: 100%;
@@ -15,7 +12,9 @@
   &--error .select__trigger {
     border-color: $color-error;
 
-    &:focus { box-shadow: 0 0 0 3px rgba($color-error, 0.12); }
+    &:focus {
+      box-shadow: 0 0 0 3px rgba($color-error, 0.12);
+    }
   }
 
   &--open .select__trigger {
@@ -42,7 +41,9 @@
     color: $color-text-primary;
     cursor: pointer;
     text-align: left;
-    transition: border-color $transition-fast, box-shadow $transition-fast;
+    transition:
+      border-color $transition-fast,
+      box-shadow $transition-fast;
     outline: none;
 
     &:hover:not(:disabled) {
@@ -61,7 +62,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
 
-    &--placeholder { color: $color-text-muted; }
+    &--placeholder {
+      color: $color-text-muted;
+    }
   }
 
   &__chevron {
@@ -69,7 +72,9 @@
     color: $color-text-muted;
     transition: transform $transition-fast;
 
-    &--up { transform: rotate(180deg); }
+    &--up {
+      transform: rotate(180deg);
+    }
   }
 
   // ── Dropdown ───────────────────────────────────────────────────────────────
@@ -97,7 +102,10 @@
     padding: $spacing-2;
     border-bottom: 1px solid $color-border-light;
 
-    &__icon { color: $color-text-muted; flex-shrink: 0; }
+    &__icon {
+      color: $color-text-muted;
+      flex-shrink: 0;
+    }
 
     &__input {
       flex: 1;
@@ -108,7 +116,9 @@
       background: transparent;
       color: $color-text-primary;
 
-      &::placeholder { color: $color-text-muted; }
+      &::placeholder {
+        color: $color-text-muted;
+      }
     }
   }
 
@@ -134,7 +144,9 @@
     transition: background $transition-fast;
     user-select: none;
 
-    &:hover { background: $color-background-secondary; }
+    &:hover {
+      background: $color-background-secondary;
+    }
 
     &--active {
       background: $color-primary-light;

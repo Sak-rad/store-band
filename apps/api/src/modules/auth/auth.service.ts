@@ -80,7 +80,11 @@ export class AuthService {
       throw new ForbiddenException('Invalid or expired refresh token');
     }
 
-    await this.prisma.session.delete({ where: { id: session.id } });
+    const deleted = await this.prisma.session.deleteMany({ where: { id: session.id } });
+    if (deleted.count === 0) {
+      // Concurrent refresh already consumed this session
+      throw new ForbiddenException('Invalid or expired refresh token');
+    }
 
     const { accessToken, refreshToken: newRefresh } = await this.generateTokens(session.userId);
     await this.createSession(session.userId, newRefresh, ip, userAgent);

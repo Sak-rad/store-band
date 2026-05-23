@@ -13,13 +13,22 @@ async function bootstrap() {
 
   const config = app.get(ConfigService);
   const clientUrl = config.get<string>('CLIENT_URL', 'http://localhost:3000');
+  const isDev = config.get<string>('NODE_ENV', 'development') !== 'production';
 
   app.set('trust proxy', 1);
   app.use(helmet({ crossOriginResourcePolicy: { policy: 'cross-origin' } }));
   app.use(cookieParser());
 
   app.enableCors({
-    origin: clientUrl,
+    origin: isDev
+      ? (origin, callback) => {
+          if (!origin || /^http:\/\/localhost(:\d+)?$/.test(origin)) {
+            callback(null, true);
+          } else {
+            callback(new Error('Not allowed by CORS'));
+          }
+        }
+      : clientUrl,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],

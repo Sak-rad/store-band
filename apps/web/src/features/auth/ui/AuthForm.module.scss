@@ -1,6 +1,3 @@
-@import '../../../../styles/variables';
-@import '../../../../styles/mixins';
-
 .form {
   @include flex-col;
   gap: $spacing-5;
@@ -16,7 +13,9 @@
       color: $color-text-primary;
     }
 
-    input { @include input-base; }
+    input {
+      @include input-base;
+    }
   }
 
   &__error {

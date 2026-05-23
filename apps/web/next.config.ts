@@ -21,6 +21,8 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   sassOptions: {
     silenceDeprecations: ['import', 'legacy-js-api'],
+    includePaths: ['./styles'],
+    additionalData: `@import "variables"; @import "mixins";`,
   },
   async headers() {
     return [

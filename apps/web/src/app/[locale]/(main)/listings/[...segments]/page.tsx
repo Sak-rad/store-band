@@ -2,12 +2,22 @@ import { cache } from 'react';
 import { redirect } from 'next/navigation';
 import { getTranslations } from 'next-intl/server';
 import type { Metadata } from 'next';
+import type { InfiniteData } from '@tanstack/react-query';
 import { SearchBar } from '../../../../../features/listing-search/ui/SearchBar';
 import { FilterPanel } from '../../../../../features/listing-search/ui/FilterPanel';
-import { ListingGrid } from '../../../../../features/listing-search/ui/ListingGrid';
+import { ListingGrid, type ListingsPage } from '../../../../../features/listing-search/ui/ListingGrid';
 import { apiServer } from '../../../../../shared/lib/api-server';
 import { parseSegments, buildListingsPath } from '../../../../../shared/lib/listing-segments';
 import styles from '../listings.module.scss';
+
+async function fetchInitialListings(params: Record<string, string | undefined>): Promise<InfiniteData<ListingsPage, unknown> | undefined> {
+  try {
+    const res = await apiServer.get('/listings', { params: { ...params, limit: 15, sort: 'newest' } });
+    return { pages: [res.data], pageParams: [undefined] };
+  } catch {
+    return undefined;
+  }
+}
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
@@ -150,6 +160,8 @@ export default async function ListingsSegmentsPage({ params, searchParams }: Pro
     priceMax: sp.priceMax,
   };
 
+  const initialData = await fetchInitialListings({ ...gridFilters, lang: locale });
+
   return (
     <div className={styles.page}>
       <script
@@ -173,7 +185,7 @@ export default async function ListingsSegmentsPage({ params, searchParams }: Pro
             <FilterPanel />
           </div>
 
-          <ListingGrid filters={gridFilters} locale={locale} />
+          <ListingGrid filters={gridFilters} locale={locale} initialData={initialData} />
         </main>
       </div>
     </div>

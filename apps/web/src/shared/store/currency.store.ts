@@ -1,7 +1,7 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
-type DisplayCurrency = 'USD' | 'RUB';
+type DisplayCurrency = "USD" | "RUB";
 
 interface CurrencyState {
   displayCurrency: DisplayCurrency;
@@ -16,7 +16,7 @@ interface CurrencyState {
 export const useCurrencyStore = create<CurrencyState>()(
   persist(
     (set, get) => ({
-      displayCurrency: 'USD',
+      displayCurrency: "USD",
       usdToRub: 90,
       userSet: false,
 
@@ -24,20 +24,20 @@ export const useCurrencyStore = create<CurrencyState>()(
       setRate: (usdToRub) => set({ usdToRub }),
       toggle: () =>
         set((s) => ({
-          displayCurrency: s.displayCurrency === 'USD' ? 'RUB' : 'USD',
+          displayCurrency: s.displayCurrency === "USD" ? "RUB" : "USD",
           userSet: true,
         })),
 
       formatPrice: (usdAmount) => {
         const { displayCurrency, usdToRub } = get();
         const num = Number(usdAmount);
-        if (isNaN(num)) return '—';
-        if (displayCurrency === 'RUB') {
-          return `${Math.round(num * usdToRub).toLocaleString('ru-RU')} ₽`;
+        if (isNaN(num)) return "—";
+        if (displayCurrency === "RUB") {
+          return `${Math.round(num * usdToRub).toLocaleString("ru-RU")} ₽`;
         }
-        return `$${num.toLocaleString('en-US')}`;
+        return `$${num.toLocaleString("en-US")}`;
       },
     }),
-    { name: 'currency-v1' },
+    { name: "currency-v1" },
   ),
 );

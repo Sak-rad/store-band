@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import styles from './Checkbox.module.scss';
+import styles from "./Checkbox.module.scss";
 
 interface Props {
   checked: boolean;
@@ -12,17 +12,27 @@ interface Props {
 
 export function Checkbox({ checked, onChange, label, hint, disabled }: Props) {
   return (
-    <label className={`${styles.checkbox} ${disabled ? styles['checkbox--disabled'] : ''}`}>
+    <label
+      className={`${styles.checkbox} ${disabled ? styles["checkbox--disabled"] : ""}`}
+    >
       <input
         type="checkbox"
         className={styles.checkbox__input}
         checked={checked}
-        onChange={e => onChange(e.target.checked)}
+        onChange={(e) => onChange(e.target.checked)}
         disabled={disabled}
       />
-      <span className={`${styles.checkbox__box} ${checked ? styles['checkbox__box--checked'] : ''}`}>
+      <span
+        className={`${styles.checkbox__box} ${checked ? styles["checkbox__box--checked"] : ""}`}
+      >
         <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-          <path d="M1 4L3.5 6.5L9 1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <path
+            d="M1 4L3.5 6.5L9 1"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </span>
       <span className={styles.checkbox__content}>

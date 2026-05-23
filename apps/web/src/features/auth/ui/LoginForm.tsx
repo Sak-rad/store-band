@@ -15,10 +15,12 @@ const schema = z.object({
 });
 type FormData = z.infer<typeof schema>;
 
-export function LoginForm() {
+interface Props { onSuccess?: () => void; }
+
+export function LoginForm({ onSuccess }: Props) {
   const t = useTranslations('auth');
   const router = useRouter();
-  const setAuth = useAuthStore((s) => s.setAuth);
+  const setUser = useAuthStore((s) => s.setUser);
 
   const { register, handleSubmit, formState: { errors, isSubmitting }, setError } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -27,8 +29,8 @@ export function LoginForm() {
   const onSubmit = async (data: FormData) => {
     try {
       const res = await api.post('/auth/login', data);
-      setAuth(res.data.user, res.data.accessToken);
-      router.push('/listings');
+      setUser(res.data.user);
+      if (onSuccess) { onSuccess(); } else { router.push('/listings'); }
     } catch (err: any) {
       const status = err.response?.status;
       const message = status === 429

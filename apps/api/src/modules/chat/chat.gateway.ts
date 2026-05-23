@@ -6,16 +6,16 @@ import {
   ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { ChatService } from './chat.service';
-import { PrismaService } from '../../prisma/prisma.service';
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { JwtService } from "@nestjs/jwt";
+import { ConfigService } from "@nestjs/config";
+import { ChatService } from "./chat.service";
+import { PrismaService } from "../../prisma/prisma.service";
 
 @WebSocketGateway({
-  cors: { origin: '*', credentials: true },
-  namespace: '/chat',
+  cors: { origin: "*", credentials: true },
+  namespace: "/chat",
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -31,17 +31,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket) {
     try {
+      const cookieHeader = client.handshake.headers?.cookie ?? "";
+      const cookieToken = cookieHeader.match(
+        /(?:^|; )access_token=([^;]*)/,
+      )?.[1];
       const token =
+        cookieToken ||
         client.handshake.auth?.token ||
-        client.handshake.headers?.authorization?.replace('Bearer ', '');
+        client.handshake.headers?.authorization?.replace("Bearer ", "");
       const payload = this.jwt.verify(token, {
-        secret: this.config.get('JWT_ACCESS_SECRET'),
+        secret: this.config.get("JWT_ACCESS_SECRET"),
       }) as { sub: string };
 
       const userId = parseInt(payload.sub, 10);
       client.data.userId = userId;
       this.onlineUsers.set(userId, client.id);
-      this.server.emit('user:online', { userId });
+      this.server.emit("user:online", { userId });
     } catch {
       client.disconnect();
     }
@@ -51,37 +56,52 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userId: number = client.data.userId;
     if (userId) {
       this.onlineUsers.delete(userId);
-      this.server.emit('user:offline', { userId });
+      this.server.emit("user:offline", { userId });
     }
   }
 
-  @SubscribeMessage('chat:join')
+  @SubscribeMessage("chat:join")
   handleJoin(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
     client.join(`chat:${chatId}`);
   }
 
-  @SubscribeMessage('chat:leave')
-  handleLeave(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
+  @SubscribeMessage("chat:leave")
+  handleLeave(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() chatId: number,
+  ) {
     client.leave(`chat:${chatId}`);
   }
 
-  @SubscribeMessage('message:send')
+  @SubscribeMessage("message:send")
   async handleMessage(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: number | string; text: string; replyToMessageId?: number | string },
+    @MessageBody()
+    data: {
+      chatId: number | string;
+      text: string;
+      replyToMessageId?: number | string;
+    },
   ) {
     const userId: number = client.data.userId;
     const chatId = Number(data.chatId);
-    const replyToMessageId = data.replyToMessageId ? Number(data.replyToMessageId) : undefined;
-    const message = await this.chatService.createMessage(userId, { chatId, text: data.text, replyToMessageId });
-    this.server.to(`chat:${chatId}`).emit('message:new', message);
+    const replyToMessageId = data.replyToMessageId
+      ? Number(data.replyToMessageId)
+      : undefined;
+    const message = await this.chatService.createMessage(userId, {
+      chatId,
+      text: data.text,
+      replyToMessageId,
+    });
+    this.server.to(`chat:${chatId}`).emit("message:new", message);
     return message;
   }
 
-  @SubscribeMessage('message:read')
+  @SubscribeMessage("message:read")
   async handleRead(
     @ConnectedSocket() client: Socket,
-    @MessageBody() data: { chatId: number | string; messageId: number | string },
+    @MessageBody()
+    data: { chatId: number | string; messageId: number | string },
   ) {
     const userId: number = client.data.userId;
     const chatId = Number(data.chatId);
@@ -89,21 +109,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.chatService.markRead(messageId, userId);
     this.server
       .to(`chat:${chatId}`)
-      .emit('message:read', { messageId, userId });
+      .emit("message:read", { messageId, userId });
   }
 
-  @SubscribeMessage('typing:start')
-  handleTypingStart(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
-    client.to(`chat:${chatId}`).emit('typing:indicator', {
+  @SubscribeMessage("typing:start")
+  handleTypingStart(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() chatId: number,
+  ) {
+    client.to(`chat:${chatId}`).emit("typing:indicator", {
       userId: client.data.userId,
       chatId,
       isTyping: true,
     });
   }
 
-  @SubscribeMessage('typing:stop')
-  handleTypingStop(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
-    client.to(`chat:${chatId}`).emit('typing:indicator', {
+  @SubscribeMessage("typing:stop")
+  handleTypingStop(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() chatId: number,
+  ) {
+    client.to(`chat:${chatId}`).emit("typing:indicator", {
       userId: client.data.userId,
       chatId,
       isTyping: false,

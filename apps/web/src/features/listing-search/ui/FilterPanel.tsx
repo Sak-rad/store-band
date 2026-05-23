@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter, usePathname } from '../../../navigation';
 import { useSearchParams } from 'next/navigation';
@@ -34,8 +35,6 @@ export function FilterPanel() {
   const searchParams = useSearchParams();
 
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [countries, setCountries]   = useState<GeoItem[]>([]);
-  const [cities, setCities]         = useState<GeoItem[]>([]);
 
   const displayCurrency = useCurrencyStore(s => s.displayCurrency);
   const usdToRub        = useCurrencyStore(s => s.usdToRub);
@@ -70,19 +69,20 @@ export function FilterPanel() {
 
   const hasFilters = extractSegments(pathname).length > 0 || searchParams.toString().length > 0;
 
-  // Load cities for the currently-relevant country
   const relevantCountry = mobileOpen ? pending.country : urlFilters.country;
-  useEffect(() => {
-    if (relevantCountry) {
-      api.get(`/countries/${relevantCountry}/cities`).then(r => setCities(r.data)).catch(() => {});
-    } else {
-      setCities([]);
-    }
-  }, [relevantCountry]);
 
-  useEffect(() => {
-    api.get('/countries').then(r => setCountries(r.data)).catch(() => {});
-  }, []);
+  const { data: countries = [] } = useQuery<GeoItem[]>({
+    queryKey: ['countries'],
+    queryFn: () => api.get('/countries').then(r => r.data),
+    staleTime: Infinity,
+  });
+
+  const { data: cities = [] } = useQuery<GeoItem[]>({
+    queryKey: ['cities', relevantCountry],
+    queryFn: () => api.get(`/countries/${relevantCountry}/cities`).then(r => r.data),
+    enabled: !!relevantCountry,
+    staleTime: Infinity,
+  });
 
   // Desktop navigates immediately; mobile updates pending only
   const applyFilters = (updated: Filters) => {
