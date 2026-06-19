@@ -61,8 +61,14 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className={styles.header__nav}>
-          <Link href="/listings" className={styles.header__nav__link}>
-            {t("listings")}
+          <Link href="/real-estate" className={styles.header__nav__link}>
+            {t("realEstate")}
+          </Link>
+          <Link href="/experiences" className={styles.header__nav__link}>
+            {t("experiences")}
+          </Link>
+          <Link href="/services" className={styles.header__nav__link}>
+            {t("services")}
           </Link>
           {user && (
             <>

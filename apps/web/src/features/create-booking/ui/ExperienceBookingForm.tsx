@@ -6,35 +6,40 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
 import { api } from '../../../shared/lib/api';
-import { getListingKind, getPriceSuffixKey } from '../../../shared/lib/listing-kind';
-import styles from './CreateBookingForm.module.scss';
 import { useFormatPrice } from '@/shared/store/currency.store';
+import styles from './ExperienceBookingForm.module.scss';
 
 interface Props { listing: any; }
 
 const schema = z.object({
-  checkIn: z.string().min(1),
-  checkOut: z.string().min(1),
+  date: z.string().min(1),
   guestCount: z.number().min(1).default(1),
-}).refine((d) => new Date(d.checkOut) > new Date(d.checkIn), {
-  path: ['checkOut'],
-  message: 'checkout_before_checkin',
 });
 type FormData = z.infer<typeof schema>;
 
-export function CreateBookingForm({ listing }: Props) {
+// Booking widget for EXPERIENCE listings: a single date + number of people,
+// priced per person. Sends checkIn === checkOut (no date range).
+export function ExperienceBookingForm({ listing }: Props) {
   const t = useTranslations('booking');
   const tListings = useTranslations('listings');
   const formatPrice = useFormatPrice();
-  const priceSuffixKey = getPriceSuffixKey(listing, getListingKind(listing));
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+  const { register, handleSubmit, watch } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { guestCount: 1 },
   });
 
+  const guests = watch('guestCount') || 1;
+  const total = Number(listing.priceMin) * guests;
+
   const mutation = useMutation({
-    mutationFn: (data: FormData) => api.post('/bookings', { ...data, listingId: listing.id }),
+    mutationFn: (data: FormData) =>
+      api.post('/bookings', {
+        listingId: listing.id,
+        checkIn: data.date,
+        checkOut: data.date,
+        guestCount: data.guestCount,
+      }),
   });
 
   if (mutation.isSuccess) {
@@ -50,34 +55,25 @@ export function CreateBookingForm({ listing }: Props) {
   return (
     <form className={styles.form} onSubmit={handleSubmit((d) => mutation.mutate(d))}>
       <div className={styles.form__header}>
-        <div className={styles['form__header__price']}>
+        <div className={styles.form__header__price}>
           {formatPrice(listing.priceMin)}
-          {priceSuffixKey && <span> / {tListings(priceSuffixKey)}</span>}
+          <span> / {tListings('perPerson')}</span>
         </div>
-        {listing.reviewCount > 0 && (
-          <div className={styles['form__header__rating']}>
-            ★ {listing.rating?.toFixed(1)} · {listing.reviewCount} отзывов
-          </div>
-        )}
       </div>
 
-      <div className={styles.form__dates}>
-        <div className={styles['form__date-field']}>
-          <label>{t('checkIn')}</label>
-          <input type="date" {...register('checkIn')} />
-        </div>
-        <div className={styles['form__date-field']}>
-          <label>{t('checkOut')}</label>
-          <input type="date" {...register('checkOut')} />
-        </div>
+      <div className={styles.form__field}>
+        <label>{t('date')}</label>
+        <input type="date" {...register('date')} />
       </div>
-      {errors.checkOut && (
-        <span className={styles.form__error}>{t('errors.checkoutBeforeCheckin')}</span>
-      )}
 
       <div className={styles.form__field}>
         <label>{t('guests')}</label>
-        <input type="number" min={1} max={20} {...register('guestCount', { valueAsNumber: true })} />
+        <input type="number" min={1} max={50} {...register('guestCount', { valueAsNumber: true })} />
+      </div>
+
+      <div className={styles.form__total}>
+        <span>{t('totalPrice')}</span>
+        <span>{formatPrice(total)}</span>
       </div>
 
       {mutation.isError && (

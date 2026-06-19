@@ -61,7 +61,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage("chat:join")
-  handleJoin(@ConnectedSocket() client: Socket, @MessageBody() chatId: number) {
+  async handleJoin(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() chatId: number,
+  ) {
+    const userId: number = client.data.userId;
+    if (!(await this.chatService.isMember(Number(chatId), userId))) return;
     client.join(`chat:${chatId}`);
   }
 

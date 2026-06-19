@@ -1,0 +1,73 @@
+.form {
+  padding: $spacing-6;
+  @include flex-col;
+  gap: $spacing-4;
+
+  &__header {
+    padding-bottom: $spacing-4;
+    border-bottom: 1px solid $color-border-light;
+
+    &__price {
+      font-size: $font-size-2xl;
+      font-weight: 800;
+      color: $color-text-primary;
+      letter-spacing: -0.02em;
+
+      span {
+        font-size: $font-size-sm;
+        font-weight: 400;
+        color: $color-text-secondary;
+      }
+    }
+  }
+
+  &__field {
+    @include flex-col;
+    gap: $spacing-2;
+
+    label {
+      font-size: $font-size-sm;
+      font-weight: 600;
+      color: $color-text-primary;
+    }
+
+    input { @include input-base; }
+  }
+
+  &__total {
+    display: flex;
+    justify-content: space-between;
+    padding-top: $spacing-4;
+    border-top: 1px solid $color-border-light;
+    font-size: $font-size-base;
+
+    span:first-child { color: $color-text-secondary; }
+    span:last-child { font-weight: 700; color: $color-text-primary; }
+  }
+
+  &__error {
+    font-size: $font-size-xs;
+    color: $color-error;
+  }
+
+  &__btn {
+    @include btn-primary;
+    width: 100%;
+    padding: $spacing-4;
+    font-size: $font-size-md;
+    border-radius: $radius-lg;
+  }
+
+  &__success {
+    padding: $spacing-5;
+    background: $color-success-bg;
+    border-radius: $radius-lg;
+    text-align: center;
+
+    p {
+      font-size: $font-size-base;
+      font-weight: 600;
+      color: $color-success-text;
+    }
+  }
+}

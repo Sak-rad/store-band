@@ -1,5 +1,6 @@
 import { PrismaClient, UserRole } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { deriveListingKind } from '../src/modules/listings/listing-kind.util';
 
 const prisma = new PrismaClient();
 
@@ -60,7 +61,7 @@ async function main() {
       create: { name, slug, icon, nameI18n: { en: name, ru: nameRu }, parentId },
     });
 
-  const [apartments, villas] = await Promise.all([
+  const [apartments, villas, excursions, transport, services, food, healthcare, education] = await Promise.all([
     upsertCat('apartments', 'Apartments', 'Квартиры',    '🏢', realEstate.id),
     upsertCat('villas',     'Villas',     'Виллы',       '🏡', realEstate.id),
     upsertCat('excursions', 'Excursions', 'Экскурсии',   '🗺️'),
@@ -109,12 +110,12 @@ async function main() {
     apt_city:   ['1522708323590-d24dbb6b0267','1502672260266-1c1ef2d93688','1555041469-a586c61ea9bc'],
     apt_modern: ['1560347876-aeef00ee58a1','1484154218962-a197022b5858','1493809842364-78817add7ffb'],
     apt_luxury: ['1600596542815-ffad4c1539a9','1600585154526-990dced4db0d','1600210492493-0946911123ea'],
-    apt_cozy:   ['1586023492125-27b2c045efd7','1617098850374-9d0f80a89e8d','1524758631624-e2822132akca'],
+    apt_cozy:   ['1586023492125-27b2c045efd7','1493809842364-78817add7ffb','1484154218962-a197022b5858'],
     apt_beach:  ['1520250497591-112f2f40a3f4','1499793983690-e29da59ef1c2','1506929562872-bb421503ef21'],
-    villa_pool: ['1613490493576-12e4b8b77a06','1582268611958-ebfd161ef9cf','1540541338287-41700207dee6'],
+    villa_pool: ['1512917774080-9991f1c4c750','1582268611958-ebfd161ef9cf','1540541338287-41700207dee6'],
     villa_sea:  ['1512917774080-9991f1c4c750','1564013799919-ab600027ffc6','1510798831971-661eb04b3739'],
-    villa_garden: ['1537996194471-e657df975ab4','1565538810643-b5bdb714032a','1448630360428-65e5a19e6f92'],
-    dubai:      ['1512453979798-5ea266f8880c','1518684079-3c830dcef090','1560438188-1f9b7dc4f94a'],
+    villa_garden: ['1537996194471-e657df975ab4','1565538810643-b5bdb714032a','1510798831971-661eb04b3739'],
+    dubai:      ['1512453979798-5ea266f8880c','1518684079-3c830dcef090','1600596542815-ffad4c1539a9'],
   };
 
   const photoUrl = (id: string, w = 1200) =>
@@ -307,13 +308,249 @@ async function main() {
       isPublished: true, isFeatured: true,
       photos: PHOTOS.villa_sea,
     },
+
+    // ── EXPERIENCES — Excursions (price per person) ──────────────────────
+    {
+      titleI18n: { en: 'Phang Nga Bay & James Bond Island boat tour', ru: 'Тур на лодке в залив Пханг Нга и остров Джеймса Бонда' },
+      descriptionI18n: { en: 'Full-day longtail boat tour through the limestone karsts of Phang Nga Bay. Sea canoeing through hidden lagoons, lunch included, hotel pickup.', ru: 'Целодневный тур на традиционной лодке среди скал залива Пханг Нга. Каякинг по скрытым лагунам, обед включён, трансфер из отеля.' },
+      title: 'Phang Nga Bay & James Bond Island boat tour', description: 'Full-day longtail boat tour through the limestone karsts of Phang Nga Bay.',
+      priceMin: 65, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: phuket.id, countryId: thailand.id,
+      lat: 8.2742, lng: 98.5008, address: 'Phang Nga Bay, departs Phuket',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.villa_sea,
+    },
+    {
+      titleI18n: { en: 'Phi Phi Islands speedboat day trip', ru: 'Однодневный тур на острова Пхи-Пхи на катере' },
+      descriptionI18n: { en: 'Speedboat tour to the iconic Phi Phi Islands and Maya Bay. Snorkeling at Pileh Lagoon, Thai buffet lunch, national park guide.', ru: 'Тур на скоростном катере к знаменитым островам Пхи-Пхи и бухте Майя. Снорклинг в лагуне Пиле, тайский обед-буфет, гид.' },
+      title: 'Phi Phi Islands speedboat day trip', description: 'Speedboat tour to the iconic Phi Phi Islands and Maya Bay.',
+      priceMin: 80, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: phuket.id, countryId: thailand.id,
+      lat: 7.7407, lng: 98.7784, address: 'Phi Phi Islands, departs Phuket',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_beach,
+    },
+    {
+      titleI18n: { en: 'Coral Island snorkeling & beach tour', ru: 'Снорклинг и пляжный тур на Коралловый остров' },
+      descriptionI18n: { en: 'Half-day trip to Koh Larn (Coral Island) from Pattaya. Crystal-clear water, snorkeling gear, beach time, optional parasailing.', ru: 'Полудневная поездка на остров Ко Лан из Паттайи. Прозрачная вода, снаряжение для снорклинга, отдых на пляже, парасейлинг по желанию.' },
+      title: 'Coral Island snorkeling & beach tour', description: 'Half-day trip to Koh Larn (Coral Island) from Pattaya.',
+      priceMin: 45, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: pattaya.id, countryId: thailand.id,
+      lat: 12.9180, lng: 100.7820, address: 'Koh Larn, departs Pattaya',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.villa_pool,
+    },
+    {
+      titleI18n: { en: 'Dubai desert safari with BBQ dinner', ru: 'Сафари по пустыне Дубая с ужином-барбекю' },
+      descriptionI18n: { en: 'Evening desert safari with dune bashing, camel ride, sandboarding and live shows. BBQ dinner under the stars, hotel transfers included.', ru: 'Вечернее сафари по пустыне: катание по дюнам, верблюды, сэндбординг и шоу. Ужин-барбекю под звёздами, трансфер включён.' },
+      title: 'Dubai desert safari with BBQ dinner', description: 'Evening desert safari with dune bashing, camel ride and BBQ dinner.',
+      priceMin: 70, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: dubai.id, countryId: uae.id,
+      lat: 24.9180, lng: 55.4090, address: 'Al Marmoom Desert, Dubai',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.dubai,
+    },
+    {
+      titleI18n: { en: 'Burj Khalifa & Dubai city sightseeing tour', ru: 'Обзорный тур по Дубаю с Бурдж-Халифой' },
+      descriptionI18n: { en: 'Guided city tour covering Burj Khalifa (124th floor), Dubai Mall, Palm Jumeirah and the old souks. Air-conditioned van, English/Russian guide.', ru: 'Обзорный тур с гидом: Бурдж-Халифа (124 этаж), Dubai Mall, Пальма Джумейра и старые рынки. Автобус с кондиционером, гид EN/RU.' },
+      title: 'Burj Khalifa & Dubai city sightseeing tour', description: 'Guided city tour covering Burj Khalifa, Dubai Mall and Palm Jumeirah.',
+      priceMin: 55, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: dubai.id, countryId: uae.id,
+      lat: 25.1972, lng: 55.2744, address: 'Downtown Dubai, Dubai',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.dubai,
+    },
+    {
+      titleI18n: { en: 'Mekong Delta full-day tour', ru: 'Целодневный тур по дельте Меконга' },
+      descriptionI18n: { en: 'Full-day Mekong Delta tour from Saigon. Sampan boat ride, fruit orchards, coconut candy workshop, traditional lunch. English-speaking guide.', ru: 'Целодневный тур по дельте Меконга из Сайгона. Прогулка на сампане, фруктовые сады, мастерская кокосовых конфет, обед. Гид со знанием английского.' },
+      title: 'Mekong Delta full-day tour', description: 'Full-day Mekong Delta tour from Saigon with sampan boat ride and lunch.',
+      priceMin: 40, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: hcmc.id, countryId: vietnam.id,
+      lat: 10.3600, lng: 106.3600, address: 'My Tho, Mekong Delta — departs Ho Chi Minh City',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.apt_city,
+    },
+    {
+      titleI18n: { en: 'Cu Chi Tunnels half-day tour', ru: 'Полудневный тур по тоннелям Кучи' },
+      descriptionI18n: { en: 'Explore the legendary Cu Chi Tunnels network. Crawl through original tunnels, learn the wartime history, hotel pickup in District 1.', ru: 'Исследуйте легендарную сеть тоннелей Кучи. Спуск в настоящие тоннели, рассказ об истории войны, трансфер из района 1.' },
+      title: 'Cu Chi Tunnels half-day tour', description: 'Explore the legendary Cu Chi Tunnels with a local guide.',
+      priceMin: 30, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: hcmc.id, countryId: vietnam.id,
+      lat: 11.1430, lng: 106.4640, address: 'Cu Chi, departs Ho Chi Minh City',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_modern,
+    },
+    {
+      titleI18n: { en: 'Halong Bay luxury cruise day trip', ru: 'Дневной круиз по бухте Халонг' },
+      descriptionI18n: { en: 'Day cruise through the UNESCO World Heritage Halong Bay. Kayaking, cave visit, seafood lunch on board, round-trip transfer from Hanoi.', ru: 'Дневной круиз по бухте Халонг (наследие ЮНЕСКО). Каякинг, посещение пещеры, обед из морепродуктов на борту, трансфер из Ханоя.' },
+      title: 'Halong Bay luxury cruise day trip', description: 'Day cruise through UNESCO World Heritage Halong Bay with kayaking and lunch.',
+      priceMin: 95, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: hanoi.id, countryId: vietnam.id,
+      lat: 20.9101, lng: 107.1839, address: 'Halong Bay, departs Hanoi',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.villa_sea,
+    },
+    {
+      titleI18n: { en: 'Ba Na Hills & Golden Bridge tour', ru: 'Тур на Ба На Хиллс и Золотой мост' },
+      descriptionI18n: { en: 'Full-day tour to Ba Na Hills via the record-breaking cable car. The famous Golden Bridge, French Village, Fantasy Park, buffet lunch.', ru: 'Целодневный тур на Ба На Хиллс по рекордной канатной дороге. Знаменитый Золотой мост, Французская деревня, парк развлечений, обед-буфет.' },
+      title: 'Ba Na Hills & Golden Bridge tour', description: 'Full-day tour to Ba Na Hills and the famous Golden Bridge.',
+      priceMin: 60, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: danang.id, countryId: vietnam.id,
+      lat: 15.9977, lng: 107.9961, address: 'Ba Na Hills, Da Nang',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.villa_garden,
+    },
+    {
+      titleI18n: { en: 'Nha Trang island-hopping boat tour', ru: 'Тур по островам Нячанга на лодке' },
+      descriptionI18n: { en: 'Four-island boat tour off Nha Trang. Snorkeling over coral reefs, floating bar, fresh seafood lunch, beach stop at Bãi Tranh.', ru: 'Тур на лодке по четырём островам Нячанга. Снорклинг над коралловыми рифами, плавучий бар, обед из морепродуктов, остановка на пляже Бай Чань.' },
+      title: 'Nha Trang island-hopping boat tour', description: 'Four-island boat tour with snorkeling and fresh seafood lunch.',
+      priceMin: 35, currency: 'USD', listingType: 'service',
+      categoryId: excursions.id, cityId: nhaTrang.id, countryId: vietnam.id,
+      lat: 12.1900, lng: 109.2400, address: 'Nha Trang Bay, Nha Trang',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_beach,
+    },
+
+    // ── SERVICES — Transport / Relocation / Food / Health / Education ────
+    {
+      titleI18n: { en: 'Airport transfer & private driver', ru: 'Трансфер из аэропорта и личный водитель' },
+      descriptionI18n: { en: 'Reliable airport pickup and private driver service across Phuket. English-speaking driver, child seats on request, flight tracking.', ru: 'Надёжный трансфер из аэропорта и услуги личного водителя по Пхукету. Водитель со знанием английского, детские кресла по запросу, отслеживание рейса.' },
+      title: 'Airport transfer & private driver', description: 'Reliable airport pickup and private driver service across Phuket.',
+      priceMin: 35, currency: 'USD', listingType: 'service',
+      categoryId: transport.id, cityId: phuket.id, countryId: thailand.id,
+      lat: 8.1132, lng: 98.3170, address: 'Phuket International Airport, Phuket',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.apt_modern,
+    },
+    {
+      titleI18n: { en: 'Monthly scooter rental with delivery', ru: 'Аренда скутера на месяц с доставкой' },
+      descriptionI18n: { en: 'Well-maintained automatic scooters for monthly rental in Da Nang. Free delivery to your door, helmets, insurance, 24/7 roadside support.', ru: 'Исправные автоматические скутеры в аренду на месяц в Дананге. Бесплатная доставка к двери, шлемы, страховка, поддержка 24/7.' },
+      title: 'Monthly scooter rental with delivery', description: 'Well-maintained automatic scooters for monthly rental in Da Nang.',
+      priceMin: 80, currency: 'USD', listingType: 'service',
+      categoryId: transport.id, cityId: danang.id, countryId: vietnam.id,
+      lat: 16.0544, lng: 108.2022, address: 'Hai Chau District, Da Nang',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_cozy,
+    },
+    {
+      titleI18n: { en: 'Private car with driver — full day', ru: 'Автомобиль с водителем на весь день' },
+      descriptionI18n: { en: 'Full-day private car hire with professional chauffeur in Dubai. Luxury sedan or SUV, fuel and tolls included, flexible itinerary.', ru: 'Аренда автомобиля с профессиональным водителем на весь день в Дубае. Седан или внедорожник премиум-класса, топливо и платные дороги включены.' },
+      title: 'Private car with driver — full day', description: 'Full-day private car hire with professional chauffeur in Dubai.',
+      priceMin: 120, currency: 'USD', listingType: 'service',
+      categoryId: transport.id, cityId: dubai.id, countryId: uae.id,
+      lat: 25.2048, lng: 55.2708, address: 'Business Bay, Dubai',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.dubai,
+    },
+    {
+      titleI18n: { en: 'Visa run & immigration assistance', ru: 'Визаран и помощь с иммиграцией' },
+      descriptionI18n: { en: 'End-to-end visa run and immigration support in Thailand. Document prep, border-run logistics, 90-day reporting, extensions. Expats welcome.', ru: 'Полное сопровождение визарана и иммиграционных вопросов в Таиланде. Подготовка документов, логистика, 90-дневная отчётность, продление виз.' },
+      title: 'Visa run & immigration assistance', description: 'End-to-end visa run and immigration support in Thailand.',
+      priceMin: 150, currency: 'USD', listingType: 'service',
+      categoryId: services.id, cityId: pattaya.id, countryId: thailand.id,
+      lat: 12.9236, lng: 100.8825, address: 'Central Pattaya, Pattaya',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.apt_city,
+    },
+    {
+      titleI18n: { en: 'Relocation & paperwork concierge', ru: 'Консьерж по переезду и документам' },
+      descriptionI18n: { en: 'Personal relocation concierge in Dubai: residence visa, Emirates ID, bank account opening, utilities setup, school search. One point of contact.', ru: 'Персональный консьерж по переезду в Дубае: резидентская виза, Emirates ID, открытие счёта, подключение коммуналки, поиск школы. Один контакт на всё.' },
+      title: 'Relocation & paperwork concierge', description: 'Personal relocation concierge handling visa, Emirates ID and bank setup in Dubai.',
+      priceMin: 300, currency: 'USD', listingType: 'service',
+      categoryId: services.id, cityId: dubai.id, countryId: uae.id,
+      lat: 25.2048, lng: 55.2708, address: 'DIFC, Dubai',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.dubai,
+    },
+    {
+      titleI18n: { en: 'Apartment deep cleaning — monthly plan', ru: 'Генеральная уборка квартиры — помесячно' },
+      descriptionI18n: { en: 'Monthly apartment cleaning subscription in Ho Chi Minh City. Vetted staff, eco-friendly products, laundry and ironing add-ons available.', ru: 'Помесячная подписка на уборку квартиры в Хошимине. Проверенный персонал, эко-средства, стирка и глажка как доп. опции.' },
+      title: 'Apartment deep cleaning — monthly plan', description: 'Monthly apartment cleaning subscription in Ho Chi Minh City.',
+      priceMin: 90, currency: 'USD', listingType: 'service',
+      categoryId: services.id, cityId: hcmc.id, countryId: vietnam.id,
+      lat: 10.7769, lng: 106.7009, address: 'District 1, Ho Chi Minh City',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_modern,
+    },
+    {
+      titleI18n: { en: 'Healthy meal delivery — weekly plan', ru: 'Доставка здоровой еды — на неделю' },
+      descriptionI18n: { en: 'Chef-prepared healthy meal delivery in Da Nang. Balanced menus, vegetarian and keto options, delivered fresh daily to your apartment.', ru: 'Доставка здоровой еды от шефа в Дананге. Сбалансированное меню, вегетарианские и кето-опции, свежая доставка каждый день.' },
+      title: 'Healthy meal delivery — weekly plan', description: 'Chef-prepared healthy meal delivery in Da Nang with vegetarian and keto options.',
+      priceMin: 120, currency: 'USD', listingType: 'service',
+      categoryId: food.id, cityId: danang.id, countryId: vietnam.id,
+      lat: 16.0544, lng: 108.2472, address: 'My An Ward, Da Nang',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_cozy,
+    },
+    {
+      titleI18n: { en: 'Private chef at home — per event', ru: 'Частный шеф-повар на дом — за мероприятие' },
+      descriptionI18n: { en: 'Book a private chef for dinners and events in Phuket. Custom Thai or international menu, grocery shopping, cooking and cleanup included.', ru: 'Закажите частного шефа для ужинов и мероприятий на Пхукете. Меню на выбор — тайское или интернациональное, закупка продуктов, готовка и уборка включены.' },
+      title: 'Private chef at home — per event', description: 'Book a private chef for dinners and events in Phuket.',
+      priceMin: 200, currency: 'USD', listingType: 'service',
+      categoryId: food.id, cityId: phuket.id, countryId: thailand.id,
+      lat: 7.8804, lng: 98.3923, address: 'Phuket Town, Phuket',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.villa_garden,
+    },
+    {
+      titleI18n: { en: 'Expat health insurance consultation', ru: 'Консультация по медстраховке для экспатов' },
+      descriptionI18n: { en: 'Independent health insurance advisory for expats in the UAE. Compare international plans, claims support, renewals. No obligation first call.', ru: 'Независимая консультация по медицинскому страхованию для экспатов в ОАЭ. Сравнение международных планов, поддержка по выплатам, продление. Первый звонок без обязательств.' },
+      title: 'Expat health insurance consultation', description: 'Independent health insurance advisory for expats in the UAE.',
+      priceMin: 50, currency: 'USD', listingType: 'service',
+      categoryId: healthcare.id, cityId: dubai.id, countryId: uae.id,
+      lat: 25.2048, lng: 55.2708, address: 'Healthcare City, Dubai',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.apt_city,
+    },
+    {
+      titleI18n: { en: 'Clinic & telemedicine appointment booking', ru: 'Запись к врачу и телемедицина' },
+      descriptionI18n: { en: 'Concierge medical booking in Ho Chi Minh City. International clinics, English/Russian-speaking doctors, telemedicine, appointment escort.', ru: 'Консьерж-запись к врачу в Хошимине. Международные клиники, врачи со знанием английского/русского, телемедицина, сопровождение на приём.' },
+      title: 'Clinic & telemedicine appointment booking', description: 'Concierge medical booking with international clinics in Ho Chi Minh City.',
+      priceMin: 40, currency: 'USD', listingType: 'service',
+      categoryId: healthcare.id, cityId: hcmc.id, countryId: vietnam.id,
+      lat: 10.7829, lng: 106.6957, address: 'District 3, Ho Chi Minh City',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.apt_modern,
+    },
+    {
+      titleI18n: { en: 'Vietnamese language tutoring — monthly', ru: 'Репетитор вьетнамского языка — помесячно' },
+      descriptionI18n: { en: 'One-on-one Vietnamese lessons for expats in Hanoi. Flexible schedule, online or in person, beginner to conversational, 8 sessions/month.', ru: 'Индивидуальные уроки вьетнамского для экспатов в Ханое. Гибкий график, онлайн или очно, от новичка до разговорного, 8 занятий в месяц.' },
+      title: 'Vietnamese language tutoring — monthly', description: 'One-on-one Vietnamese lessons for expats in Hanoi, 8 sessions per month.',
+      priceMin: 180, currency: 'USD', listingType: 'service',
+      categoryId: education.id, cityId: hanoi.id, countryId: vietnam.id,
+      lat: 21.0278, lng: 105.8342, address: 'Ba Dinh District, Hanoi',
+      isPublished: true, isFeatured: true,
+      photos: PHOTOS.apt_city,
+    },
+    {
+      titleI18n: { en: 'International school placement advisory', ru: 'Консультация по подбору международной школы' },
+      descriptionI18n: { en: 'Expert advisory for placing your children in Dubai international schools. Shortlisting, applications, assessments prep, enrolment support.', ru: 'Экспертная помощь в устройстве детей в международные школы Дубая. Подбор, заявки, подготовка к тестам, сопровождение зачисления.' },
+      title: 'International school placement advisory', description: 'Expert advisory for placing your children in Dubai international schools.',
+      priceMin: 250, currency: 'USD', listingType: 'service',
+      categoryId: education.id, cityId: dubai.id, countryId: uae.id,
+      lat: 25.1110, lng: 55.1880, address: 'Jumeirah, Dubai',
+      isPublished: true, isFeatured: false,
+      photos: PHOTOS.dubai,
+    },
   ] as const;
+
+  const slugByCategoryId: Record<number, string> = {
+    [apartments.id]: apartments.slug,
+    [villas.id]: villas.slug,
+    [excursions.id]: excursions.slug,
+    [transport.id]: transport.slug,
+    [services.id]: services.slug,
+    [food.id]: food.slug,
+    [healthcare.id]: healthcare.slug,
+    [education.id]: education.slug,
+  };
 
   const createdListings: { id: number }[] = [];
   for (const { photos, ...listing } of listings) {
     const created = await prisma.listing.create({
       data: {
         ...listing,
+        kind: deriveListingKind(slugByCategoryId[listing.categoryId], listing.listingType),
         providerId: provider.id,
         media: { createMany: { data: mediaSet(photos as unknown as string[]) } },
       },
@@ -406,7 +643,7 @@ async function main() {
   console.log(`✅ Seed complete — ${listings.length} listings created`);
   console.log(`   Provider login: provider@meriloz.com / Admin1234!`);
   console.log(`   New cities: Nha Trang (VN), Phuket (TH), Pattaya (TH), Dubai (AE)`);
-  console.log(`   Categories: real-estate (parent) → apartments, villas`);
+  console.log(`   Verticals: real-estate (apartments/villas), experiences (excursions), services (transport/services/food/healthcare/education)`);
 }
 
 main()

@@ -48,16 +48,18 @@ export function parseSegments(
 }
 
 /**
- * Build a /listings/... path from active geo/filter values.
+ * Build a /<base>/... path from active geo/filter values.
  * Segment order: [country?, city?, category?, listingType?]
+ * `basePath` lets verticals (/real-estate, /services, …) reuse segment URLs.
  */
 export function buildListingsPath(
   filters: Pick<ListingFilters, 'country' | 'city' | 'category' | 'listingType'>,
+  basePath = '/listings',
 ): string {
   const segs: string[] = [];
   if (filters.country) segs.push(filters.country);
   if (filters.city && filters.country) segs.push(filters.city);
   if (filters.category) segs.push(filters.category);
   if (filters.listingType) segs.push(filters.listingType);
-  return segs.length ? `/listings/${segs.join('/')}` : '/listings';
+  return segs.length ? `${basePath}/${segs.join('/')}` : basePath;
 }

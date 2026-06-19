@@ -7,10 +7,11 @@ import Image from 'next/image';
 import { MapPin, Star, MessageCircle, BadgeCheck } from 'lucide-react';
 import { useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
-import { useCurrencyStore } from '../../../shared/store/currency.store';
-import { CreateBookingForm } from '@/features/create-booking/ui/CreateBookingForm';
+import { useFormatPrice } from '../../../shared/store/currency.store';
 import { PhotoSlider } from '@/entities/photo/ui/PhotoSlider';
 import { ReviewsSection } from '@/entities/review/ui/ReviewsSection';
+import { getListingKind, getPriceSuffixKey } from '../../../shared/lib/listing-kind';
+import { BookingPanel } from './BookingPanel';
 import styles from './ListingSheet.module.scss';
 
 interface Props {
@@ -21,7 +22,7 @@ interface Props {
 export function ListingSheet({ id, locale }: Props) {
   const router = useRouter();
   const t = useTranslations('listings');
-  const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const formatPrice = useFormatPrice();
   const scrollRef   = useRef<HTMLDivElement>(null);
   const reviewsRef  = useRef<HTMLElement>(null);
 
@@ -51,6 +52,8 @@ export function ListingSheet({ id, locale }: Props) {
   const locationStr = listing
     ? [listing.city?.name, listing.country?.name].filter(Boolean).join(', ')
     : '';
+  const kind = listing ? getListingKind(listing) : 'STAY';
+  const priceSuffixKey = listing ? getPriceSuffixKey(listing, kind) : null;
 
   const handleContact = async () => {
     if (!listing?.provider) return;
@@ -131,8 +134,15 @@ export function ListingSheet({ id, locale }: Props) {
                 </div>
 
                 <div className={styles.content__price}>
-                  <strong>{formatPrice(listing.priceMin)}</strong>
-                  <span> / {t('perMonth')}</span>
+                  {listing.priceOnRequest ? (
+                    <strong>{t('priceOnRequest')}</strong>
+                  ) : (
+                    <>
+                      {kind === 'SERVICE' && <span>{t('priceFrom')} </span>}
+                      <strong>{formatPrice(listing.priceMin)}</strong>
+                      {priceSuffixKey && <span> / {t(priceSuffixKey)}</span>}
+                    </>
+                  )}
                 </div>
 
                 <p className={styles.content__description}>{listing.description}</p>
@@ -173,7 +183,7 @@ export function ListingSheet({ id, locale }: Props) {
 
                 {/* Booking */}
                 <div className={styles.content__booking}>
-                  <CreateBookingForm listing={listing} />
+                  <BookingPanel listing={listing} />
                 </div>
 
                 <a href={`/${locale}/listing/${listing.id}`} className={styles.content__fullpage}>

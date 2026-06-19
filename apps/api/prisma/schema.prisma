@@ -27,6 +27,14 @@ enum ContextType {
   VEHICLE
 }
 
+// Behavioural archetype of a listing — drives pricing, booking flow and rendering.
+enum ListingKind {
+  STAY
+  SALE
+  EXPERIENCE
+  SERVICE
+}
+
 enum BookingStatus {
   PENDING
   CONFIRMED
@@ -188,6 +196,7 @@ model Listing {
   countryId            Int
   providerId           Int
   listingType          String    @default("rent")
+  kind                 ListingKind @default(SERVICE)
   isShortTermAvailable Boolean   @default(false)
   isPublished          Boolean   @default(false)
   isActive             Boolean   @default(true)

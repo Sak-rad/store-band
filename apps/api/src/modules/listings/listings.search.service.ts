@@ -49,6 +49,11 @@ export class ListingsSearchService {
     if (resolvedCityId) where.cityId = resolvedCityId;
     if (resolvedCategoryIds?.length) where.categoryId = { in: resolvedCategoryIds };
     else if (resolvedCategoryId) where.categoryId = resolvedCategoryId;
+    if (filter.kind) {
+      const kinds = filter.kind.split(',').map((k) => k.trim()).filter(Boolean);
+      if (kinds.length === 1) where.kind = kinds[0];
+      else if (kinds.length > 1) where.kind = { in: kinds };
+    }
     if (isFeatured !== undefined) where.isFeatured = isFeatured;
     // Filter by priceMin of the listing (always non-null) so we don't lose
     // listings that have priceMax = null (price on request / open range).

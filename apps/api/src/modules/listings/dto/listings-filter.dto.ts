@@ -7,6 +7,7 @@ export class ListingsFilterDto {
   @IsOptional() @IsString() city?: string;       // city slug
   @IsOptional() @Type(() => Number) @IsInt() categoryId?: number;
   @IsOptional() @IsString() category?: string;   // category slug → resolved to id in search service
+  @IsOptional() @IsString() kind?: string;        // comma-separated ListingKind values, e.g. "STAY,SALE"
   @IsOptional() @IsString() currency?: string;
   @IsOptional() @Type(() => Number) @IsNumber() priceMin?: number;
   @IsOptional() @Type(() => Number) @IsNumber() priceMax?: number;

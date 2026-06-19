@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Link } from "../../../navigation";
-import { useCurrencyStore } from "../../../shared/store/currency.store";
+import { useFormatPrice } from "../../../shared/store/currency.store";
 import styles from "./ListingCard.module.scss";
 
 interface Listing {
@@ -30,7 +30,7 @@ interface Props {
 
 export function ListingCard({ listing, priority }: Props) {
   const t = useTranslations("listings");
-  const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const formatPrice = useFormatPrice();
   const thumb = listing.media?.[0]?.thumbUrl || listing.media?.[0]?.url;
   const location = [listing.city?.name, listing.country?.name]
     .filter(Boolean)

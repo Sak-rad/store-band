@@ -1,0 +1,38 @@
+.card {
+  padding: $spacing-6;
+  @include flex-col;
+  gap: $spacing-4;
+
+  &__price {
+    font-size: $font-size-2xl;
+    font-weight: 800;
+    color: $color-text-primary;
+    letter-spacing: -0.02em;
+    padding-bottom: $spacing-4;
+    border-bottom: 1px solid $color-border-light;
+
+    span {
+      font-size: $font-size-sm;
+      font-weight: 400;
+      color: $color-text-secondary;
+    }
+  }
+
+  &__from {
+    font-size: $font-size-sm;
+    font-weight: 400;
+    color: $color-text-secondary;
+  }
+
+  &__btn {
+    @include btn-primary;
+    width: 100%;
+    padding: $spacing-4;
+    font-size: $font-size-md;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-2;
+  }
+}

@@ -8,6 +8,7 @@ import { FilterPanel } from '../../../../../features/listing-search/ui/FilterPan
 import { ListingGrid, type ListingsPage } from '../../../../../features/listing-search/ui/ListingGrid';
 import { apiServer } from '../../../../../shared/lib/api-server';
 import { parseSegments, buildListingsPath } from '../../../../../shared/lib/listing-segments';
+import { verticalForFilters } from '../../../../../shared/lib/verticals';
 import styles from '../listings.module.scss';
 
 async function fetchInitialListings(params: Record<string, string | undefined>): Promise<InfiniteData<ListingsPage, unknown> | undefined> {
@@ -101,7 +102,17 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   const { countryName, cityName } = await resolveLocation(filters.country, filters.city, locale);
   const { title, description } = buildPageText(t, filters, countryName, cityName);
 
-  const pageUrl = `${BASE_URL}/${locale}/${buildListingsPath(filters).slice(1)}`;
+  // A category/listingType refinement canonicalises onto its vertical (same geo,
+  // category dropped — mirrors VerticalCatalog) so the two routes don't compete.
+  // Pure-geo / unfiltered /listings stays self-canonical (cross-vertical catalog).
+  const vertical = verticalForFilters(filters);
+  const canonicalRel = vertical
+    ? [vertical.slug, filters.country, filters.city && filters.country ? filters.city : undefined]
+        .filter(Boolean)
+        .join('/')
+    : buildListingsPath(filters).slice(1);
+
+  const pageUrl = `${BASE_URL}/${locale}/${canonicalRel}`;
 
   return {
     title,
@@ -109,9 +120,9 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     alternates: {
       canonical: pageUrl,
       languages: {
-        en: `${BASE_URL}/en/${buildListingsPath(filters).slice(1)}`,
-        ru: `${BASE_URL}/ru/${buildListingsPath(filters).slice(1)}`,
-        'x-default': `${BASE_URL}/en/${buildListingsPath(filters).slice(1)}`,
+        en: `${BASE_URL}/en/${canonicalRel}`,
+        ru: `${BASE_URL}/ru/${canonicalRel}`,
+        'x-default': `${BASE_URL}/en/${canonicalRel}`,
       },
     },
     openGraph: {

@@ -15,8 +15,8 @@ export class ChatController {
   }
 
   @Get('chats/:id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.chatService.findOne(id);
+  findOne(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
+    return this.chatService.findOne(id, userId);
   }
 
   @Post('chats')
@@ -27,10 +27,11 @@ export class ChatController {
   @Get('chats/:id/messages')
   getMessages(
     @Param('id', ParseIntPipe) chatId: number,
+    @CurrentUser('id') userId: number,
     @Query('cursor') cursor?: string,
     @Query('limit') limit?: number,
   ) {
-    return this.chatService.getMessages(chatId, cursor ? parseInt(cursor, 10) : undefined, limit);
+    return this.chatService.getMessages(chatId, userId, cursor ? parseInt(cursor, 10) : undefined, limit);
   }
 
   @Post('messages')
@@ -39,7 +40,7 @@ export class ChatController {
   }
 
   @Patch('messages/:id/pin')
-  pinMessage(@Param('id', ParseIntPipe) id: number) {
-    return this.chatService.pinMessage(id);
+  pinMessage(@Param('id', ParseIntPipe) id: number, @CurrentUser('id') userId: number) {
+    return this.chatService.pinMessage(id, userId);
   }
 }

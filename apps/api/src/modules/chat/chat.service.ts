@@ -1,10 +1,23 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CreateChatDto } from './dto/create-chat.dto';
 
 @Injectable()
 export class ChatService {
   constructor(private prisma: PrismaService) {}
+
+  // A user belongs to a chat if they are the chat's user or the chat's provider owner.
+  async isMember(chatId: number, userId: number) {
+    const chat = await this.prisma.chat.findFirst({
+      where: { id: chatId, OR: [{ userId }, { provider: { userId } }] },
+      select: { id: true },
+    });
+    return !!chat;
+  }
+
+  private async assertMembership(chatId: number, userId: number) {
+    if (!(await this.isMember(chatId, userId))) throw new ForbiddenException();
+  }
 
   async findAll(userId: number) {
     return this.prisma.chat.findMany({
@@ -19,7 +32,8 @@ export class ChatService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: number, userId: number) {
+    await this.assertMembership(id, userId);
     const chat = await this.prisma.chat.findUnique({
       where: { id },
       include: {
@@ -69,7 +83,8 @@ export class ChatService {
     });
   }
 
-  async getMessages(chatId: number, cursor?: number, limit?: number) {
+  async getMessages(chatId: number, userId: number, cursor?: number, limit?: number) {
+    await this.assertMembership(chatId, userId);
     const take = Math.min(Number.isFinite(Number(limit)) ? Number(limit) : 50, 100);
     const messages = await this.prisma.message.findMany({
       where: { chatId },
@@ -94,6 +109,7 @@ export class ChatService {
     senderId: number,
     data: { chatId: number; text: string; replyToMessageId?: number },
   ) {
+    await this.assertMembership(data.chatId, senderId);
     const message = await this.prisma.message.create({
       data: {
         chatId: data.chatId,
@@ -118,6 +134,7 @@ export class ChatService {
   async markRead(messageId: number, userId: number) {
     const message = await this.prisma.message.findUnique({ where: { id: messageId } });
     if (!message) return;
+    await this.assertMembership(message.chatId, userId);
     if (message.readBy.includes(userId)) return;
     await this.prisma.message.update({
       where: { id: messageId },
@@ -125,7 +142,10 @@ export class ChatService {
     });
   }
 
-  async pinMessage(messageId: number) {
+  async pinMessage(messageId: number, userId: number) {
+    const message = await this.prisma.message.findUnique({ where: { id: messageId } });
+    if (!message) throw new NotFoundException();
+    await this.assertMembership(message.chatId, userId);
     return this.prisma.message.update({
       where: { id: messageId },
       data: { isPinned: true },

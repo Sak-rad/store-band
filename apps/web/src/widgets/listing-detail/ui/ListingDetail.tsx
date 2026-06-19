@@ -7,10 +7,11 @@ import Image from 'next/image';
 import { MapPin, Star, MessageCircle, BadgeCheck } from 'lucide-react';
 import { Link, useRouter } from '../../../navigation';
 import { api } from '../../../shared/lib/api';
-import { useCurrencyStore } from '../../../shared/store/currency.store';
-import { CreateBookingForm } from '@/features/create-booking/ui/CreateBookingForm';
+import { useFormatPrice } from '../../../shared/store/currency.store';
 import { PhotoSlider } from '@/entities/photo/ui/PhotoSlider';
 import { ReviewsSection } from '@/entities/review/ui/ReviewsSection';
+import { getListingKind, getPriceSuffixKey } from '../../../shared/lib/listing-kind';
+import { BookingPanel } from './BookingPanel';
 import styles from './ListingDetail.module.scss';
 
 interface Props {
@@ -22,7 +23,7 @@ export function ListingDetail({ id, locale }: Props) {
   const t = useTranslations('listings');
   const tCommon = useTranslations('common');
   const router = useRouter();
-  const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  const formatPrice = useFormatPrice();
   const reviewsRef = useRef<HTMLElement>(null);
 
   const scrollToReviews = () =>
@@ -37,6 +38,8 @@ export function ListingDetail({ id, locale }: Props) {
   if (!listing) return <p>{tCommon('error')}</p>;
 
   const locationStr = [listing.city?.name, listing.country?.name].filter(Boolean).join(', ');
+  const kind = getListingKind(listing);
+  const priceSuffixKey = getPriceSuffixKey(listing, kind);
 
   const handleContactProvider = () => {
     router.push(`/chats?providerId=${listing.provider?.id}&listingId=${listing.id}`);
@@ -101,10 +104,21 @@ export function ListingDetail({ id, locale }: Props) {
 
           {/* Price */}
           <div className={styles.detail__price}>
-            <span className={styles['detail__price__amount']}>
-              {formatPrice(listing.priceMin)}
-            </span>
-            <span className={styles['detail__price__period']}> / {t('perMonth')}</span>
+            {listing.priceOnRequest ? (
+              <span className={styles['detail__price__amount']}>{t('priceOnRequest')}</span>
+            ) : (
+              <>
+                {kind === 'SERVICE' && (
+                  <span className={styles['detail__price__period']}>{t('priceFrom')} </span>
+                )}
+                <span className={styles['detail__price__amount']}>
+                  {formatPrice(listing.priceMin)}
+                </span>
+                {priceSuffixKey && (
+                  <span className={styles['detail__price__period']}> / {t(priceSuffixKey)}</span>
+                )}
+              </>
+            )}
           </div>
 
           {/* Description */}
@@ -157,7 +171,7 @@ export function ListingDetail({ id, locale }: Props) {
 
         {/* Sidebar: booking panel */}
         <aside className={styles.detail__sidebar}>
-          <CreateBookingForm listing={listing} />
+          <BookingPanel listing={listing} />
         </aside>
       </div>
     </div>

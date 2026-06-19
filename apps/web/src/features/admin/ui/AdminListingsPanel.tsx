@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useAuthStore } from '../../../shared/store/auth.store';
 import { api } from '../../../shared/lib/api';
-import { useCurrencyStore } from '../../../shared/store/currency.store';
+import { useFormatPrice } from '../../../shared/store/currency.store';
 import { Link } from '../../../navigation';
 import { revalidatePWA } from '@/app/actions';
 import styles from './AdminListingsPanel.module.scss';
@@ -15,7 +15,7 @@ interface Props { locale: string }
 export function AdminListingsPanel({ locale }: Props) {
   const { user } = useAuthStore();
   const tCommon = useTranslations('common');
-  const formatPrice = useCurrencyStore(s => s.formatPrice);
+  const formatPrice = useFormatPrice();
   const qc = useQueryClient();
   const [actionId, setActionId] = useState<number | null>(null);
 
