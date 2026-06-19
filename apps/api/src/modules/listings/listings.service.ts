@@ -10,6 +10,7 @@ import { ListingsI18nService } from './listings.i18n.service';
 import { CreateListingDto } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { ListingsFilterDto } from './dto/listings-filter.dto';
+import { deriveListingKind } from './listing-kind.util';
 
 @Injectable()
 export class ListingsService {
@@ -73,12 +74,19 @@ export class ListingsService {
     const priceOnRequest = dto.priceOnRequest ?? false;
     const photos = dto.photoUrls ?? [];
 
+    const category = await this.prisma.category.findUnique({
+      where: { id: dto.categoryId },
+      select: { slug: true },
+    });
+    const kind = deriveListingKind(category?.slug, dto.listingType);
+
     return this.prisma.listing.create({
       data: {
         titleI18n: dto.titleI18n as any,
         descriptionI18n: dto.descriptionI18n as any,
         title: dto.titleI18n.en,
         description: dto.descriptionI18n.en,
+        kind,
         priceMin: priceOnRequest ? 0 : (dto.priceMin ?? 0),
         priceMax: dto.priceMax,
         priceOnRequest,

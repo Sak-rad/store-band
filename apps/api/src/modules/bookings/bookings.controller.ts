@@ -26,8 +26,13 @@ export class BookingsController {
   }
 
   @Patch(':id')
-  update(@Param('id', ParseIntPipe) id: number, @Body('status') status: string, @Req() req: Request) {
-    return this.bookingsService.update(id, status, (req as any).locale || 'en');
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('status') status: string,
+    @CurrentUser('id') userId: number,
+    @Req() req: Request,
+  ) {
+    return this.bookingsService.update(id, status, userId, (req as any).locale || 'en');
   }
 
   @Delete(':id')

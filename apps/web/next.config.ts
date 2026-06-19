@@ -33,6 +33,11 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
+    // Dev: skip server-side optimization so the browser loads source images
+    // directly. The local optimizer can't reach remote hosts (e.g. Unsplash)
+    // in some dev/sandboxed networks → /_next/image times out (504). Prod keeps
+    // optimization on.
+    unoptimized: process.env.NODE_ENV !== 'production',
     remotePatterns: [
       { protocol: 'https', hostname: '*.r2.cloudflarestorage.com' },
       { protocol: 'https', hostname: 'cdn.example.com' },

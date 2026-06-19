@@ -115,6 +115,10 @@
     "filterCity": "City",
     "perNight": "per night",
     "perMonth": "per month",
+    "perPerson": "per person",
+    "priceFrom": "from",
+    "priceOnRequest": "Price on request",
+    "requestViewing": "Request a viewing",
     "contactProvider": "Contact provider",
     "book": "Book now",
     "addToFavorites": "Save",
@@ -156,6 +160,7 @@
     "pageDescSuffix": "Find options in {location}.",
     "pageTitle": {
       "default": "Housing, services & local life abroad",
+      "real-estate": "Real estate abroad",
       "apartments": "Apartments for rent abroad",
       "villas": "Villas for rent abroad",
       "services": "Services & local help abroad",
@@ -170,6 +175,7 @@
     },
     "pageDesc": {
       "default": "Apartments, restaurants, doctors, schools and transport — everything you need abroad in one place. Verified providers, real reviews.",
+      "real-estate": "Rent and buy property abroad: apartments and villas. Real photos, reviews and direct contact with the owner.",
       "apartments": "Apartments for rent abroad — long-term and short-stay. Real photos, tenant reviews, direct contact with landlords.",
       "villas": "Villas for rent abroad. Pools, sea views, for families and groups. Verified owners.",
       "services": "Useful services for life abroad: legal help, delivery, language courses, medical care and more.",
@@ -193,6 +199,7 @@
     "replyTo": "Reply to"
   },
   "booking": {
+    "date": "Date",
     "checkIn": "Check-in",
     "checkOut": "Check-out",
     "guests": "Guests",
@@ -266,6 +273,9 @@
   "nav": {
     "home": "Home",
     "listings": "Listings",
+    "realEstate": "Real Estate",
+    "experiences": "Experiences",
+    "services": "Services",
     "chats": "Messages",
     "bookings": "Bookings",
     "favorites": "Saved",

@@ -31,9 +31,7 @@ function LazyAuthModal() {
 }
 
 function AppInit({ locale }: { locale: string }) {
-  const setDisplayCurrency = useCurrencyStore((s) => s.setDisplayCurrency);
   const setRate = useCurrencyStore((s) => s.setRate);
-  const userSet = useCurrencyStore((s) => s.userSet);
 
   useQuery({
     queryKey: ["currency-rates"],
@@ -47,10 +45,21 @@ function AppInit({ locale }: { locale: string }) {
   });
 
   useEffect(() => {
-    if (!userSet && locale === "ru") {
-      setDisplayCurrency("RUB");
+    // The RUB-for-ru default is a first-visit convenience only — a persisted
+    // user choice must always win. Run it *after* persist has hydrated and read
+    // fresh state; otherwise we'd act on the pre-hydration default
+    // (userSet=false) and clobber the saved currency on every reload.
+    const applyLocaleDefault = () => {
+      const { userSet, setDisplayCurrency } = useCurrencyStore.getState();
+      if (!userSet && locale === "ru") setDisplayCurrency("RUB");
+    };
+
+    if (useCurrencyStore.persist.hasHydrated()) {
+      applyLocaleDefault();
+      return;
     }
-  }, [locale, userSet, setDisplayCurrency]);
+    return useCurrencyStore.persist.onFinishHydration(applyLocaleDefault);
+  }, [locale]);
 
   return null;
 }

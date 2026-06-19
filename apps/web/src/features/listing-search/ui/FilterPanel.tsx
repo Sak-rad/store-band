@@ -20,14 +20,22 @@ const REAL_ESTATE_CHILDREN = ['apartments', 'villas'] as const;
 const LISTING_TYPES = ['rent', 'buy', 'short-term'] as const;
 const SERVICES = ['excursions', 'transport', 'services', 'food', 'healthcare', 'education'] as const;
 
-function extractSegments(pathname: string): string[] {
-  const match = pathname.match(/\/listings\/(.+)/);
+function extractSegments(pathname: string, basePath: string): string[] {
+  const escaped = basePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const match = pathname.match(new RegExp(`${escaped}/(.+)`));
   return match ? match[1].split('/').filter(Boolean) : [];
 }
 
 type Filters = ReturnType<typeof parseSegments>;
 
-export function FilterPanel() {
+interface FilterPanelProps {
+  /** Route the filter navigates within. Defaults to the shared /listings catalog. */
+  basePath?: string;
+  /** Restrict the category chips shown (e.g. a vertical). Undefined → show all. */
+  categories?: string[];
+}
+
+export function FilterPanel({ basePath = '/listings', categories }: FilterPanelProps = {}) {
   const t         = useTranslations('listings');
   const tC        = useTranslations('common');
   const router    = useRouter();
@@ -56,7 +64,7 @@ export function FilterPanel() {
   };
 
   // Filters from URL — source of truth for desktop
-  const urlFilters = parseSegments(extractSegments(pathname));
+  const urlFilters = parseSegments(extractSegments(pathname, basePath));
 
   // Pending filters — used while mobile sheet is open (no navigation until Apply)
   const [pending, setPending] = useState<Filters>(urlFilters);
@@ -67,7 +75,7 @@ export function FilterPanel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, mobileOpen]);
 
-  const hasFilters = extractSegments(pathname).length > 0 || searchParams.toString().length > 0;
+  const hasFilters = extractSegments(pathname, basePath).length > 0 || searchParams.toString().length > 0;
 
   const relevantCountry = mobileOpen ? pending.country : urlFilters.country;
 
@@ -86,7 +94,7 @@ export function FilterPanel() {
 
   // Desktop navigates immediately; mobile updates pending only
   const applyFilters = (updated: Filters) => {
-    const path = buildListingsPath(updated);
+    const path = buildListingsPath(updated, basePath);
     const qs   = searchParams.toString();
     router.push(qs ? `${path}?${qs}` : path);
   };
@@ -112,12 +120,12 @@ export function FilterPanel() {
   const closeSheet = () => setMobileOpen(false);
 
   const clearAll = () => {
-    router.push('/listings');
+    router.push(basePath);
     setMobileOpen(false);
   };
 
   const applyPrice = (key: 'priceMin' | 'priceMax', value: string) => {
-    const path   = buildListingsPath(urlFilters);
+    const path   = buildListingsPath(urlFilters, basePath);
     const qs     = new URLSearchParams(searchParams.toString());
     const usdVal = toUsd(value);
     if (usdVal) qs.set(key, usdVal); else qs.delete(key);
@@ -127,6 +135,10 @@ export function FilterPanel() {
   // Which filters to display in the sheet
   const display = mobileOpen ? pending : urlFilters;
   const isRealEstate = display.category === REAL_ESTATE_PARENT || REAL_ESTATE_CHILDREN.includes(display.category as any);
+
+  // Category scoping: a vertical exposes only its own chips; /listings shows all.
+  const showRealEstate = !categories || [REAL_ESTATE_PARENT, ...REAL_ESTATE_CHILDREN].some(s => categories.includes(s));
+  const services = categories ? SERVICES.filter(s => categories.includes(s)) : [...SERVICES];
 
   const filterContent = (
     <div className={styles.filter}>
@@ -162,57 +174,61 @@ export function FilterPanel() {
       </div>
 
       {/* ── Real Estate ─────────────────────────────── */}
-      <div className={styles.filter__section}>
-        <p className={styles.filter__section__label}>{t('realEstate')}</p>
-        <div className={styles.filter__chips}>
-          {/* Parent chip: shows both apartments + villas */}
-          <button
-            className={`${styles.filter__chip} ${display.category === REAL_ESTATE_PARENT ? styles['filter__chip--active'] : ''}`}
-            onClick={() => updateFilter({ category: display.category === REAL_ESTATE_PARENT ? undefined : REAL_ESTATE_PARENT, listingType: undefined })}
-          >
-            {t('categories.real-estate')}
-          </button>
-          {/* Child chips: apartments / villas */}
-          {REAL_ESTATE_CHILDREN.map(slug => (
+      {showRealEstate && (
+        <div className={styles.filter__section}>
+          <p className={styles.filter__section__label}>{t('realEstate')}</p>
+          <div className={styles.filter__chips}>
+            {/* Parent chip: shows both apartments + villas */}
             <button
-              key={slug}
-              className={`${styles.filter__chip} ${display.category === slug ? styles['filter__chip--active'] : ''}`}
-              onClick={() => updateFilter({ category: display.category === slug ? undefined : slug })}
+              className={`${styles.filter__chip} ${display.category === REAL_ESTATE_PARENT ? styles['filter__chip--active'] : ''}`}
+              onClick={() => updateFilter({ category: display.category === REAL_ESTATE_PARENT ? undefined : REAL_ESTATE_PARENT, listingType: undefined })}
             >
-              {t(`categories.${slug}`)}
+              {t('categories.real-estate')}
             </button>
-          ))}
-        </div>
-        {isRealEstate && (
-          <div className={styles.filter__subrow}>
-            {LISTING_TYPES.map(type => (
+            {/* Child chips: apartments / villas */}
+            {REAL_ESTATE_CHILDREN.map(slug => (
               <button
-                key={type}
-                className={`${styles.filter__chip} ${styles['filter__chip--sm']} ${display.listingType === type ? styles['filter__chip--active'] : ''}`}
-                onClick={() => updateFilter({ listingType: display.listingType === type ? undefined : type })}
+                key={slug}
+                className={`${styles.filter__chip} ${display.category === slug ? styles['filter__chip--active'] : ''}`}
+                onClick={() => updateFilter({ category: display.category === slug ? undefined : slug })}
               >
-                {t(`listingType.${type}`)}
+                {t(`categories.${slug}`)}
               </button>
             ))}
           </div>
-        )}
-      </div>
+          {isRealEstate && (
+            <div className={styles.filter__subrow}>
+              {LISTING_TYPES.map(type => (
+                <button
+                  key={type}
+                  className={`${styles.filter__chip} ${styles['filter__chip--sm']} ${display.listingType === type ? styles['filter__chip--active'] : ''}`}
+                  onClick={() => updateFilter({ listingType: display.listingType === type ? undefined : type })}
+                >
+                  {t(`listingType.${type}`)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* ── Services ────────────────────────────────── */}
-      <div className={styles.filter__section}>
-        <p className={styles.filter__section__label}>{t('services')}</p>
-        <div className={styles.filter__chips}>
-          {SERVICES.map(slug => (
-            <button
-              key={slug}
-              className={`${styles.filter__chip} ${display.category === slug ? styles['filter__chip--active'] : ''}`}
-              onClick={() => updateFilter({ category: display.category === slug ? undefined : slug })}
-            >
-              {t(`categories.${slug}`)}
-            </button>
-          ))}
+      {services.length > 0 && (
+        <div className={styles.filter__section}>
+          <p className={styles.filter__section__label}>{t('services')}</p>
+          <div className={styles.filter__chips}>
+            {services.map(slug => (
+              <button
+                key={slug}
+                className={`${styles.filter__chip} ${display.category === slug ? styles['filter__chip--active'] : ''}`}
+                onClick={() => updateFilter({ category: display.category === slug ? undefined : slug })}
+              >
+                {t(`categories.${slug}`)}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Price ───────────────────────────────────── */}
       <div className={styles.filter__section}>

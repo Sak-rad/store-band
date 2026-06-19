@@ -5,7 +5,11 @@ import { useRouter } from '../../../navigation';
 import { useState } from 'react';
 import styles from './SearchBar.module.scss';
 
-export function SearchBar() {
+interface Props {
+  basePath?: string;
+}
+
+export function SearchBar({ basePath = '/listings' }: Props) {
   const t = useTranslations('listings');
   const tC = useTranslations('common');
   const router = useRouter();
@@ -15,7 +19,8 @@ export function SearchBar() {
     e.preventDefault();
     const params = new URLSearchParams();
     if (query.trim()) params.set('q', query.trim());
-    router.push(`/listings?${params.toString()}`);
+    const qs = params.toString();
+    router.push(qs ? `${basePath}?${qs}` : basePath);
   };
 
   return (

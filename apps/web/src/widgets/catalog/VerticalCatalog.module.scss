@@ -1,0 +1,61 @@
+.page {
+  flex: 1;
+
+  &__search {
+    width: 100%;
+  }
+
+  &__body {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-8 $spacing-6;
+    display: grid;
+    grid-template-columns: $sidebar-width 1fr;
+    gap: $spacing-8;
+    align-items: start;
+
+    @include below(lg) {
+      grid-template-columns: 1fr;
+      padding: $spacing-6 $spacing-4;
+      gap: 0;
+    }
+
+    @include below(sm) {
+      padding: $spacing-4;
+    }
+  }
+
+  // Desktop: sticky sidebar. Mobile: hidden (filter opens as bottom sheet)
+  &__sidebar {
+    position: sticky;
+    top: calc($header-height + $spacing-4);
+
+    @include below(lg) {
+      display: none;
+    }
+  }
+
+  &__main {
+    min-width: 0;
+    @include flex-col;
+    gap: $spacing-4;
+  }
+
+  // Mobile filter trigger bar shown above the grid
+  &__mobile_filter {
+    display: none;
+    align-items: center;
+    gap: $spacing-3;
+
+    @include below(lg) {
+      display: flex;
+    }
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: $color-text-primary;
+  }
+}

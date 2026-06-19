@@ -10,12 +10,11 @@ interface CurrencyState {
   setDisplayCurrency: (c: DisplayCurrency) => void;
   setRate: (rate: number) => void;
   toggle: () => void;
-  formatPrice: (usdAmount: number | string) => string;
 }
 
 export const useCurrencyStore = create<CurrencyState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       displayCurrency: "USD",
       usdToRub: 90,
       userSet: false,
@@ -27,17 +26,29 @@ export const useCurrencyStore = create<CurrencyState>()(
           displayCurrency: s.displayCurrency === "USD" ? "RUB" : "USD",
           userSet: true,
         })),
-
-      formatPrice: (usdAmount) => {
-        const { displayCurrency, usdToRub } = get();
-        const num = Number(usdAmount);
-        if (isNaN(num)) return "—";
-        if (displayCurrency === "RUB") {
-          return `${Math.round(num * usdToRub).toLocaleString("ru-RU")} ₽`;
-        }
-        return `$${num.toLocaleString("en-US")}`;
-      },
     }),
     { name: "currency-v1" },
   ),
 );
+
+const format = (
+  usdAmount: number | string,
+  displayCurrency: DisplayCurrency,
+  usdToRub: number,
+): string => {
+  const num = Number(usdAmount);
+  if (isNaN(num)) return "—";
+  if (displayCurrency === "RUB") {
+    return `${Math.round(num * usdToRub).toLocaleString("ru-RU")} ₽`;
+  }
+  return `$${num.toLocaleString("en-US")}`;
+};
+
+// Reactive formatter: subscribes to currency + rate so consuming components
+// re-render the moment the user toggles currency. (A store method reading
+// get() is a stable reference and would NOT trigger a re-render.)
+export function useFormatPrice() {
+  const displayCurrency = useCurrencyStore((s) => s.displayCurrency);
+  const usdToRub = useCurrencyStore((s) => s.usdToRub);
+  return (usdAmount: number | string) => format(usdAmount, displayCurrency, usdToRub);
+}
