@@ -8,7 +8,6 @@ const intlMiddleware = createMiddleware({
   localePrefix: 'always',
 });
 
-// ── Basic Auth (staging protection) ───────────────────────────────────────────
 function basicAuth(req: NextRequest): NextResponse | null {
   const password = process.env.BASIC_AUTH_PASSWORD;
   if (!password) return null;
